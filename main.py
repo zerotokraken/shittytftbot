@@ -7,6 +7,7 @@ import json
 from datetime import timedelta
 from io import BytesIO
 from PIL import Image
+import boto3
 import asyncio
 
 # Set up the bot with a command prefix
@@ -47,6 +48,19 @@ SHOP_ODDS = {
     9: [15, 20, 25, 30, 10],
     10: [5, 10, 20, 40, 25]
 }
+
+def get_secret(secret_name):
+    # Create a Secrets Manager client
+    client = boto3.client('secretsmanager')
+
+    try:
+        # Get the secret value
+        response = client.get_secret_value(SecretId=secret_name)
+        secret = response['SecretString']
+        return json.loads(secret)  # Convert the secret string to a dictionary
+    except Exception as e:
+        print(f"Error retrieving secret {secret_name}: {e}")
+        return None
 
 @bot.event
 async def on_ready():
@@ -214,6 +228,75 @@ async def roll(ctx, level: int = 5):
     else:
         print("No images available to display.")
 
+# Define the lookup command
+@bot.command(help="Lookup a player by name and tagline (format: name#tagline)")
+async def lookup(ctx, player: str):
+    try:
+        # Split the player argument into gameName and tagLine
+        gameName, tagLine = player.split('#')
+
+        # Define the regions
+        account_regions = ["americas", "asia", "europe"]
+        summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2",
+                            "th2", "tr1", "tw2", "vn2"]
+
+        # Try each account region to get puuid
+        puuid = None
+        for region in account_regions:
+            api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}?api_key={APIKEY}"
+            response = requests.get(api_url)
+            if response.status_code == 200:
+                player_data = response.json()
+                puuid = player_data['puuid']
+                break
+        if not puuid:
+            print("Failed to lookup player in all account regions.")
+            return
+
+        # Try each summoner region to get summonerId
+        summoner_id = None
+        for region in summoner_regions:
+            summoner_url = f"https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={APIKEY}"
+            summoner_response = requests.get(summoner_url)
+            if summoner_response.status_code == 200:
+                summoner_data = summoner_response.json()
+                summoner_id = summoner_data['id']
+                break
+
+        if not summoner_id:
+            print("Failed to get summoner data in all summoner regions.")
+            return
+
+        # Try each summoner region to get league data
+        league_data = None
+        for region in summoner_regions:
+            league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={APIKEY}"
+            league_response = requests.get(league_url)
+            if league_response.status_code == 200:
+                league_data = league_response.json()
+                if league_data:
+                    break
+
+        if not league_data:
+            print("Failed to get league data in all summoner regions.")
+            return
+
+        # Extract the required data
+        tier = league_data[0]['tier']
+        rank = league_data[0]['rank']
+        league_points = league_data[0]['leaguePoints']
+        wins = league_data[0]['wins']
+        losses = league_data[0]['losses']
+        total_games = wins + losses
+
+        # Format the output message
+        message = f"{gameName} is {tier} {rank} {league_points} LP with {total_games} games played."
+        await ctx.send(message)
+
+    except ValueError:
+        print("Invalid format. Please use the format: name#tagline")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 # Command to post a random message from the specific channel
 @bot.command()
@@ -234,6 +317,10 @@ async def malding(ctx):
 async def on_message(message):
     # Main match parameter
     main_match = 'shitty tft bot'
+    alternate_spellings = [
+        'shittytftbot', 'shittytft', 'shittytftbotapp', 'shittytftb0t',  # Add more as needed
+        'shittytftbotapp'  # Example variation
+    ]
 
     # Lists of context words
     positive_words = [
@@ -249,7 +336,7 @@ async def on_message(message):
         'trash', 'stupid', 'dumb', 'idiot', 'clown', 'noob', 'pathetic', 'disappointing', 'disgrace', 'annoying',
         'loser', 'lame', 'abysmal', 'horrid', 'dreadful', 'shameful', 'atrocious', 'horrible', 'inferior', 'subpar',
         'crap', 'sucky', 'terrible', 'unsatisfactory', 'miserable', 'awful', 'dismal', 'poor', 'unpleasant',
-        'disastrous'
+        'disastrous', 'flame'
     ]
 
     greeting_words = [
@@ -332,17 +419,17 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Check if the bot is mentioned or the bot's name is in the message
-    if bot.user.mention in message.content or main_match in message.content.lower():
+    if bot.user.mention in message.content or main_match in message.content.lower() or any(
+            alt in message.content.lower() for alt in alternate_spellings):
         # Lowercase the full message
         message_content = message.content.lower()
 
         # Determine context (positive, negative, neutral, greeting)
         context = 'neutral'
-        if any(word in message_content for word in positive_words):
-            context = 'positive'
-        elif any(word in message_content for word in negative_words):
+        if any(word in message_content for word in negative_words):
             context = 'negative'
+        elif any(word in message_content for word in positive_words):
+            context = 'positive'
         elif any(word in message_content for word in greeting_words):
             context = 'greeting'
 
@@ -648,7 +735,16 @@ async def shittycommands(ctx):
     response = '\n'.join(command_names) or 'No commands available.'
     await ctx.send(f'Available commands:\n{response}')
 
+# Retrieve botkey and riotapikey from AWS Secrets Manager
+bot_secret = get_secret("botkey")
+riot_api_key = get_secret("riotapikey")
+
+# Access the keys
+if bot_secret:
+    bot_key = bot_secret.get("botkey")
+if riot_api_key:
+    apikey = riot_api_key.get("riotapikey")
 
 # Run the bot using your token
-bot.run('')
+bot.run(bot_key)
 
