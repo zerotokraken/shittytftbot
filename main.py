@@ -659,7 +659,6 @@ async def socks(ctx):
     await ctx.send(
         "stats say ur eif, but im pretty sure the stats also dont account for people that are not 6 bastion experts")
 
-
 @bot.command()
 async def hero(ctx):
     await ctx.send("these hero augments are not fucking balanced man")

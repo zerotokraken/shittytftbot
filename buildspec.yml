@@ -10,7 +10,12 @@ phases:
 
   pre_build:
     commands:
-      - echo "Running pre-build commands"
+      - echo "Retrieving secrets from AWS Secrets Manager"
+      - |
+        export SECRETS=$(aws secretsmanager get-secret-value --secret-id mysecrets --query SecretString --output text)
+        export BOT_KEY=$(echo $SECRETS | jq -r '.botkey')
+        export RIOT_API_KEY=$(echo $SECRETS | jq -r '.riotapikey')
+      - echo "Secrets retrieved and environment variables set"
 
   build:
     commands:
@@ -25,11 +30,6 @@ phases:
 artifacts:
   files:
     - '**/*'  # Specify the files you want to include in the build artifacts, if needed
-
-env:
-  secrets-manager:
-    botkey: botkey
-    riotapikey: riotapikey
 
 cache:
   paths:
