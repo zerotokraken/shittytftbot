@@ -10,12 +10,7 @@ phases:
 
   pre_build:
     commands:
-      - echo "Retrieving secrets from AWS Secrets Manager"
-      - |
-        export SECRETS=$(aws secretsmanager get-secret-value --secret-id mysecrets --query SecretString --output text)
-        export BOT_KEY=$(echo $SECRETS | jq -r '.botkey')
-        export RIOT_API_KEY=$(echo $SECRETS | jq -r '.riotapikey')
-      - echo "Secrets retrieved and environment variables set"
+      - echo "Running pre-build commands"
 
   build:
     commands:

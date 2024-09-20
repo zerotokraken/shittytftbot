@@ -8,6 +8,7 @@ from datetime import timedelta
 from io import BytesIO
 from PIL import Image
 import boto3
+from botocore.exceptions import ClientError
 import asyncio
 
 # Set up the bot with a command prefix
@@ -49,18 +50,30 @@ SHOP_ODDS = {
     10: [5, 10, 20, 40, 25]
 }
 
-def get_secret(secret_name):
+def get_secret():
+    secret_name = "mysecrets"
+    region_name = "us-east-2"
+
     # Create a Secrets Manager client
-    client = boto3.client('secretsmanager')
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
 
     try:
-        # Get the secret value
-        response = client.get_secret_value(SecretId=secret_name)
-        secret = response['SecretString']
-        return json.loads(secret)  # Convert the secret string to a dictionary
-    except Exception as e:
-        print(f"Error retrieving secret {secret_name}: {e}")
-        return None
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    secret = get_secret_value_response['SecretString']
+    secrets = json.loads(secret)
+
+    return secrets
 
 @bot.event
 async def on_ready():
@@ -734,15 +747,9 @@ async def shittycommands(ctx):
     response = '\n'.join(command_names) or 'No commands available.'
     await ctx.send(f'Available commands:\n{response}')
 
-# Retrieve botkey and riotapikey from AWS Secrets Manager
-bot_secret = get_secret("botkey")
-riot_api_key = get_secret("riotapikey")
-
-# Access the keys
-if bot_secret:
-    bot_key = bot_secret.get("botkey")
-if riot_api_key:
-    apikey = riot_api_key.get("riotapikey")
+secrets = get_secret()
+botkey = secrets['botkey']
+APIKEY = secrets['riotapikey']
 
 # Run the bot using your token
 bot.run(bot_key)
