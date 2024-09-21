@@ -15,7 +15,7 @@ phases:
   build:
     commands:
       - echo "Building the application"
-      - python main.py
+      - python main.py  # Make sure your code accesses environment variables for the keys
 
   post_build:
     commands:
@@ -24,6 +24,11 @@ phases:
 artifacts:
   files:
     - '**/*'
+
+env:
+  variables:
+    botkey: $botkey
+    riotapikey: $riotapikey
 
 cache:
   paths:

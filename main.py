@@ -7,8 +7,7 @@ import json
 from datetime import timedelta
 from io import BytesIO
 from PIL import Image
-import boto3
-from botocore.exceptions import ClientError
+import os
 import asyncio
 
 # Set up the bot with a command prefix
@@ -750,10 +749,8 @@ async def shittycommands(ctx):
     response = '\n'.join(command_names) or 'No commands available.'
     await ctx.send(f'Available commands:\n{response}')
 
-secrets = get_secret()
-botkey = secrets.get('botkey')
-APIKEY = secrets.get('riotapikey')
-
+botkey = os.getenv('botkey')
+APIKEY = os.getenv('riotapikey')
 # Run the bot using your token
 bot.run(bot_key)
 
