@@ -49,34 +49,6 @@ SHOP_ODDS = {
     10: [5, 10, 20, 40, 25]
 }
 
-
-def get_secret():
-    secret_name = "mysecrets"
-    region_name = "us-east-2"
-
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-
-    try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-    except ClientError as e:
-        print(f"Error retrieving secret: {e}")
-        raise e
-
-    # Extract the secret string
-    secret_string = get_secret_value_response['SecretString']
-
-    # Parse the JSON string into a Python dictionary
-    secrets = json.loads(secret_string)
-
-    return secrets
-
 @bot.event
 async def on_ready():
     global GUILD_ID, CHANNEL_ID
