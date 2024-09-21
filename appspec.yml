@@ -1,0 +1,9 @@
+version: 0.0
+Resources:
+  - LambdaFunction:
+      FunctionName: ShittyTFTBotFunction  # Replace with your actual Lambda function name
+      Alias: live  # Alias to use, update as necessary
+Hooks:
+  BeforeAllowTraffic:
+    - location: scripts/run_main.py
+      timeout: 300
