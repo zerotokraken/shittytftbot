@@ -27,8 +27,8 @@ artifacts:
 
 env:
   secrets-manager:
-    botkey: mysecrets
-    riotapikey: mysecrets
+    botkey: mysecrets:botkey  # Specify the key within the secret
+    riotapikey: mysecrets:riotapikey  # Specify the key within the secret
 
 cache:
   paths:
