@@ -25,11 +25,6 @@ artifacts:
   files:
     - '**/*'
 
-env:
-  secrets-manager:
-    botkey: mysecrets:botkey  # Specify the key within the secret
-    riotapikey: mysecrets:riotapikey  # Specify the key within the secret
-
 cache:
   paths:
     - '/root/.cache/pip'
