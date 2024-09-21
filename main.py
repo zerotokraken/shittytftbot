@@ -50,6 +50,7 @@ SHOP_ODDS = {
     10: [5, 10, 20, 40, 25]
 }
 
+
 def get_secret():
     secret_name = "mysecrets"
     region_name = "us-east-2"
@@ -66,12 +67,14 @@ def get_secret():
             SecretId=secret_name
         )
     except ClientError as e:
-        # For a list of exceptions thrown, see
-        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        print(f"Error retrieving secret: {e}")
         raise e
 
-    secret = get_secret_value_response['mysecrets']
-    secrets = json.loads(secret)
+    # Extract the secret string
+    secret_string = get_secret_value_response['SecretString']
+
+    # Parse the JSON string into a Python dictionary
+    secrets = json.loads(secret_string)
 
     return secrets
 
@@ -748,8 +751,8 @@ async def shittycommands(ctx):
     await ctx.send(f'Available commands:\n{response}')
 
 secrets = get_secret()
-botkey = secrets['botkey']
-APIKEY = secrets['riotapikey']
+botkey = secrets.get('botkey')
+APIKEY = secrets.get('riotapikey')
 
 # Run the bot using your token
 bot.run(bot_key)
