@@ -3,15 +3,10 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.9 # Specify your Python version
+      python: 3.9
     commands:
       - pip install --upgrade pip
-      - pip install -r requirements.txt  # Install dependencies from requirements.txt
-
-env:
-  secrets-manager:
-    botkey: mysecrets
-    riotapikey: mysecrets
+      - pip install -r requirements.txt
 
   pre_build:
     commands:
@@ -20,8 +15,7 @@ env:
   build:
     commands:
       - echo "Building the application"
-      # Add any additional build steps here (e.g., linting, testing)
-      - python main.py  # Start the Python app (optional)
+      - python main.py
 
   post_build:
     commands:
@@ -29,7 +23,12 @@ env:
 
 artifacts:
   files:
-    - '**/*'  # Specify the files you want to include in the build artifacts, if needed
+    - '**/*'
+
+env:
+  secrets-manager:
+    botkey: mysecrets
+    riotapikey: mysecrets
 
 cache:
   paths:
