@@ -220,19 +220,10 @@ async def roll(ctx, level: int = 5):
 @bot.command(help="Lookup a player by name and tagline (format: name#tagline)")
 async def lookup(ctx, player: str):
     try:
-        # Strip any extra spaces and split the player argument into gameName and tagLine
-        player = player.strip()
-        if '#' not in player:
-            await ctx.send("Invalid format. Please use the format: name#tagline")
-            return
+        # Split the player argument into gameName and tagLine
+        gameName, tagLine = player.split('#')
 
-        gameName, tagLine = player.split('#', 1)
-
-        # Strip any extra spaces but encode the gameName
-        gameName = gameName.strip()
-        tagLine = tagLine.strip()
-
-        # URL encode the gameName to handle spaces and special characters
+        # Encode the gameName to handle spaces and special characters
         encoded_gameName = urllib.parse.quote(gameName)
 
         # Define the regions
@@ -245,14 +236,13 @@ async def lookup(ctx, player: str):
         for region in account_regions:
             api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={APIKEY}"
             response = requests.get(api_url)
-            print(f"Request URL: {api_url}")  # Debugging line
-            print(f"Response: {response.status_code} - {response.text}")  # Debugging line
+            print(api_url, "\n", response.text)
             if response.status_code == 200:
                 player_data = response.json()
-                puuid = player_data.get('puuid')
+                puuid = player_data['puuid']
                 break
         if not puuid:
-            await ctx.send("Failed to lookup player in all account regions.")
+            print("Failed to lookup player in all account regions.")
             return
 
         # Try each summoner region to get summonerId
@@ -260,15 +250,14 @@ async def lookup(ctx, player: str):
         for region in summoner_regions:
             summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={APIKEY}"
             summoner_response = requests.get(summoner_url)
-            print(f"Request URL: {summoner_url}")  # Debugging line
-            print(f"Response: {summoner_response.status_code} - {summoner_response.text}")  # Debugging line
+            print(summoner_url, "\n", summoner_response)
             if summoner_response.status_code == 200:
                 summoner_data = summoner_response.json()
-                summoner_id = summoner_data.get('id')
+                summoner_id = summoner_data['id']
                 break
 
         if not summoner_id:
-            await ctx.send("Failed to get summoner data in all summoner regions.")
+            print("Failed to get summoner data in all summoner regions.")
             return
 
         # Try each summoner region to get league data
@@ -276,36 +265,35 @@ async def lookup(ctx, player: str):
         for region in summoner_regions:
             league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={APIKEY}"
             league_response = requests.get(league_url)
-            print(f"Request URL: {league_url}")  # Debugging line
-            print(f"Response: {league_response.status_code} - {league_response.text}")  # Debugging line
+            print(league_url, "\n", league_response)
             if league_response.status_code == 200:
                 league_data = league_response.json()
                 if league_data:
                     break
 
         if not league_data:
-            await ctx.send("Failed to get league data in all summoner regions.")
+            print("Failed to get league data in all summoner regions.")
             return
 
         # Extract the required data
-        tier = league_data[0].get('tier')
-        rank = league_data[0].get('rank')
-        league_points = league_data[0].get('leaguePoints')
-        wins = league_data[0].get('wins')
-        losses = league_data[0].get('losses')
+        tier = league_data[0]['tier']
+        rank = league_data[0]['rank']
+        league_points = league_data[0]['leaguePoints']
+        wins = league_data[0]['wins']
+        losses = league_data[0]['losses']
         total_games = wins + losses
 
         # Format the output message
-        if tier in ["CHALLENGER", "GRANDMASTER", "MASTER"]:
+        if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
             message = f"{gameName} is {tier} {league_points} LP with {total_games} games played."
         else:
             message = f"{gameName} is {tier} {rank} {league_points} LP with {total_games} games played."
         await ctx.send(message)
 
     except ValueError:
-        await ctx.send("Invalid format. Please use the format: name#tagline")
+        print("Invalid format. Please use the format: name#tagline")
     except Exception as e:
-        await ctx.send(f"An error occurred: {str(e)}")
+        print(f"An error occurred: {str(e)}")
 
 
 # Command to post a random message from the specific channel
