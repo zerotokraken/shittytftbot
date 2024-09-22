@@ -221,9 +221,12 @@ async def roll(ctx, level: int = 5):
 async def lookup(ctx, *, player: str):
     try:
 
-        player = player.replace(' ', '%20')
         # Split the player argument into gameName and tagLine
         gameName, tagLine = player.split('#')
+
+        # Encode the gameName to handle spaces and special characters
+        encoded_gameName = urllib.parse.quote(gameName)
+        
         # Define the regions
         account_regions = ["americas", "asia", "europe"]
         summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2",
@@ -232,7 +235,7 @@ async def lookup(ctx, *, player: str):
         # Try each account region to get puuid
         puuid = None
         for region in account_regions:
-            api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}?api_key={APIKEY}"
+            api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={APIKEY}"
             response = requests.get(api_url)
             print(api_url, "\n", response.text)
             if response.status_code == 200:
