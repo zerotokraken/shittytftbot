@@ -728,7 +728,7 @@ async def shittycommands(ctx):
     await ctx.send(f'Available commands:\n{response}')
 
 botkey = os.getenv('botkey')
-APIKEY = os.getenv('riotapikey')
+APIKEY = os.getenv('APIKEY')
 
 # Run the bot using your token
 bot.run(botkey)
