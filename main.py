@@ -136,9 +136,11 @@ async def roll(ctx, level: int = 5):
 
     # If the roll is specifically "ZTK", force it to only pick tier 5 units
     if str(ctx.author) == "zerotokraken (ZTK)":
+        print("Rigged roll enabled")
         level = 5  # Set level to 5 for tier 5
         odds = [0, 0, 0, 0, 5]  # Only roll tier 5 units
     else:
+        print(f"Simulating shop roll for level {level}")
         if level not in SHOP_ODDS:
             print("Invalid level. Please choose a level between 2 and 10.")
             return
@@ -226,7 +228,7 @@ async def lookup(ctx, *, player: str):
 
         # Encode the gameName to handle spaces and special characters
         encoded_gameName = urllib.parse.quote(gameName)
-        
+
         # Define the regions
         account_regions = ["americas", "asia", "europe"]
         summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2",
