@@ -136,7 +136,7 @@ async def roll(ctx, level: int = 5):
         await fetch_champions_data()
 
     # If the roll is specifically "ZTK", force it to only pick tier 5 units
-    if str(ctx.author) == "zerotokraken (ZTK)":
+    if str(ctx.author) == "zerotokraken":
         print("Rigged roll enabled")
         level = 5  # Set level to 5 for tier 5
         odds = [0, 0, 0, 0, 5]  # Only roll tier 5 units
