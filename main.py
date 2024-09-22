@@ -218,14 +218,12 @@ async def roll(ctx, level: int = 5):
 
 # Define the lookup command
 @bot.command(help="Lookup a player by name and tagline (format: name#tagline)")
-async def lookup(ctx, player: str):
+async def lookup(ctx, *, player: str):
     try:
 
         player = player.replace(' ', '%20')
         # Split the player argument into gameName and tagLine
-        print(player)
         gameName, tagLine = player.split('#')
-        print(gameName, tagLine)
         # Define the regions
         account_regions = ["americas", "asia", "europe"]
         summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2",
