@@ -241,7 +241,6 @@ async def lookup(ctx, *, player: str):
         for region in account_regions:
             api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={APIKEY}"
             response = requests.get(api_url)
-            print(api_url, "\n", response.text)
             if response.status_code == 200:
                 player_data = response.json()
                 puuid = player_data['puuid']
@@ -255,7 +254,6 @@ async def lookup(ctx, *, player: str):
         for region in summoner_regions:
             summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={APIKEY}"
             summoner_response = requests.get(summoner_url)
-            print(summoner_url, "\n", summoner_response)
             if summoner_response.status_code == 200:
                 summoner_data = summoner_response.json()
                 summoner_id = summoner_data['id']
@@ -270,7 +268,6 @@ async def lookup(ctx, *, player: str):
         for region in summoner_regions:
             league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={APIKEY}"
             league_response = requests.get(league_url)
-            print(league_url, "\n", league_response)
             if league_response.status_code == 200:
                 league_data = league_response.json()
                 if league_data:
@@ -288,11 +285,38 @@ async def lookup(ctx, *, player: str):
         losses = league_data[0]['losses']
         total_games = wins + losses
 
+        lol_Chess_url = f"https://tft.dakgg.io/api/v1/summoners/na1/{gameName}-{tagLine}/overviews?season=set12"
+
+        lol_chess_response = requests.get(lol_Chess_url)
+
+        # Check if the request was successful
+        if lol_chess_response.status_code == 200:
+            # Parse the response content as JSON
+            data = lol_chess_response.json()
+
+            # Get the summonerSeasonOverviews data
+            overview = data["summonerSeasonOverviews"][0]
+
+            # Calculate Win %, Top 4 %, and Average Placement
+            plays = overview["plays"]
+            wins = overview["wins"]
+            tops = overview["tops"]
+            sum_placement = overview["sumPlacement"]
+
+            # Calculate Win %
+            win_percentage = (wins / plays) * 100
+
+            # Calculate Top 4 %
+            top4_percentage = (tops / plays) * 100
+
+            # Calculate Average Placement
+            average_placement = sum_placement / plays
+
         # Format the output message
         if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
-            message = f"{gameName} is {tier} {league_points} LP with {total_games} games played."
+            message = f"{gameName} is {tier} {league_points} LP with {total_games} games played. \nWin %: {win_percentage:.2f}% \nTop 4 %: {top4_percentage:.2f}% \nAverage Placement: {average_placement:.2f}"
         else:
-            message = f"{gameName} is {tier} {rank} {league_points} LP with {total_games} games played."
+            message = f"{gameName} is {tier} {rank} {league_points} LP with {total_games} games played. \nWin %: {win_percentage:.2f}% \nTop 4 %: {top4_percentage:.2f}% \nAverage Placement: {average_placement:.2f}"
         await ctx.send(message)
 
     except ValueError:
