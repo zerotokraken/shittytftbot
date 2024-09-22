@@ -304,15 +304,18 @@ async def lookuptest(ctx, *, player: str):
         regalia_response = requests.get(regalia_url)
         regalia_data = regalia_response.json()
 
+        # Base URL for the regalia images
+        base_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/tft-regalia/"
+
         # Extract the correct rank image
         rank_image_url = None
         if tier in regalia_data["data"]["RANKED_TFT"]:
-            rank_image = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
-            rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/14.18.1/img/{rank_image}"
+            rank_image_full = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
+            rank_image_url = base_image_url + rank_image_full
 
         # Format the output message with the regalia image
         embed = discord.Embed(
-            title=f"{gameName}'s Stats",
+            title=f"{gameName}",
             description=f"Rank: {tier} {rank} ({league_points} LP)\n"
                         f"Total Games: {total_games}\n"
                         f"Win %: {win_percentage:.2f}%\n"
@@ -331,7 +334,7 @@ async def lookuptest(ctx, *, player: str):
         await ctx.send("Invalid format. Please use the format: name#tagline.")
     except Exception as e:
         await ctx.send(f"An error occurred: {str(e)}")
-        
+
 # Define the lookup command
 @bot.command(help="Lookup a player by name and tagline (format: name#tagline)")
 async def lookup(ctx, *, player: str):
