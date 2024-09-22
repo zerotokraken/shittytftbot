@@ -9,6 +9,7 @@ from io import BytesIO
 from PIL import Image
 import os
 import asyncio
+import requests
 
 # Set up the bot with a command prefix
 intents = discord.Intents.default()
@@ -243,7 +244,7 @@ async def lookup(ctx, player: str):
         # Try each summoner region to get summonerId
         summoner_id = None
         for region in summoner_regions:
-            summoner_url = f"https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={APIKEY}"
+            summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={APIKEY}"
             summoner_response = requests.get(summoner_url)
             if summoner_response.status_code == 200:
                 summoner_data = summoner_response.json()
@@ -277,7 +278,10 @@ async def lookup(ctx, player: str):
         total_games = wins + losses
 
         # Format the output message
-        message = f"{gameName} is {tier} {rank} {league_points} LP with {total_games} games played."
+        if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
+            message = f"{gameName} is {tier} {league_points} LP with {total_games} games played."
+        else:
+            message = f"{gameName} is {tier} {rank} {league_points} LP with {total_games} games played."
         await ctx.send(message)
 
     except ValueError:
@@ -723,6 +727,7 @@ async def shittycommands(ctx):
 
 botkey = os.getenv('botkey')
 APIKEY = os.getenv('riotapikey')
+
 # Run the bot using your token
 bot.run(botkey)
 
