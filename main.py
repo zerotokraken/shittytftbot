@@ -458,7 +458,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # Define the lookup command
-@bot.command(help="Lookup augment data from the web. Usage: !lookupaugment <augment_name>")
+@bot.command(help="Lookup augment data from tactics.tools, Usage: !aug <augment_name>")
 async def aug(ctx, *, augment_name: str):
     # Remove any spaces from the augment name
 
