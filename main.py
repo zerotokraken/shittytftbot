@@ -222,6 +222,118 @@ async def roll(ctx, level: int = 5):
 
 # Define the lookup command
 @bot.command(help="Lookup a player by name and tagline (format: name#tagline)")
+async def lookuptest(ctx, *, player: str):
+    try:
+        # Split the player argument into gameName and tagLine
+        gameName, tagLine = player.split('#')
+
+        # Encode the gameName to handle spaces and special characters
+        encoded_gameName = urllib.parse.quote(gameName)
+
+        # Define the regions
+        account_regions = ["americas", "asia", "europe"]
+        summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2", "th2", "tr1", "tw2", "vn2"]
+
+        # Try each account region to get puuid
+        puuid = None
+        for region in account_regions:
+            api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={APIKEY}"
+            response = requests.get(api_url)
+            if response.status_code == 200:
+                player_data = response.json()
+                puuid = player_data['puuid']
+                break
+        if not puuid:
+            await ctx.send("Failed to lookup player in all account regions.")
+            return
+
+        # Try each summoner region to get summonerId
+        summoner_id = None
+        for region in summoner_regions:
+            summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={APIKEY}"
+            summoner_response = requests.get(summoner_url)
+            if summoner_response.status_code == 200:
+                summoner_data = summoner_response.json()
+                summoner_id = summoner_data['id']
+                break
+        if not summoner_id:
+            await ctx.send("Failed to get summoner data in all summoner regions.")
+            return
+
+        # Try each summoner region to get league data
+        league_data = None
+        for region in summoner_regions:
+            league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={APIKEY}"
+            league_response = requests.get(league_url)
+            if league_response.status_code == 200:
+                league_data = league_response.json()
+                if league_data:
+                    break
+        if not league_data:
+            await ctx.send("Failed to get league data in all summoner regions.")
+            return
+
+        # Extract the required data
+        tier = league_data[0]['tier']
+        rank = league_data[0]['rank']
+        league_points = league_data[0]['leaguePoints']
+        wins = league_data[0]['wins']
+        losses = league_data[0]['losses']
+        total_games = wins + losses
+
+        # Fetch match stats for calculating Win %, Top 4 %, and Avg Placement
+        lol_chess_url = f"https://tft.dakgg.io/api/v1/summoners/na1/{encoded_gameName}-{tagLine}/overviews?season=set12"
+        lol_chess_response = requests.get(lol_chess_url)
+
+        if lol_chess_response.status_code == 200:
+            data = lol_chess_response.json()
+            overview = data["summonerSeasonOverviews"][0]
+
+            # Calculate Win %, Top 4 %, and Average Placement
+            plays = overview["plays"]
+            wins = overview["wins"]
+            tops = overview["tops"]
+            sum_placement = overview["sumPlacement"]
+
+            win_percentage = (wins / plays) * 100
+            top4_percentage = (tops / plays) * 100
+            average_placement = sum_placement / plays
+
+        # Get the regalia image based on the player's rank
+        regalia_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/tft-regalia.json"
+        regalia_response = requests.get(regalia_url)
+        regalia_data = regalia_response.json()
+
+        # Extract the correct rank image
+        rank_image_url = None
+        if tier in regalia_data["data"]["RANKED_TFT"]:
+            rank_image = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
+            rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/14.18.1/img/{rank_image}"
+
+        # Format the output message with the regalia image
+        embed = discord.Embed(
+            title=f"{gameName}'s Stats",
+            description=f"Rank: {tier} {rank} ({league_points} LP)\n"
+                        f"Total Games: {total_games}\n"
+                        f"Win %: {win_percentage:.2f}%\n"
+                        f"Top 4 %: {top4_percentage:.2f}%\n"
+                        f"Average Placement: {average_placement:.2f}",
+            color=discord.Color.blue()
+        )
+
+        # Add the rank image to the embed
+        if rank_image_url:
+            embed.set_thumbnail(url=rank_image_url)
+
+        await ctx.send(embed=embed)
+
+    except ValueError:
+        await ctx.send("Invalid format. Please use the format: name#tagline.")
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
+        
+# Define the lookup command
+@bot.command(help="Lookup a player by name and tagline (format: name#tagline)")
 async def lookup(ctx, *, player: str):
     try:
 
