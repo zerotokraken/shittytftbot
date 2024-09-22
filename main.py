@@ -456,6 +456,60 @@ async def on_message(message):
     # Process commands if the message is a command
     await bot.process_commands(message)
 
+# Define the lookup command
+@bot.command(help="Lookup augment data from the web. Usage: !lookupaugment <augment_name>")
+async def aug(ctx, *, augment_name: str):
+    # Remove any spaces from the augment name
+
+    search_term = augment_name.replace(' ', '')
+
+    # URL to fetch data from
+    url = "https://tactics.tools/_next/data/hX4-m6EX8cV19isHOjRQ_/en/augments.json"
+
+    # Make an HTTP GET request to the URL
+    response = requests.get(url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Get the content of the page
+        html_content = response.text
+
+        # Use regex to extract JSON-like data (matching patterns like `{"id": "something", ...}`)
+        json_pattern = r'{"id":".+?"[^}]*}'  # A simple regex to capture objects starting with {"id": ...}
+
+        matches = re.findall(json_pattern, html_content)
+
+        found = False  # To check if any matches were found
+
+        # Process each match to parse it as JSON and find the specific key you're interested in
+        for match in matches:
+            try:
+                # Load the match as a JSON object (need to add closing bracket if truncated)
+                json_data = json.loads(match + "}")  # Add closing bracket if necessary
+
+                # Check if the "id" or any other key matches a partial word or pattern
+                if search_term.lower() in json_data['id'].lower():  # Use lower() for case-insensitive search
+                    found = True
+                    # Access the nested data in the 'base' section
+                    base_data = json_data.get('base', {})
+                    place = base_data.get('place', 'N/A')
+                    top4_rate = base_data.get('top4', 'N/A')
+                    win_rate = base_data.get('won', 'N/A')
+
+                    # Send the result to Discord
+                    await ctx.send(f"{augment_name} - AVP: {place}, Top 4: {top4_rate}%, Win: {win_rate}%")
+                    break
+
+            except json.JSONDecodeError as e:
+                await ctx.send(f"Failed to parse JSON: {str(e)}")
+                return
+
+        if not found:
+            await print(f"No augment found matching `{augment_name}`.")
+
+    else:
+        await print(f"Failed to retrieve the page. Status code: {response.status_code}")
+
 # Command to select a random user and call them a noob, without tagging
 @bot.command()
 async def noob(ctx):
