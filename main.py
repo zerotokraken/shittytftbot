@@ -130,6 +130,7 @@ async def refresh_cache():
 # Command to roll champions
 @bot.command(help="Type the level you want to roll on")
 async def roll(ctx, level: int = 5):
+
     if not champions_data:
         print("Champions data is not available. Please wait while we update it.")
         await fetch_champions_data()
@@ -140,7 +141,7 @@ async def roll(ctx, level: int = 5):
         level = 5  # Set level to 5 for tier 5
         odds = [0, 0, 0, 0, 5]  # Only roll tier 5 units
     else:
-        print(f"Simulating shop roll for level {level}")
+        print(f"Player: {ctx.author}, Simulating shop roll for level {level}")
         if level not in SHOP_ODDS:
             print("Invalid level. Please choose a level between 2 and 10.")
             return
