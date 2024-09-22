@@ -11,6 +11,7 @@ from PIL import Image
 import os
 import asyncio
 import requests
+import re
 
 # Set up the bot with a command prefix
 intents = discord.Intents.default()
