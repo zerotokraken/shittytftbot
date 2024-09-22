@@ -55,14 +55,13 @@ async def on_ready():
     global GUILD_ID, CHANNEL_ID
 
     print(f'Bot {bot.user} is ready.')
-
+    if APIKEY:
+        print(f"Riot Apikey was found with a value of: {APIKEY}")
     # Fetch and print guild and channel information
     for guild in bot.guilds:
         if guild.name == GUILD_NAME:
             GUILD_ID = guild.id
-            print(f'Found guild: {guild.name} (ID: {guild.id})')
             for channel in guild.channels:
-                print(f'Channel: {channel.name} (ID: {channel.id})')
                 if channel.name == CHANNEL_NAME:
                     CHANNEL_ID = channel.id
                     break
@@ -233,6 +232,7 @@ async def lookup(ctx, player: str):
         for region in account_regions:
             api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}?api_key={APIKEY}"
             response = requests.get(api_url)
+            print(api_url, "\n", response.text)
             if response.status_code == 200:
                 player_data = response.json()
                 puuid = player_data['puuid']
@@ -246,6 +246,7 @@ async def lookup(ctx, player: str):
         for region in summoner_regions:
             summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={APIKEY}"
             summoner_response = requests.get(summoner_url)
+            print(summoner_url, "\n", summoner_response)
             if summoner_response.status_code == 200:
                 summoner_data = summoner_response.json()
                 summoner_id = summoner_data['id']
@@ -260,6 +261,7 @@ async def lookup(ctx, player: str):
         for region in summoner_regions:
             league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={APIKEY}"
             league_response = requests.get(league_url)
+            print(league_url, "\n", league_response)
             if league_response.status_code == 200:
                 league_data = league_response.json()
                 if league_data:
