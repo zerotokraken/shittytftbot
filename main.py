@@ -596,6 +596,9 @@ async def metatft(ctx):
 async def jials(ctx):
     await ctx.send("galbia or jials, they're essentially the same person to me")
 
+@bot.command()
+async def hawktuah(ctx):
+    await ctx.send("You gotta give 'em that hawk tuah and spit on that thang")
 
 @bot.command()
 async def vuhramald(ctx):
