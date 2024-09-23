@@ -299,32 +299,26 @@ async def lookuptest(ctx, *, player: str):
             top4_percentage = (tops / plays) * 100
             average_placement = sum_placement / plays
 
+        # Convert the tier to match the regalia data keys
+        tier_key = tier.capitalize()  # Example: Convert CHALLENGER to Challenger
+
         # Get the regalia image based on the player's rank
         regalia_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/tft-regalia.json"
         regalia_response = requests.get(regalia_url)
         regalia_data = regalia_response.json()
 
-        # Base URL for the regalia images
-        base_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/tft-regalia/"
-
-        # Debug: Print the fetched data to understand its structure
-        print("Regalia Data:", regalia_data)
-
         # Extract the correct rank image
         rank_image_url = None
-        if tier in regalia_data["data"]["RANKED_TFT"]:
-            rank_image_full = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
-            rank_image_url = base_image_url + rank_image_full
-            print(f"Rank image URL: {rank_image_url}")  # Debug: Print the URL to verify
-        else:
-            print(f"Tier '{tier}' not found in regalia data")  # Debug: Notify if tier is missing
+        if tier_key in regalia_data["data"]["RANKED_TFT"]:
+            rank_image = regalia_data["data"]["RANKED_TFT"][tier_key]["image"]["full"]
+            rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/{rank_image}"
 
         # Format the output message
         if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
             # Format the output message with the regalia image
             embed = discord.Embed(
                 title=f"{gameName}",
-                description=f"Rank: {tier} ({league_points} LP)\n"
+                description=f"Rank: {tier_key} ({league_points} LP)\n"
                             f"Total Games: {total_games}\n"
                             f"Win %: {win_percentage:.2f}%\n"
                             f"Top 4 %: {top4_percentage:.2f}%\n"
@@ -335,7 +329,7 @@ async def lookuptest(ctx, *, player: str):
             # Format the output message with the regalia image
             embed = discord.Embed(
                 title=f"{gameName}",
-                description=f"Rank: {tier} {rank} ({league_points} LP)\n"
+                description=f"Rank: {tier_key} {rank} ({league_points} LP)\n"
                             f"Total Games: {total_games}\n"
                             f"Win %: {win_percentage:.2f}%\n"
                             f"Top 4 %: {top4_percentage:.2f}%\n"
