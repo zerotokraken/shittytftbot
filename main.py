@@ -306,13 +306,38 @@ async def lookuptest(ctx, *, player: str):
 
         # Base URL for the regalia images
         base_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/tft-regalia/"
-
+        print(base_image_url)
         # Extract the correct rank image
         rank_image_url = None
         if tier in regalia_data["data"]["RANKED_TFT"]:
             rank_image_full = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
             rank_image_url = base_image_url + rank_image_full
             print(f"Rank image URL: {rank_image_url}")  # Debug: Print the URL to verify
+        
+        # Format the output message
+        if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
+            # Format the output message with the regalia image
+            embed = discord.Embed(
+                title=f"{gameName}",
+                description=f"Rank: {tier} ({league_points} LP)\n"
+                            f"Total Games: {total_games}\n"
+                            f"Win %: {win_percentage:.2f}%\n"
+                            f"Top 4 %: {top4_percentage:.2f}%\n"
+                            f"Average Placement: {average_placement:.2f}",
+                color=discord.Color.blue()
+            )
+        else:
+            # Format the output message with the regalia image
+            embed = discord.Embed(
+                title=f"{gameName}",
+                description=f"Rank: {tier} {rank} ({league_points} LP)\n"
+                            f"Total Games: {total_games}\n"
+                            f"Win %: {win_percentage:.2f}%\n"
+                            f"Top 4 %: {top4_percentage:.2f}%\n"
+                            f"Average Placement: {average_placement:.2f}",
+                color=discord.Color.blue()
+            )
+        await ctx.send(message)
 
         # Format the output message with the regalia image
         embed = discord.Embed(
