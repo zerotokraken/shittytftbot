@@ -312,6 +312,7 @@ async def lookuptest(ctx, *, player: str):
         if tier_key in regalia_data["data"]["RANKED_TFT"]:
             rank_image = regalia_data["data"]["RANKED_TFT"][tier_key]["image"]["full"]
             rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/{rank_image}"
+            print(rank_image_url)
 
         # Format the output message
         if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
