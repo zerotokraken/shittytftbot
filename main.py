@@ -327,8 +327,9 @@ async def lookuptest(ctx, *, player: str):
             print(rank_image_url)
 
         # Determine the color for the embed based on the rank
-        embed_color = rank_colors.get(tier, discord.Color.default())
+        embed_color = rank_colors.get(tier_key, discord.Color.default())
 
+        print(embed_color)
         # Format the output message
         if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
             # Format the output message with the regalia image
