@@ -306,13 +306,18 @@ async def lookuptest(ctx, *, player: str):
 
         # Base URL for the regalia images
         base_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/tft-regalia/"
-        print(base_image_url)
+
+        # Debug: Print the fetched data to understand its structure
+        print("Regalia Data:", regalia_data)
+
         # Extract the correct rank image
         rank_image_url = None
         if tier in regalia_data["data"]["RANKED_TFT"]:
             rank_image_full = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
             rank_image_url = base_image_url + rank_image_full
             print(f"Rank image URL: {rank_image_url}")  # Debug: Print the URL to verify
+        else:
+            print(f"Tier '{tier}' not found in regalia data")  # Debug: Notify if tier is missing
 
         # Format the output message
         if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
