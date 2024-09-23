@@ -312,6 +312,7 @@ async def lookuptest(ctx, *, player: str):
         if tier in regalia_data["data"]["RANKED_TFT"]:
             rank_image_full = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
             rank_image_url = base_image_url + rank_image_full
+            print(f"Rank image URL: {rank_image_url}")  # Debug: Print the URL to verify
 
         # Format the output message with the regalia image
         embed = discord.Embed(
@@ -327,6 +328,8 @@ async def lookuptest(ctx, *, player: str):
         # Add the rank image to the embed
         if rank_image_url:
             embed.set_thumbnail(url=rank_image_url)
+        else:
+            print("No rank image URL found")  # Debug: Notify if no image URL is available
 
         await ctx.send(embed=embed)
 
