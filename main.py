@@ -313,7 +313,7 @@ async def lookuptest(ctx, *, player: str):
             rank_image_full = regalia_data["data"]["RANKED_TFT"][tier]["image"]["full"]
             rank_image_url = base_image_url + rank_image_full
             print(f"Rank image URL: {rank_image_url}")  # Debug: Print the URL to verify
-        
+
         # Format the output message
         if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
             # Format the output message with the regalia image
@@ -337,18 +337,6 @@ async def lookuptest(ctx, *, player: str):
                             f"Average Placement: {average_placement:.2f}",
                 color=discord.Color.blue()
             )
-        await ctx.send(message)
-
-        # Format the output message with the regalia image
-        embed = discord.Embed(
-            title=f"{gameName}",
-            description=f"Rank: {tier} {rank} ({league_points} LP)\n"
-                        f"Total Games: {total_games}\n"
-                        f"Win %: {win_percentage:.2f}%\n"
-                        f"Top 4 %: {top4_percentage:.2f}%\n"
-                        f"Average Placement: {average_placement:.2f}",
-            color=discord.Color.blue()
-        )
 
         # Add the rank image to the embed
         if rank_image_url:
