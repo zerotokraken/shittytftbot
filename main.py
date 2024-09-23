@@ -299,6 +299,18 @@ async def lookuptest(ctx, *, player: str):
             top4_percentage = (tops / plays) * 100
             average_placement = sum_placement / plays
 
+        # Define colors based on rank
+        rank_colors = {
+            'Challenger': discord.Color.from_rgb(255, 215, 0),  # Yellow
+            'Grandmaster': discord.Color.from_rgb(255, 165, 0),  # Orange
+            'Diamond': discord.Color.from_rgb(0, 191, 255),  # Blue
+            'Platinum': discord.Color.from_rgb(0, 128, 128),  # Teal
+            'Emerald': discord.Color.from_rgb(0, 128, 0),  # Green
+            'Gold': discord.Color.from_rgb(255, 215, 0),  # Darker Yellow
+            'Silver': discord.Color.from_rgb(192, 192, 192),  # Gray
+            'Bronze': discord.Color.from_rgb(139, 69, 19)  # Brown
+        }
+
         # Convert the tier to match the regalia data keys
         tier_key = tier.capitalize()  # Example: Convert CHALLENGER to Challenger
 
@@ -314,6 +326,9 @@ async def lookuptest(ctx, *, player: str):
             rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/tft-regalia/{rank_image}"
             print(rank_image_url)
 
+        # Determine the color for the embed based on the rank
+        embed_color = rank_colors.get(tier, discord.Color.default())
+
         # Format the output message
         if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
             # Format the output message with the regalia image
@@ -324,7 +339,7 @@ async def lookuptest(ctx, *, player: str):
                             f"Win %: {win_percentage:.2f}%\n"
                             f"Top 4 %: {top4_percentage:.2f}%\n"
                             f"Average Placement: {average_placement:.2f}",
-                color=discord.Color.blue()
+                color=embed_color
             )
         else:
             # Format the output message with the regalia image
@@ -335,7 +350,7 @@ async def lookuptest(ctx, *, player: str):
                             f"Win %: {win_percentage:.2f}%\n"
                             f"Top 4 %: {top4_percentage:.2f}%\n"
                             f"Average Placement: {average_placement:.2f}",
-                color=discord.Color.blue()
+                color=embed_color
             )
 
         # Add the rank image to the embed
