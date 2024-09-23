@@ -308,7 +308,8 @@ async def lookup(ctx, *, player: str):
             'Emerald': discord.Color.from_rgb(0, 128, 0),  # Green
             'Gold': discord.Color.from_rgb(255, 215, 0),  # Darker Yellow
             'Silver': discord.Color.from_rgb(192, 192, 192),  # Gray
-            'Bronze': discord.Color.from_rgb(139, 69, 19)  # Brown
+            'Bronze': discord.Color.from_rgb(139, 69, 19),  # Brown
+            'Master': discord.Color.from_rgb(128, 0, 128)  # Purple
         }
 
         # Convert the tier to match the regalia data keys
@@ -329,30 +330,22 @@ async def lookup(ctx, *, player: str):
         # Determine the color for the embed based on the rank
         embed_color = rank_colors.get(tier_key, discord.Color.default())
 
-        print(embed_color)
         # Format the output message
-        if tier == "CHALLENGER" or tier == "GRANDMASTER" or tier == "MASTER":
-            # Format the output message with the regalia image
-            embed = discord.Embed(
-                title=f"{gameName}",
-                description=f"Rank: {tier_key} ({league_points} LP)\n"
-                            f"Total Games: {total_games}\n"
-                            f"Win %: {win_percentage:.2f}%\n"
-                            f"Top 4 %: {top4_percentage:.2f}%\n"
-                            f"Average Placement: {average_placement:.2f}",
-                color=embed_color
-            )
+        embed = discord.Embed(
+            title=f"{gameName}",
+            color=embed_color
+        )
+
+        # Add fields based on tier
+        if tier in ["CHALLENGER", "GRANDMASTER", "MASTER"]:
+            embed.add_field(name="Rank", value=f"{tier_key} ({league_points} LP)", inline=False)
         else:
-            # Format the output message with the regalia image
-            embed = discord.Embed(
-                title=f"{gameName}",
-                description=f"Rank: {tier_key} {rank} ({league_points} LP)\n"
-                            f"Total Games: {total_games}\n"
-                            f"Win %: {win_percentage:.2f}%\n"
-                            f"Top 4 %: {top4_percentage:.2f}%\n"
-                            f"Average Placement: {average_placement:.2f}",
-                color=embed_color
-            )
+            embed.add_field(name="Rank", value=f"{tier_key} {rank} ({league_points} LP)", inline=False)
+
+        embed.add_field(name="Total Games", value=str(total_games), inline=False)
+        embed.add_field(name="Win %", value=f"{win_percentage:.2f}%", inline=False)
+        embed.add_field(name="Top 4 %", value=f"{top4_percentage:.2f}%", inline=False)
+        embed.add_field(name="Average Placement", value=f"{average_placement:.2f}", inline=False)
 
         # Add the rank image to the embed
         if rank_image_url:
