@@ -294,10 +294,11 @@ async def lookup(ctx, *, player: str):
             wins = overview["wins"]
             tops = overview["tops"]
             sum_placement = overview["sumPlacement"]
-
+            print(overview, plays, wins, tops, sum_placement)
             win_percentage = (wins / plays) * 100
             top4_percentage = (tops / plays) * 100
             average_placement = sum_placement / plays
+            print(win_percentage, top4_percentage, average_placement)
 
         # Define colors based on rank
         rank_colors = {
