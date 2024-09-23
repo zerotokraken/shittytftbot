@@ -227,6 +227,7 @@ async def lookup(ctx, *, player: str):
         # Split the player argument into gameName and tagLine
         gameName, tagLine = player.split('#')
 
+        shortened_gameName = gameName.strip()
         # Encode the gameName to handle spaces and special characters
         encoded_gameName = urllib.parse.quote(gameName)
 
@@ -282,7 +283,7 @@ async def lookup(ctx, *, player: str):
         total_games = wins + losses
 
         # Fetch match stats for calculating Win %, Top 4 %, and Avg Placement
-        lol_chess_url = f"https://tft.dakgg.io/api/v1/summoners/na1/{encoded_gameName}-{tagLine}/overviews?season=set12"
+        lol_chess_url = f"https://tft.dakgg.io/api/v1/summoners/na1/{shortened_gameName}-{tagLine}/overviews?season=set12"
         lol_chess_response = requests.get(lol_chess_url)
 
         if lol_chess_response.status_code == 200:
