@@ -244,7 +244,7 @@ async def lookup(ctx, *, player: str):
                 puuid = player_data['puuid']
                 break
         if not puuid:
-            await ctx.send("Failed to lookup player in all account regions.")
+            print("Failed to lookup player in all account regions.")
             return
 
         # Try each summoner region to get summonerId
@@ -257,7 +257,7 @@ async def lookup(ctx, *, player: str):
                 summoner_id = summoner_data['id']
                 break
         if not summoner_id:
-            await ctx.send("Failed to get summoner data in all summoner regions.")
+            print("Failed to get summoner data in all summoner regions.")
             return
 
         # Try each summoner region to get league data
@@ -270,7 +270,7 @@ async def lookup(ctx, *, player: str):
                 if league_data:
                     break
         if not league_data:
-            await ctx.send("Failed to get league data in all summoner regions.")
+            print("Failed to get league data in all summoner regions.")
             return
 
         # Extract the required data
@@ -356,9 +356,9 @@ async def lookup(ctx, *, player: str):
         await ctx.send(embed=embed)
 
     except ValueError:
-        await ctx.send("Invalid format. Please use the format: name#tagline.")
+        print("Invalid format. Please use the format: name#tagline.")
     except Exception as e:
-        await ctx.send(f"An error occurred: {str(e)}")
+        print(f"An error occurred: {str(e)}")
 
 
 # Command to post a random message from the specific channel
