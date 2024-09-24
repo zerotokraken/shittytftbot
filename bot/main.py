@@ -39,6 +39,7 @@ cache = {
     'timestamp': 0
 }
 
+
 @bot.event
 async def on_ready():
     global guild_id, channel_id
@@ -47,7 +48,8 @@ async def on_ready():
                     latest_version=latest_version, shop_odds=shop_odds)
 
     if APIKEY:
-        print(f"Riot Apikey was found with a value of: {APIKEY}")
+        print(f"Riot API key was found with a value of: {APIKEY}")
+
     # Fetch and print guild and channel information
     for guild in bot.guilds:
         if guild.name == guild_name:
@@ -68,8 +70,8 @@ async def on_ready():
     print(f'Bot {bot.user} is ready.')
 
     await fetch_latest_version()
-
     await fetch_champions_data()
+
 
 async def fetch_latest_version():
     global latest_version
@@ -82,6 +84,7 @@ async def fetch_latest_version():
             else:
                 print(f"Failed to fetch versions data: {response.status}")
 
+
 async def fetch_champions_data():
     global champions_data
     url = base_champions_url.format(version=latest_version)
@@ -92,6 +95,7 @@ async def fetch_champions_data():
                 champions_data = data.get('data', {})
             else:
                 print(f"Failed to fetch champions data: {response.status}")
+
 
 @tasks.loop(seconds=3600)  # Refresh every hour
 async def refresh_cache():
@@ -121,7 +125,8 @@ async def refresh_cache():
 
 
 # Function to load cogs
-async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):
+async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None,
+                    shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
     # Iterate over files in cogs directory
@@ -151,6 +156,6 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
             else:
                 await bot.load_extension(cog_name)
 
+
 # Run the bot using your token
 bot.run(botkey)
-
