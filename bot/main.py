@@ -22,7 +22,6 @@ with open(config_path, 'r') as config_file:
     config = json.load(config_file)
 
 # Load static data from config
-cache_duration = config['cache_duration']
 guild_name = config['guild_name']
 versions_url = config['versions_url']
 base_champions_url = config['base_champions_url']
@@ -67,9 +66,8 @@ async def on_ready():
 
     await fetch_latest_version()
     await fetch_champions_data()
-    # Perform the initial cache refresh
-    await refresh_cache()
-    await load_cogs(bot, config=config, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
+
+    await load_cogs(bot, config=config, cache=cache, cache_duration=3600, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
     print(f'Bot {bot.user} is ready.')
