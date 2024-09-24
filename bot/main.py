@@ -4,6 +4,7 @@ import aiohttp
 import time
 import json
 import os
+import importlib
 
 # Set up the bot with a command prefix
 intents = discord.Intents.default()
@@ -44,8 +45,6 @@ cache = {
 async def on_ready():
     global guild_id, channel_id
 
-
-
     if APIKEY:
         print(f"Riot API key was found with a value of: {APIKEY}")
 
@@ -65,7 +64,7 @@ async def on_ready():
         print('Guild or Channel ID not set. Check your configuration.')
     else:
         refresh_cache.start()
-        
+
     await load_cogs(bot, config=config, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
     print(f'Bot {bot.user} is ready.')
@@ -125,6 +124,9 @@ async def refresh_cache():
         print(f'Guild with ID {guild_id} not found.')
 
 
+
+
+
 async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None,
                     shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
@@ -133,27 +135,30 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
     for filename in os.listdir(cogs_dir):
         if filename.endswith('.py') and filename != '__init__.py':
             cog_name = f'cogs.{filename[:-3]}'
+            print(f"Loading {cog_name}...")
 
             try:
-                if cog_name == 'cogs.malding_command':
-                    # Load cog with cache arguments
-                    malding_cog = __import__('cogs.malding_command', fromlist=['setup'])
-                    await malding_cog.setup(bot, cache, cache_duration)
-                elif cog_name == 'cogs.roll_commands':
-                    # Load cog with champions_data, latest_version, and shop_odds
-                    roll_cog = __import__('cogs.roll_commands', fromlist=['setup'])
-                    await roll_cog.setup(bot, champions_data, latest_version, shop_odds)
-                elif cog_name == 'cogs.message_responder':
-                    # Load cog with config
-                    responder_cog = __import__('cogs.message_responder', fromlist=['setup'])
-                    await responder_cog.setup(bot, config)
-                elif cog_name == 'cogs.streamer_commands':
-                    # Simple extension loading, no extra arguments
-                    await bot.load_extension(cog_name)
+                # Load the cog module
+                cog_module = importlib.import_module(cog_name)
+
+                # Check if the module has a setup function and call it with the appropriate arguments
+                if hasattr(cog_module, 'setup'):
+                    if cog_name == 'cogs.malding_command':
+                        await cog_module.setup(bot, cache, cache_duration)
+                    elif cog_name == 'cogs.roll_commands':
+                        await cog_module.setup(bot, champions_data, latest_version, shop_odds)
+                    elif cog_name == 'cogs.message_responder':
+                        await cog_module.setup(bot, config)
+                    else:
+                        await cog_module.setup(bot)
                 else:
+                    # Load cog without setup if it doesn't have a setup function
                     await bot.load_extension(cog_name)
+
+                print(f"Successfully loaded {cog_name}")
             except Exception as e:
                 print(f"Failed to load extension {cog_name}: {e}")
+
 
 # Run the bot using your token
 bot.run(botkey)
