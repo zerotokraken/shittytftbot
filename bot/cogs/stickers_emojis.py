@@ -62,5 +62,5 @@ class StickersEmojis(commands.Cog):
         else:
             print("Emoji not found or not available in this server.")
 
-def setup(bot):
-    bot.add_cog(StickersEmojis(bot))
+async def setup(bot):
+    await bot.add_cog(StickersEmojis(bot))

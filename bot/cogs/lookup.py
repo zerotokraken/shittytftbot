@@ -139,5 +139,5 @@ class LookupCommands(commands.Cog):
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-def setup(bot):
-    bot.add_cog(LookupCommands(bot))
+async def setup(bot):
+    await bot.add_cog(LookupCommands(bot))

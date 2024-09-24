@@ -61,5 +61,5 @@ class AugCommands(commands.Cog):
             except aiohttp.ClientError as e:
                 print(f"Error fetching augment data: {str(e)}")
 
-def setup(bot):
-    bot.add_cog(AugCommands(bot))
+async def setup(bot):
+    await bot.add_cog(AugCommands(bot))
