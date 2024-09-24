@@ -16,6 +16,7 @@ class AugCommands(commands.Cog):
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(url) as response:
+                    print(session.get(url).text)
                     if response.status == 200:
                         html_content = await response.text()
                         json_pattern = r'{"id":".+?"[^}]*}'
@@ -43,6 +44,7 @@ class AugCommands(commands.Cog):
 
         for patch_number in self.patch_numbers:
             url = f"{self.augment_url}{self.version}{patch_number}/1"
+            print(url)
             json_data = await self.fetch_augment_data(url)
             if json_data:
                 # Process the data if found
