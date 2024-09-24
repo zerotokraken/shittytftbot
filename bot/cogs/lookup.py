@@ -2,10 +2,12 @@ import discord
 from discord.ext import commands
 import requests
 import urllib.parse
+import os
 
 class LookupCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.APIKEY = APIKEY = os.getenv('APIKEY')
 
     @commands.command(help="Lookup a player by name and tagline (format: name#tagline)")
     async def lookup(self, ctx, *, player: str):

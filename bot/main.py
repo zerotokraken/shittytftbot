@@ -67,6 +67,8 @@ async def on_ready():
 
     await fetch_latest_version()
     await fetch_champions_data()
+    # Perform the initial cache refresh
+    await refresh_cache()
     await load_cogs(bot, config=config, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
@@ -124,9 +126,6 @@ async def refresh_cache():
             print(f'Channel with ID {channel} not found.')
     else:
         print(f'Guild with ID {guild_id} not found.')
-
-
-import importlib
 
 
 async def load_cogs(bot, config=None,  cache=None, cache_duration=None, champions_data=None, latest_version=None,
