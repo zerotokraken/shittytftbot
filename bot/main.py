@@ -134,28 +134,27 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
         if filename.endswith('.py') and filename != '__init__.py':
             cog_name = f'cogs.{filename[:-3]}'
 
-            # Check for specific cogs that need extra arguments
-            if cog_name == 'cogs.malding_command':
-                # Manually import and setup the cog with extra arguments
-                await bot.load_extension(cog_name)
-                bot.get_cog('MaldingCommand').cache = cache
-                bot.get_cog('MaldingCommand').cache_duration = cache_duration
-            elif cog_name == 'cogs.roll_commands':
-                await bot.load_extension(cog_name)
-                roll_cog = bot.get_cog('RollCommands')
-                roll_cog.champions_data = champions_data
-                roll_cog.latest_version = latest_version
-                roll_cog.shop_odds = shop_odds
-            elif cog_name == 'cogs.message_responder':
-                await bot.load_extension(cog_name)
-                bot.get_cog('MessageResponder').config = config
-            elif cog_name == 'cogs.stickers_emojis':
-                await bot.load_extension(cog_name)
-            elif cog_name == 'cogs.streamer_commands':
-                await bot.load_extension(cog_name)
-            else:
-                await bot.load_extension(cog_name)
-
+            try:
+                if cog_name == 'cogs.malding_command':
+                    await bot.load_extension(cog_name)
+                    malding_cog = bot.get_cog('MaldingCommand')
+                    malding_cog.cache = cache
+                    malding_cog.cache_duration = cache_duration
+                elif cog_name == 'cogs.roll_commands':
+                    # Directly call setup with arguments instead of loading it through bot.load_extension
+                    roll_cog = __import__('cogs.roll_commands', fromlist=['setup'])
+                    await roll_cog.setup(bot, champions_data, latest_version, shop_odds)
+                elif cog_name == 'cogs.message_responder':
+                    await bot.load_extension(cog_name)
+                    bot.get_cog('MessageResponder').config = config
+                elif cog_name == 'cogs.stickers_emojis':
+                    await bot.load_extension(cog_name)
+                elif cog_name == 'cogs.streamer_commands':
+                    await bot.load_extension(cog_name)
+                else:
+                    await bot.load_extension(cog_name)
+            except Exception as e:
+                print(f"Failed to load extension {cog_name}: {e}")
 
 # Run the bot using your token
 bot.run(botkey)
