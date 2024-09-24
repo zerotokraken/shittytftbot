@@ -21,13 +21,13 @@ with open(config_path, 'r') as config_file:
     config = json.load(config_file)
 
 # Load static data from config
-CACHE_DURATION = config['CACHE_DURATION']
-GUILD_NAME = config['GUILD_NAME']
-VERSIONS_URL = config['VERSIONS_URL']
-BASE_CHAMPIONS_URL = config['BASE_CHAMPIONS_URL']
+cache_duration = config['CACHE_DURATION']
+guild_name = config['GUILD_NAME']
+versions_url = config['VERSIONS_URL']
+base_champions_url = config['BASE_CHAMPIONS_URL']
 
-GUILD_ID = None
-CHANNEL_ID = None
+guild_id = None
+channel_id = None
 latest_version = None
 
 champions_data = {}
@@ -40,24 +40,24 @@ cache = {
 
 @bot.event
 async def on_ready():
-    global GUILD_ID, CHANNEL_ID
+    global guild_id, channel_id
 
     print(f'Bot {bot.user} is ready.')
     if APIKEY:
         print(f"Riot Apikey was found with a value of: {APIKEY}")
     # Fetch and print guild and channel information
     for guild in bot.guilds:
-        if guild.name == GUILD_NAME:
-            GUILD_ID = guild.id
+        if guild.name == guild_name:
+            guild_id = guild.id
             for channel in guild.channels:
                 if channel.name == "malding":
-                    CHANNEL_ID = channel.id
+                    channel_id = channel.id
                     break
-            if CHANNEL_ID is None:
-                print(f'No channel with name malding found in guild {GUILD_NAME}.')
+            if channel_id is None:
+                print(f'No channel with name malding found in guild {guild_name}.')
             else:
                 break
-    if GUILD_ID is None or CHANNEL_ID is None:
+    if guild_id is None or channel_id is None:
         print('Guild or Channel ID not set. Check your configuration.')
     else:
         refresh_cache.start()
@@ -68,7 +68,7 @@ async def on_ready():
 async def fetch_latest_version():
     global latest_version
     async with aiohttp.ClientSession() as session:
-        async with session.get(VERSIONS_URL) as response:
+        async with session.get(versions_url) as response:
             if response.status == 200:
                 versions = await response.json()
                 if versions:
@@ -78,7 +78,7 @@ async def fetch_latest_version():
 
 async def fetch_champions_data():
     global champions_data
-    url = BASE_CHAMPIONS_URL.format(version=latest_version)
+    url = base_champions_url.format(version=latest_version)
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             if response.status == 200:
@@ -89,13 +89,13 @@ async def fetch_champions_data():
 
 @tasks.loop(seconds=3600)  # Refresh every hour
 async def refresh_cache():
-    if GUILD_ID is None or CHANNEL_ID is None:
+    if guild_id is None or channel_id is None:
         print('Guild or Channel ID not set. Cannot refresh cache.')
         return
 
-    guild = bot.get_guild(GUILD_ID)
+    guild = bot.get_guild(guild_id)
     if guild:
-        channel = guild.get_channel(CHANNEL_ID)
+        channel = guild.get_channel(channel_id)
         if channel:
             messages = []
             try:
@@ -109,9 +109,9 @@ async def refresh_cache():
             except discord.HTTPException as e:
                 print(f'Failed to fetch messages: {e}')
         else:
-            print(f'Channel with ID {CHANNEL_ID} not found.')
+            print(f'Channel with ID {channel} not found.')
     else:
-        print(f'Guild with ID {GUILD_ID} not found.')
+        print(f'Guild with ID {guild_id} not found.')
 
 
 # Add this to your `load_cogs` function
