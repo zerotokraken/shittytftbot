@@ -149,6 +149,8 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
                         await cog_module.setup(bot, cache, cache_duration)
                     elif cog_name == 'cogs.roll':
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
+                    elif cog_name == 'cogs.aug':
+                        await cog_module.setup(bot, latest_version)
                     else:
                         await cog_module.setup(bot)
                 else:

@@ -8,7 +8,7 @@ import os
 class AugCommands(commands.Cog):
     def __init__(self, bot, version):
         self.bot = bot
-        self.version = version
+        self.version = latest_version
         self.augment_url = os.getenv('augment_url')
         self.patch_numbers = [0, 1, 2]  # List of patch numbers to attempt
 
@@ -59,4 +59,4 @@ class AugCommands(commands.Cog):
             await ctx.send(f"No augment found matching `{augment_name}`.")
 
 async def setup(bot):
-    await bot.add_cog(AugCommands(bot, version))
+    await bot.add_cog(AugCommands(bot, latest_version))
