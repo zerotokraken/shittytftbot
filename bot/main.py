@@ -70,7 +70,7 @@ async def on_ready():
     else:
         refresh_cache.start()
 
-    await load_cogs(bot, config=config, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
+    await load_cogs(bot, config=config, on_message=on_message, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
     print(f'Bot {bot.user} is ready.')
 
