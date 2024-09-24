@@ -124,24 +124,26 @@ async def refresh_cache():
         print(f'Guild with ID {guild_id} not found.')
 
 
-
+import importlib
 
 
 async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None,
                     shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
-    # Iterate over files in cogs directory
     for filename in os.listdir(cogs_dir):
         if filename.endswith('.py') and filename != '__init__.py':
             cog_name = f'cogs.{filename[:-3]}'
+
+            if cog_name == 'cogs.init':
+                print(f"Skipping {cog_name} because it is a blank file.")
+                continue
+
             print(f"Loading {cog_name}...")
 
             try:
-                # Load the cog module
                 cog_module = importlib.import_module(cog_name)
 
-                # Check if the module has a setup function and call it with the appropriate arguments
                 if hasattr(cog_module, 'setup'):
                     if cog_name == 'cogs.malding_command':
                         await cog_module.setup(bot, cache, cache_duration)
@@ -152,7 +154,6 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
                     else:
                         await cog_module.setup(bot)
                 else:
-                    # Load cog without setup if it doesn't have a setup function
                     await bot.load_extension(cog_name)
 
                 print(f"Successfully loaded {cog_name}")
