@@ -27,5 +27,5 @@ class MaldingCommand(commands.Cog):
         random_message = random.choice(self.cache['messages'])
         await ctx.send(random_message)
 
-async def setup(bot, cache, cache_duration):
-    await bot.add_cog(MaldingCommand(bot, cache, cache_duration))
+def setup(bot, cache, cache_duration):
+    bot.add_cog(MaldingCommand(bot, cache, cache_duration))
