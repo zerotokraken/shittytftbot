@@ -2,12 +2,11 @@ import discord
 from discord.ext import commands
 import random
 import asyncio
-from main import config
 
 class MessageResponder(commands.Cog):
     def __init__(self, bot, config):
         self.bot = bot
-        self.config = config
+        self.config = on_message
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -61,5 +60,6 @@ class MessageResponder(commands.Cog):
         # Process commands if the message is a command
         await self.bot.process_commands(message)
 
-async def setup(bot):
-    await bot.add_cog(MessageResponder(bot))
+def setup(bot):
+    # Note: `config` should be passed in some other way, e.g., global or through a different method
+    bot.add_cog(MessageResponder(bot, on_message))
