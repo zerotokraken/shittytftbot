@@ -70,12 +70,14 @@ async def on_ready():
     else:
         refresh_cache.start()
 
-    await load_cogs(bot, config=config, on_message=on_message, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
-                    latest_version=latest_version, shop_odds=shop_odds)
-    print(f'Bot {bot.user} is ready.')
-
     await fetch_latest_version()
     await fetch_champions_data()
+    await load_cogs(bot, config=config, on_message=on_message, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
+                    latest_version=latest_version, shop_odds=shop_odds)
+
+    print(f'Bot {bot.user} is ready.')
+
+
 
 
 async def fetch_latest_version():
@@ -132,7 +134,7 @@ async def refresh_cache():
 import importlib
 
 
-async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None,
+async def load_cogs(bot, config=None, on_message=None,  cache=None, cache_duration=None, champions_data=None, latest_version=None,
                     shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
