@@ -56,7 +56,7 @@ class AugCommands(commands.Cog):
                     break
 
         if not found:
-            await ctx.send(f"No augment found matching `{augment_name}`.")
+            print(f"No augment found matching `{augment_name}`.")
 
 async def setup(bot, latest_version):
     await bot.add_cog(AugCommands(bot, latest_version))

@@ -81,6 +81,7 @@ async def fetch_latest_version():
                 versions = await response.json()
                 if versions:
                     latest_version = versions[0]
+                    print(f"Current TFT Patch: {latest_version}")
             else:
                 print(f"Failed to fetch versions data: {response.status}")
 
