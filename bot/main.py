@@ -124,8 +124,7 @@ async def refresh_cache():
         print(f'Guild with ID {guild_id} not found.')
 
 
-async def load_cogs(bot, config=None,  cache=None, cache_duration=None, champions_data=None, latest_version=None,
-                    shop_odds=None):
+async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
     for filename in os.listdir(cogs_dir):
@@ -136,6 +135,11 @@ async def load_cogs(bot, config=None,  cache=None, cache_duration=None, champion
                 continue
 
             print(f"Loading {cog_name}...")
+
+            # Check if the cog is already loaded
+            if cog_name in bot.cogs:
+                print(f"{cog_name} is already loaded.")
+                continue
 
             try:
                 cog_module = importlib.import_module(cog_name)
@@ -153,6 +157,7 @@ async def load_cogs(bot, config=None,  cache=None, cache_duration=None, champion
                 print(f"Successfully loaded {cog_name}")
             except Exception as e:
                 print(f"Failed to load extension {cog_name}: {e}")
+
 
 
 # Run the bot using your token
