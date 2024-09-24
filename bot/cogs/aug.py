@@ -12,6 +12,7 @@ class AugCommands(commands.Cog):
         self.augment_url = os.getenv('augment_url')
         self.latest_version = latest_version
         self.patch_numbers = [2, 1, 0]  # List of patch numbers to attempt
+        self.patch_mapping = {0: "", 1: "B", 2: "C"}
 
     async def fetch_augment_data(self, url):
         async with aiohttp.ClientSession() as session:
@@ -33,8 +34,8 @@ class AugCommands(commands.Cog):
         found = False
 
         for patch_number in self.patch_numbers:
+            patch_suffix = self.patch_mapping.get(patch_number, "")
             url = f"{self.augment_url}{self.version}{patch_number}/1"
-            print(f"Fetching URL: {url}")
             json_data = await self.fetch_augment_data(url)
 
             if json_data:
@@ -51,7 +52,7 @@ class AugCommands(commands.Cog):
                         # Create an embed
                         embed = discord.Embed(
                             title=f"{augment_name}",
-                            description=f"Patch {self.latest_version} {patch_number}",
+                            description=f"Patch {self.latest_version} {patch_suffix}",
                             color=discord.Color.blue()  # Customize color as needed
                         )
                         embed.add_field(name="AVP", value=f"{place}", inline=False)
