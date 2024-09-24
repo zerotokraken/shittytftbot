@@ -6,7 +6,7 @@ import re
 import os
 
 class AugCommands(commands.Cog):
-    def __init__(self, bot, version):
+    def __init__(self, bot, latest_version):
         self.bot = bot
         self.version = latest_version
         self.augment_url = os.getenv('augment_url')
@@ -58,5 +58,5 @@ class AugCommands(commands.Cog):
         if not found:
             await ctx.send(f"No augment found matching `{augment_name}`.")
 
-async def setup(bot):
+async def setup(bot, latest_version):
     await bot.add_cog(AugCommands(bot, latest_version))
