@@ -10,6 +10,7 @@ class AugCommands(commands.Cog):
         self.bot = bot
         self.version = "".join(latest_version.split('.')[:2])
         self.augment_url = os.getenv('augment_url')
+        self.latest_version = latest_version
         self.patch_numbers = [2, 1, 0]  # List of patch numbers to attempt
 
     async def fetch_augment_data(self, url):
@@ -65,7 +66,7 @@ class AugCommands(commands.Cog):
                 break
 
         if not found:
-            await ctx.send(f"No augment found matching `{augment_name}`.")
+            print(f"No augment found matching `{augment_name}`.")
 
 
 async def setup(bot, latest_version):
