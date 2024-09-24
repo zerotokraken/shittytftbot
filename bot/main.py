@@ -146,13 +146,13 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
 
                 if hasattr(cog_module, 'setup'):
                     if cog_name == 'cogs.malding':
-                        await cog_module.setup(bot, cache, cache_duration)
+                        cog_module.setup(bot, cache, cache_duration)
                     elif cog_name == 'cogs.roll':
-                        await cog_module.setup(bot, champions_data, latest_version, shop_odds)
+                        cog_module.setup(bot, champions_data, latest_version, shop_odds)
                     else:
-                        await cog_module.setup(bot)
+                        cog_module.setup(bot)
                 else:
-                    await bot.load_extension(cog_name)
+                    bot.load_extension(cog_name)
 
                 print(f"Successfully loaded {cog_name}")
             except Exception as e:
