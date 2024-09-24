@@ -46,7 +46,19 @@ class AugCommands(commands.Cog):
                         place = base_data.get('place', 'N/A')
                         top4_rate = base_data.get('top4', 'N/A')
                         win_rate = base_data.get('won', 'N/A')
-                        await ctx.send(f"{augment_name} - AVP: {place}, Top 4: {top4_rate}%, Win: {win_rate}%")
+
+                        # Create an embed
+                        embed = discord.Embed(
+                            title=f"Augment: {augment_name}",
+                            description=f"Details for {augment_name}",
+                            color=discord.Color.blue()  # Customize color as needed
+                        )
+                        embed.add_field(name="AVP", value=f"{place}", inline=False)
+                        embed.add_field(name="Top 4 Rate", value=f"{top4_rate}%", inline=False)
+                        embed.add_field(name="Win Rate", value=f"{win_rate}%", inline=False)
+                        embed.set_footer(text="Data sourced from tactics.tools")
+
+                        await ctx.send(embed=embed)
                         break
 
             if found:
