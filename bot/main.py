@@ -22,7 +22,7 @@ with open(config_path, 'r') as config_file:
     config = json.load(config_file)
 
 # Load configuration from config.json
-message_path = os.path.join(os.path.dirname(__file__), config, 'on_message.json')
+message_path = os.path.join(os.path.dirname(__file__), 'config', 'on_message.json')
 with open(config_path, 'r') as on_message_file:
     on_message = json.load(on_message_file)
 
