@@ -66,6 +66,6 @@ class MessageResponder(commands.Cog):
         # Process commands if the message is a command
         await self.bot.process_commands(message)
 
-def setup(bot):
+async def setup(bot):
     # Note: `config` should be passed in some other way, e.g., global or through a different method
-    bot.add_cog(MessageResponder(bot))
+    await bot.add_cog(MessageResponder(bot))
