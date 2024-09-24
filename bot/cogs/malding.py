@@ -24,7 +24,7 @@ class MaldingCommand(commands.Cog):
             return
 
         # Ensure num_messages is within the limit
-        num_messages = min(max(num_messages, 1), 5)  # Adjust 10 to your desired limit
+        num_messages = min(max(num_messages, 1), 3)  # Adjust 10 to your desired limit
 
         for _ in range(num_messages):
             # Send a random message from the cache
