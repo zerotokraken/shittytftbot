@@ -61,6 +61,9 @@ class MessageResponder(commands.Cog):
         # Process commands if the message is a command
         await self.bot.process_commands(message)
 
-
-async def setup(bot, config):
-    await bot.add_cog(MessageResponder(bot, config))
+def setup(bot, config):
+    # Load configuration from config.json
+    config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
+    with open(config_path, 'r') as config_file:
+        config = json.load(config_file)
+    bot.add_cog(MessageResponder(bot, config))
