@@ -1,9 +1,9 @@
 {
-    "CACHE_DURATION": 3600,
-    "GUILD_NAME": "Competitive TFT",
-    "VERSIONS_URL": "https://ddragon.leagueoflegends.com/api/versions.json",
-    "BASE_CHAMPIONS_URL": "https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/tft-champion.json",
-    "SHOP_ODDS": {
+    "cache_duration": 3600,
+    "guild_name": "Competitive TFT",
+    "versions_url": "https://ddragon.leagueoflegends.com/api/versions.json",
+    "base_champions_url": "https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/tft-champion.json",
+    "shop_odds": {
         "2": [100, 0, 0, 0, 0],
         "3": [75, 25, 0, 0, 0],
         "4": [55, 30, 15, 0, 0],

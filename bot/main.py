@@ -21,10 +21,11 @@ with open(config_path, 'r') as config_file:
     config = json.load(config_file)
 
 # Load static data from config
-cache_duration = config['CACHE_DURATION']
-guild_name = config['GUILD_NAME']
-versions_url = config['VERSIONS_URL']
-base_champions_url = config['BASE_CHAMPIONS_URL']
+cache_duration = config['cache_duration']
+guild_name = config['guild_name']
+versions_url = config['versions_url']
+base_champions_url = config['base_champions_url']
+shop_odds = config['shop_odds']
 
 guild_id = None
 channel_id = None
