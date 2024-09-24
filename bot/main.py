@@ -151,7 +151,9 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
                     elif cog_name == 'cogs.roll':
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
                     elif cog_name == 'cogs.aug':
-                        await cog_module.setup(bot, latest_version)
+                        await cog_module.setup(bot, "14.18.1")
+                        #await cog_module.setup(bot, latest_version)
+                        # temporary fix for api version being showing next patch already
                     else:
                         await cog_module.setup(bot)
                 else:
