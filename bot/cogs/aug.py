@@ -50,6 +50,7 @@ class AugCommands(commands.Cog):
                         # Create an embed
                         embed = discord.Embed(
                             title=f"{augment_name}",
+                            description=f"Patch {latest_version} {patch_number}",
                             color=discord.Color.blue()  # Customize color as needed
                         )
                         embed.add_field(name="AVP", value=f"{place}", inline=False)
