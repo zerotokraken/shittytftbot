@@ -124,7 +124,6 @@ async def refresh_cache():
         print(f'Guild with ID {guild_id} not found.')
 
 
-# Function to load cogs
 async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None,
                     shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
@@ -136,20 +135,19 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
 
             try:
                 if cog_name == 'cogs.malding_command':
-                    await bot.load_extension(cog_name)
-                    malding_cog = bot.get_cog('MaldingCommand')
-                    malding_cog.cache = cache
-                    malding_cog.cache_duration = cache_duration
+                    # Load cog with cache arguments
+                    malding_cog = __import__('cogs.malding_command', fromlist=['setup'])
+                    await malding_cog.setup(bot, cache, cache_duration)
                 elif cog_name == 'cogs.roll_commands':
-                    # Directly call setup with arguments instead of loading it through bot.load_extension
+                    # Load cog with champions_data, latest_version, and shop_odds
                     roll_cog = __import__('cogs.roll_commands', fromlist=['setup'])
                     await roll_cog.setup(bot, champions_data, latest_version, shop_odds)
                 elif cog_name == 'cogs.message_responder':
-                    await bot.load_extension(cog_name)
-                    bot.get_cog('MessageResponder').config = config
-                elif cog_name == 'cogs.stickers_emojis':
-                    await bot.load_extension(cog_name)
+                    # Load cog with config
+                    responder_cog = __import__('cogs.message_responder', fromlist=['setup'])
+                    await responder_cog.setup(bot, config)
                 elif cog_name == 'cogs.streamer_commands':
+                    # Simple extension loading, no extra arguments
                     await bot.load_extension(cog_name)
                 else:
                     await bot.load_extension(cog_name)
