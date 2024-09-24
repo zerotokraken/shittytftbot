@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import asyncio
-
+from main import config
 
 class MessageResponder(commands.Cog):
     def __init__(self, bot, config):
@@ -61,9 +61,5 @@ class MessageResponder(commands.Cog):
         # Process commands if the message is a command
         await self.bot.process_commands(message)
 
-def setup(bot, config):
-    # Load configuration from config.json
-    config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
-    with open(config_path, 'r') as config_file:
-        config = json.load(config_file)
-    bot.add_cog(MessageResponder(bot, config))
+def setup(bot):
+    bot.add_cog(MessageResponder(bot))

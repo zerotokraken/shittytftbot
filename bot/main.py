@@ -136,7 +136,6 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
             cog_name = f'cogs.{filename[:-3]}'
 
             if cog_name == 'cogs.init':
-                print(f"Skipping {cog_name} because it is a blank file.")
                 continue
 
             print(f"Loading {cog_name}...")
@@ -150,7 +149,7 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
                     elif cog_name == 'cogs.roll_commands':
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
                     elif cog_name == 'cogs.message_responder':
-                        await cog_module.setup(bot, config)
+                        await cog_module.setup(bot)
                     else:
                         await cog_module.setup(bot)
                 else:
