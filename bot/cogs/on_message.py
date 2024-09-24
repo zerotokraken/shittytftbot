@@ -4,7 +4,7 @@ import random
 import asyncio
 
 class MessageResponder(commands.Cog):
-    def __init__(self, bot, config):
+    def __init__(self, bot):
         self.bot = bot
 
         config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'on_message.json')
