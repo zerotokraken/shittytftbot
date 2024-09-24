@@ -8,10 +8,10 @@ import os
 class AugCommands(commands.Cog):
     def __init__(self, bot, latest_version):
         self.bot = bot
-        self.version = latest_version
+        self.version = "".join(latest_version.split('.')[:2])
         self.augment_url = os.getenv('augment_url')
         self.patch_numbers = [0, 1, 2]  # List of patch numbers to attempt
-
+        # Split the version number by '.' and concatenate the first two parts
     async def fetch_augment_data(self, url):
         async with aiohttp.ClientSession() as session:
             try:
