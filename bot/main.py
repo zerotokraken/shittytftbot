@@ -43,7 +43,9 @@ cache = {
 async def on_ready():
     global guild_id, channel_id
 
-    print(f'Bot {bot.user} is ready.')
+    await load_cogs(bot, config=config, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
+                    latest_version=latest_version, shop_odds=shop_odds)
+
     if APIKEY:
         print(f"Riot Apikey was found with a value of: {APIKEY}")
     # Fetch and print guild and channel information
@@ -63,7 +65,10 @@ async def on_ready():
     else:
         refresh_cache.start()
 
+    print(f'Bot {bot.user} is ready.')
+
     await fetch_latest_version()
+
     await fetch_champions_data()
 
 async def fetch_latest_version():
@@ -115,37 +120,36 @@ async def refresh_cache():
         print(f'Guild with ID {guild_id} not found.')
 
 
-# Add this to your `load_cogs` function
-def load_cogs(bot, config, cache=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):
+# Function to load cogs
+async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
+    # Iterate over files in cogs directory
     for filename in os.listdir(cogs_dir):
         if filename.endswith('.py') and filename != '__init__.py':
             cog_name = f'cogs.{filename[:-3]}'
 
+            # Check for specific cogs that need extra arguments
             if cog_name == 'cogs.malding_command':
-                bot.load_extension(cog_name)
-                malding_cog = bot.get_cog('MaldingCommand')
-                malding_cog.cache = cache
-                malding_cog.cache_duration = cache_duration
+                # Manually import and setup the cog with extra arguments
+                await bot.load_extension(cog_name)
+                bot.get_cog('MaldingCommand').cache = cache
+                bot.get_cog('MaldingCommand').cache_duration = cache_duration
             elif cog_name == 'cogs.roll_commands':
-                bot.load_extension(cog_name)
+                await bot.load_extension(cog_name)
                 roll_cog = bot.get_cog('RollCommands')
                 roll_cog.champions_data = champions_data
                 roll_cog.latest_version = latest_version
                 roll_cog.shop_odds = shop_odds
             elif cog_name == 'cogs.message_responder':
-                bot.load_extension(cog_name)
+                await bot.load_extension(cog_name)
                 bot.get_cog('MessageResponder').config = config
             elif cog_name == 'cogs.stickers_emojis':
-                bot.load_extension(cog_name)
+                await bot.load_extension(cog_name)
             elif cog_name == 'cogs.streamer_commands':
-                bot.load_extension(cog_name)
+                await bot.load_extension(cog_name)
             else:
-                bot.load_extension(cog_name)
-
-# Usage example:
-load_cogs(bot, config=config, cache=cache, cache_duration=cache_duration, champions_data=champions_data, latest_version=latest_version, shop_odds=shop_odds)
+                await bot.load_extension(cog_name)
 
 # Run the bot using your token
 bot.run(botkey)
