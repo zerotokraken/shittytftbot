@@ -49,8 +49,7 @@ class AugCommands(commands.Cog):
 
                         # Create an embed
                         embed = discord.Embed(
-                            title=f"Augment: {augment_name}",
-                            description=f"Details for {augment_name}",
+                            title=f"{augment_name}",
                             color=discord.Color.blue()  # Customize color as needed
                         )
                         embed.add_field(name="AVP", value=f"{place}", inline=False)
