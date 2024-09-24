@@ -21,11 +21,6 @@ config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
 with open(config_path, 'r') as config_file:
     config = json.load(config_file)
 
-# Load configuration from config.json
-message_path = os.path.join(os.path.dirname(__file__), 'config', 'on_message.json')
-with open(config_path, 'r') as on_message_file:
-    on_message = json.load(on_message_file)
-
 # Load static data from config
 cache_duration = config['cache_duration']
 guild_name = config['guild_name']
@@ -72,7 +67,7 @@ async def on_ready():
 
     await fetch_latest_version()
     await fetch_champions_data()
-    await load_cogs(bot, config=config, on_message=on_message, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
+    await load_cogs(bot, config=config, cache=cache, cache_duration=cache_duration, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
     print(f'Bot {bot.user} is ready.')
@@ -134,7 +129,7 @@ async def refresh_cache():
 import importlib
 
 
-async def load_cogs(bot, config=None, on_message=None,  cache=None, cache_duration=None, champions_data=None, latest_version=None,
+async def load_cogs(bot, config=None,  cache=None, cache_duration=None, champions_data=None, latest_version=None,
                     shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
@@ -156,7 +151,7 @@ async def load_cogs(bot, config=None, on_message=None,  cache=None, cache_durati
                     elif cog_name == 'cogs.roll_commands':
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
                     elif cog_name == 'cogs.message_responder':
-                        await cog_module.setup(bot, on_message)
+                        await cog_module.setup(bot)
                     else:
                         await cog_module.setup(bot)
                 else:

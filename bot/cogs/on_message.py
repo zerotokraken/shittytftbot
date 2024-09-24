@@ -6,6 +6,10 @@ import asyncio
 class MessageResponder(commands.Cog):
     def __init__(self, bot, config):
         self.bot = bot
+
+        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'on_message.json')
+        with open(config_path, 'r') as config_file:
+            self.config = json.load(config_file)
         self.config = on_message
 
     @commands.Cog.listener()
@@ -62,4 +66,4 @@ class MessageResponder(commands.Cog):
 
 def setup(bot):
     # Note: `config` should be passed in some other way, e.g., global or through a different method
-    bot.add_cog(MessageResponder(bot, on_message))
+    bot.add_cog(MessageResponder(bot))
