@@ -73,8 +73,6 @@ async def on_ready():
     print(f'Bot {bot.user} is ready.')
 
 
-
-
 async def fetch_latest_version():
     global latest_version
     async with aiohttp.ClientSession() as session:
@@ -143,12 +141,10 @@ async def load_cogs(bot, config=None,  cache=None, cache_duration=None, champion
                 cog_module = importlib.import_module(cog_name)
 
                 if hasattr(cog_module, 'setup'):
-                    if cog_name == 'cogs.malding_command':
+                    if cog_name == 'cogs.malding':
                         await cog_module.setup(bot, cache, cache_duration)
-                    elif cog_name == 'cogs.roll_commands':
+                    elif cog_name == 'cogs.roll':
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
-                    elif cog_name == 'cogs.message_responder':
-                        await cog_module.setup(bot)
                     else:
                         await cog_module.setup(bot)
                 else:
