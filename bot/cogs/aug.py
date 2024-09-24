@@ -21,7 +21,6 @@ class AugCommands(commands.Cog):
                         return data
                     elif response.status == 404:
                         return None
-
             except aiohttp.ClientError as e:
                 print(f"Error fetching augment data: {str(e)}")
                 return None
@@ -38,7 +37,7 @@ class AugCommands(commands.Cog):
             if json_data:
                 # Process the data if found
                 for item in json_data:
-                    if search_term.lower() in item['id'].lower():
+                    if search_term.lower() in item.get('id', '').lower():
                         found = True
                         base_data = item.get('base', {})
                         place = base_data.get('place', 'N/A')
