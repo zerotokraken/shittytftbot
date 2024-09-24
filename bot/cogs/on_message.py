@@ -61,5 +61,5 @@ class MessageResponder(commands.Cog):
         # Process commands if the message is a command
         await self.bot.process_commands(message)
 
-def setup(bot):
-    bot.add_cog(MessageResponder(bot))
+async def setup(bot):
+    await bot.add_cog(MessageResponder(bot))
