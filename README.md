@@ -2,15 +2,27 @@
 
 ShittyTFTBot is a Discord bot designed for managing and interacting with players and data related to Teamfight Tactics (TFT). It supports various commands to look up player information and provide updates based on Riot Games' API.
 
+# Hosting
+
+The bot is deployed via pipeline from Github to Heroku. When commits are made the updates are then pushed to the hosted instance and a rolling update will be made.
+
 # Features
 
-Lookup Command: Retrieve player data by name and tagline.
+Lookup Command: Retrieve player data by name and tagline when '!lookup gameName#tagline' is used.
 
-Malding: Retrieves 1000 message cache from the channel and is able to output them on command. This cache updates hourly.
+Malding: Retrieves 1000 message cache from the channel and is able to output them when '!malding' is used. This cache updates hourly.
 
-Hosting: Deployed on Heroku.
+Augment Lookup: Scrapes Augment data from various websites when '!aug AugmentName' is used.
 
-More features are included but not currently listed. Will add later.
+Roll Shop: Simulates rolling shops based on the requested level and outputs a rectangle shop sized image with your output units. Command is '!roll#'. The # is the level you wish to roll at.
+
+On-Message: Bot responses with a temperament system based on the contextual words. This is a very basic 'personality' attempt and will likely be expanded upon further. Activation involves typing the bot's name or tagging it.
+
+Misc Commands: Any one line jokes or small functions will be housed in here. Check the misc file to read through these.
+
+Streamer Commands: These commands will output a line said by the streamer, an emoji/sticker or a clip of that streamer. Example: '!soju'
+
+Stickers & Emojis: Outputs a specific sticker or emoji. Example: '!frog'
 
 # Prerequisites
 

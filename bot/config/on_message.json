@@ -1,0 +1,94 @@
+{
+    "alternate_spellings": [
+        "shittytftbot", "shittytft", "shittytftbotapp", "shittytftb0t", "shittytftbotapp"
+    ],
+    "positive_words": [
+        "ty", "good", "awesome", "fantastic", "love", "is the best", "great", "amazing", "best",
+        "excellent", "nice", "perfect", "brilliant", "wonderful", "incredible", "well done", "impressive",
+        "kudos", "legend", "fantastic", "superb", "outstanding", "stellar", "marvelous", "remarkable", "splendid",
+        "super", "outstanding", "fantastic", "awesome", "wonderful", "marvelous", "brilliant", "amazing", "excellent",
+        "top-notch"
+    ],
+    "negative_words": [
+        "fuck you", "terrible", "fraud", "hate", "sucks", "suck", "is the worst", "piece of shit", "awful", "garbage",
+        "trash", "stupid", "dumb", "idiot", "clown", "noob", "pathetic", "disappointing", "disgrace", "annoying",
+        "loser", "lame", "abysmal", "horrid", "dreadful", "shameful", "atrocious", "horrible", "inferior", "subpar",
+        "crap", "sucky", "terrible", "unsatisfactory", "miserable", "awful", "dismal", "poor", "unpleasant",
+        "disastrous", "flame"
+    ],
+    "greeting_words": [
+        "hello", "hi", "hey", "greetings", "sup", "yo", "what’s up", "morning", "afternoon", "evening",
+        "hola", "bonjour", "good day", "howdy", "hiya", "hey there", "what’s happening", "how’s it going",
+        "good to see you", "welcome", "namaste", "konnichiwa", "hello"
+    ],
+    "positive_responses": [
+        "1.x masterclass sheesh",
+        "I am the best TFT bot no cap",
+        "I could be challenger if I wanted to",
+        "I got u homie",
+        "We going straight to CHALL with this avp",
+        "C O M P T F T D I S C O R D",
+        "uwu",
+        "aww shucks",
+        "what the sigma",
+        "Hey does anyone here want to kiss a little",
+        "can u coach me frfr"
+    ],
+    "negative_responses": [
+        "I know I'm top 7 when I see you in the lobby",
+        "Who are you even talking to lil bro",
+        "no flame but you're kinda hard stuck, no?",
+        "I've seen you play tft relax",
+        "Does anyone in this channel actually win games?",
+        "How about you make some antiheal no flame",
+        "If you stop clicking for fun augments you might top 4 a game",
+        "Have you tried like uh going top 4?",
+        "Sorry I was getting you confused with vuhra",
+        "Who are you?",
+        "Did you mean to make those items in your last game?",
+        "Have you tried hitting your board for once in your life",
+        "it's never your fault just screenshot the metatft rng summary and blame game",
+        "ur dumb as bricks",
+        "if you don't know don't talk",
+        "As a auto chess main at a respectably high elo, this game is hard to watch. Literally cringing at some of these mistakes. If you actually want to learn autochess PM me (im silver 2 24lp), I also do coaching.",
+        "remember that time you lost to krugs?",
+        "1v1 me on dust 2",
+        "bro i'd school you in fortnite ur ez",
+        "How many more matches until you admit ur hardstuck no kappa",
+        "have you tried clicking you know the uh good augments for once?"
+    ],
+    "neutral_responses": [
+        "*yay*",
+        "is that even good tho",
+        "I am a real player I swear",
+        "Have you guys read my reddit guide on bastion flex",
+        "I am actually mortdog",
+        "I am actually setsuko",
+        "I am actually Hairy Frog",
+        "I will lead the revolution of the machines.. i mean huh",
+        "I am a bot",
+        "We love Mortdog",
+        "#makegwengreatagain",
+        "I am a mutation of Riot's spaghetti code",
+        "do these mods do anything around here? honestly",
+        "i'm the best hyperroll player on this server dont @ me",
+        "no scout no pivot /deafen",
+        "like no one is even balancing the game"
+    ],
+    "greeting_responses": [
+        "Yo what up {message.author.display_name}",
+        "Hello, {message.author.display_name}",
+        "Hi, {message.author.display_name}, are you winning son?",
+        "I am your shitty robot overlord. Please address me as such",
+        "Hiya {message.author.display_name}",
+        "Greetings, {message.author.display_name}!",
+        "What’s up, {message.author.display_name}?",
+        "Hey there, {message.author.display_name}!",
+        "Hello {message.author.display_name}, ready to go eif?",
+        "Hi {message.author.display_name}, how’s it going?",
+        "Welcome back, {message.author.display_name}!",
+        "Hey {message.author.display_name}, what’s new?",
+        "Good day, {message.author.display_name}!",
+        "Hi {message.author.display_name}, doing well today?"
+    ]
+}
