@@ -139,5 +139,5 @@ class MiscCommands(commands.Cog):
     async def hawktuah(self, ctx):
         await ctx.send("You gotta give 'em that hawk tuah and spit on that thang")
 
-def setup(bot):
-    bot.add_cog(MiscCommands(bot))
+async def setup(bot):
+    await bot.add_cog(MiscCommands(bot))

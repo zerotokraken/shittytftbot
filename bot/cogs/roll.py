@@ -97,6 +97,6 @@ class RollCommands(commands.Cog):
         else:
             await ctx.send("No images available to display.")
 
-def setup(bot, champions_data, latest_version, shop_odds):
-    bot.add_cog(RollCommands(bot, champions_data, latest_version, shop_odds))
+async def setup(bot, champions_data, latest_version, shop_odds):
+    await bot.add_cog(RollCommands(bot, champions_data, latest_version, shop_odds))
 

@@ -72,5 +72,5 @@ class StreamerCommands(commands.Cog):
         else:
             await ctx.send(f'{selected_line_soju}')
 
-def setup(bot):
-    bot.add_cog(StreamerCommands(bot))
+async def setup(bot):
+    await bot.add_cog(StreamerCommands(bot))
