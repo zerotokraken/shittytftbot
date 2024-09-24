@@ -12,7 +12,7 @@ class MessageResponder(commands.Cog):
         config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'on_message.json')
         with open(config_path, 'r') as config_file:
             self.config = json.load(config_file)
-        self.config = on_message
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
