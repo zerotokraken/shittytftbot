@@ -7,7 +7,7 @@ import os
 class LookupCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.APIKEY = os.getenv('APIKEY')
+        self.APIKEY = APIKEY
 
     @commands.command(help="Lookup a player by name and tagline (format: name#tagline)")
     async def lookup(self, ctx, *, player: str):
@@ -141,5 +141,5 @@ class LookupCommands(commands.Cog):
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-async def setup(bot):
-    await bot.add_cog(LookupCommands(bot))
+async def setup(bot, APIKEY):
+    await bot.add_cog(LookupCommands(bot, APIKEY))

@@ -21,7 +21,6 @@ class AugCommands(commands.Cog):
                     if response.status == 200:
                         # Directly parse the JSON response
                         data = await response.json()
-                        print(data)
                         return data
                     elif response.status == 404:
                         return None
@@ -37,7 +36,6 @@ class AugCommands(commands.Cog):
         for patch_number in self.patch_numbers:
             patch_suffix = self.patch_mapping.get(patch_number, "")
             url = f"{self.augment_url}{self.version}{patch_number}/1"
-            print(url)
             json_data = await self.fetch_augment_data(url)
 
             if json_data:
