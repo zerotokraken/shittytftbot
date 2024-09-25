@@ -8,6 +8,7 @@ class LookupCommands(commands.Cog):
     def __init__(self, bot, apikey):
         self.bot = bot
         self.APIKEY = apikey  # Assigning API key correctly
+        self.latest_version = latest_version
 
     @commands.command(help="Lookup a player by name and tagline (format: name#tagline)")
     async def lookup(self, ctx, *, player: str):
@@ -142,5 +143,5 @@ class LookupCommands(commands.Cog):
             print(f"An error occurred: {str(e)}")
 
 
-async def setup(bot, apikey):
-    await bot.add_cog(LookupCommands(bot, apikey))
+async def setup(bot, apikey, latest_version):
+    await bot.add_cog(LookupCommands(bot, apikey, latest_version))

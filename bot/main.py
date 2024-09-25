@@ -153,7 +153,7 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
                     elif cog_name == 'cogs.aug':
                         await cog_module.setup(bot, latest_version)
                     elif cog_name == 'cogs.lookup':
-                        await cog_module.setup(bot, APIKEY)
+                        await cog_module.setup(bot, APIKEY, latest_version)
                     else:
                         await cog_module.setup(bot)
                 else:
