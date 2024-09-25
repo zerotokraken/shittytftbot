@@ -5,7 +5,7 @@ import urllib.parse
 import os
 
 class LookupCommands(commands.Cog):
-    def __init__(self, bot, apikey):
+    def __init__(self, bot, apikey, latest_version):
         self.bot = bot
         self.APIKEY = apikey  # Assigning API key correctly
         self.latest_version = latest_version
@@ -105,14 +105,14 @@ class LookupCommands(commands.Cog):
             tier_key = tier.capitalize()
 
             # Get the regalia image based on the player's rank
-            regalia_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/data/en_US/tft-regalia.json"
+            regalia_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/data/en_US/tft-regalia.json"
             regalia_response = requests.get(regalia_url)
             regalia_data = regalia_response.json()
 
             rank_image_url = None
             if tier_key in regalia_data["data"]["RANKED_TFT"]:
                 rank_image = regalia_data["data"]["RANKED_TFT"][tier_key]["image"]["full"]
-                rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{latest_version}/img/tft-regalia/{rank_image}"
+                rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/img/tft-regalia/{rank_image}"
 
             embed_color = rank_colors.get(tier_key, discord.Color.default())
 
