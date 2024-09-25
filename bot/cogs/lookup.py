@@ -5,9 +5,9 @@ import urllib.parse
 import os
 
 class LookupCommands(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, apikey):
         self.bot = bot
-        self.APIKEY = APIKEY
+        self.APIKEY = apikey  # Assigning API key correctly
 
     @commands.command(help="Lookup a player by name and tagline (format: name#tagline)")
     async def lookup(self, ctx, *, player: str):
@@ -26,7 +26,7 @@ class LookupCommands(commands.Cog):
             # Try each account region to get puuid
             puuid = None
             for region in account_regions:
-                api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={APIKEY}"
+                api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.APIKEY}"
                 response = requests.get(api_url)
                 if response.status_code == 200:
                     player_data = response.json()
@@ -39,7 +39,7 @@ class LookupCommands(commands.Cog):
             # Try each summoner region to get summonerId
             summoner_id = None
             for region in summoner_regions:
-                summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={APIKEY}"
+                summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={self.APIKEY}"
                 summoner_response = requests.get(summoner_url)
                 if summoner_response.status_code == 200:
                     summoner_data = summoner_response.json()
@@ -52,7 +52,7 @@ class LookupCommands(commands.Cog):
             # Try each summoner region to get league data
             league_data = None
             for region in summoner_regions:
-                league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={APIKEY}"
+                league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={self.APIKEY}"
                 league_response = requests.get(league_url)
                 if league_response.status_code == 200:
                     league_data = league_response.json()
@@ -141,5 +141,6 @@ class LookupCommands(commands.Cog):
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
-async def setup(bot, APIKEY):
-    await bot.add_cog(LookupCommands(bot, APIKEY))
+
+async def setup(bot, apikey):
+    await bot.add_cog(LookupCommands(bot, apikey))
