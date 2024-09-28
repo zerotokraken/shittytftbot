@@ -73,7 +73,7 @@ class AugCommands(commands.Cog):
                 dynamic_id, image_url, found_name = await self.get_augment_by_name(augment_name)
 
                 if not dynamic_id or not image_url:
-                    await ctx.send(f"No augment found for `{augment_name}`.")
+                    print(f"No augment found for `{augment_name}`.")
                     return
 
                 # Iterate over the 'singles' list in the JSON data to match with dynamic ID
@@ -107,7 +107,7 @@ class AugCommands(commands.Cog):
                 break
 
         if not found:
-            await ctx.send(f"No augment stats found for `{augment_name}`.")
+            print(f"No augment stats found for `{augment_name}`.")
 
 
 async def setup(bot, latest_version):
