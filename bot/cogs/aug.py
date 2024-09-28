@@ -116,10 +116,12 @@ class AugCommands(commands.Cog):
                         # Resize the image
                         resized_image_bytes = await self.resize_image(image_url, size=(48, 48))
 
-                        # Add the image to the embed
+                        # Add the thumbnail image to the embed
                         if resized_image_bytes:
-                            file = discord.File(resized_image_bytes, filename="augment_image.png")
-                            embed.set_image(url="attachment://augment_image.png")
+                            # Use an in-memory image file for the thumbnail
+                            file = discord.File(resized_image_bytes, filename="augment_thumbnail.png")
+                            # Set the thumbnail directly
+                            embed.set_thumbnail(url="attachment://augment_thumbnail.png")
 
 
                         # Send the embed with the image
@@ -130,7 +132,7 @@ class AugCommands(commands.Cog):
                 break
 
         if not found:
-            await ctx.send(f"No augment stats found for `{augment_name}`.")
+            print(f"No augment stats found for `{augment_name}`.")
 
 
 async def setup(bot, latest_version):
