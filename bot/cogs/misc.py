@@ -139,5 +139,9 @@ class MiscCommands(commands.Cog):
     async def hawktuah(self, ctx):
         await ctx.send("You gotta give 'em that hawk tuah and spit on that thang")
 
+    @commands.command()
+    async def saida(self, ctx):
+        await ctx.send("https://clips.twitch.tv/ConcernedPoliteFlyShadyLulu-ZYsvLju7ZH8kualJ")
+
 async def setup(bot):
     await bot.add_cog(MiscCommands(bot))
