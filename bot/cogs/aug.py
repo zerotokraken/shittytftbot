@@ -84,50 +84,48 @@ class AugCommands(commands.Cog):
             json_data = await self.fetch_augment_data(url)
 
             if json_data:
-                # Extract augment details from the name
-                dynamic_id, image_url, found_name = await self.get_augment_by_name(augment_name)
-
-                if not dynamic_id or not image_url:
-                    await ctx.send(f"No augment found for `{augment_name}`.")
-                    return
-
-                # Iterate over the 'singles' list in the JSON data to match with dynamic ID
+                # Iterate over the 'singles' list in the JSON data
                 singles = json_data.get('singles', [])
                 for augment in singles:
-                    if dynamic_id.lower() in augment['id'].lower():
+                    if search_term.lower() in augment['id'].lower():
                         found = True
                         base_data = augment.get('base', {})
                         place = base_data.get('place', 'N/A')
                         top4_rate = base_data.get('top4', 'N/A')
                         win_rate = base_data.get('won', 'N/A')
 
-                        # Create an embed with stats
-                        embed = discord.Embed(
-                            title=f"{found_name}",
-                            description=f"Patch {self.latest_version} {patch_suffix}",
-                            color=discord.Color.blue()  # Customize color as needed
-                        )
-                        embed.add_field(name="AVP (Average Placement)", value=f"{place}", inline=False)
-                        embed.add_field(name="Top 4 Rate", value=f"{top4_rate}%", inline=False)
-                        embed.add_field(name="Win Rate", value=f"{win_rate}%", inline=False)
-
-                        embed.set_footer(text=f"Data sourced from tactics.tools")
+                        # Prepare the image URL
+                        image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/augment/{augment['image']['full']}"
 
                         # Resize the image
                         resized_image_bytes = await self.resize_image(image_url, size=(48, 48))
 
-                        # Send the embed first
-                        await ctx.send(embed=embed)
+                        # Create an embed
+                        embed = discord.Embed(
+                            title=f"{augment_name}",
+                            description=f"Patch {self.latest_version} {patch_suffix}",
+                            color=discord.Color.blue()  # Customize color as needed
+                        )
+                        embed.add_field(name="AVP", value=f"{place}", inline=False)
+                        embed.add_field(name="Top 4 Rate", value=f"{top4_rate}%", inline=False)
+                        embed.add_field(name="Win Rate", value=f"{win_rate}%", inline=False)
 
-                        # Send the resized image as an attachment
-                        await ctx.send(file=discord.File(resized_image_bytes, filename='image.png'))
+                        # Add the image to the embed
+                        if resized_image_bytes:
+                            file = discord.File(resized_image_bytes, filename="augment_image.png")
+                            embed.set_image(url="attachment://augment_image.png")
+
+                        embed.set_footer(text="Data sourced from tactics.tools")
+
+                        # Send the embed with the image
+                        await ctx.send(embed=embed, file=file)
                         break
 
             if found:
                 break
 
         if not found:
-            await ctx.send(f"No augment stats found for `{augment_name}`.")
+            print(f"No augment found matching `{augment_name}`.")
 
 
 async def setup(bot, latest_version):
