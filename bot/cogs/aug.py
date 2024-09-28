@@ -100,6 +100,7 @@ class AugCommands(commands.Cog):
                         place = base_data.get('place', 'N/A')
                         top4_rate = base_data.get('top4', 'N/A')
                         win_rate = base_data.get('won', 'N/A')
+                        sample_size = base_data.get('count', 'N/A')
 
                         # Create an embed with stats
                         embed = discord.Embed(
@@ -110,8 +111,9 @@ class AugCommands(commands.Cog):
                         embed.add_field(name="AVP (Average Placement)", value=f"{place}", inline=False)
                         embed.add_field(name="Top 4 Rate", value=f"{top4_rate}%", inline=False)
                         embed.add_field(name="Win Rate", value=f"{win_rate}%", inline=False)
+                        embed.add_field(name="Sample Size", value=f"{sample_size}", inline=False)
 
-                        embed.set_footer(text=f"Data sourced from tactics.tools")
+                        embed.set_footer(text=f"Data sourced from tactics.tools (Diamond +)")
 
                         # Resize the image
                         resized_image_bytes = await self.resize_image(image_url, size=(48, 48))
