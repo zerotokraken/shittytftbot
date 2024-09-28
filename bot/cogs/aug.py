@@ -3,6 +3,8 @@ from discord.ext import commands
 import aiohttp
 import os
 import re
+from PIL import Image
+from io import BytesIO
 
 
 class AugCommands(commands.Cog):
@@ -58,6 +60,19 @@ class AugCommands(commands.Cog):
 
         return None, None, None
 
+    async def resize_image(self, url, size=(48, 48)):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    img_data = await response.read()
+                    img = Image.open(BytesIO(img_data))
+                    img = img.resize(size, Image.ANTIALIAS)
+                    img_byte_array = BytesIO()
+                    img.save(img_byte_array, format='PNG')
+                    img_byte_array.seek(0)
+                    return img_byte_array
+                return None
+
     @commands.command(help="Lookup augment data from tactics.tools, Usage: !aug <augment_name>")
     async def aug(self, ctx, *, augment_name: str):
         search_term = augment_name.replace(' ', '')
@@ -73,7 +88,7 @@ class AugCommands(commands.Cog):
                 dynamic_id, image_url, found_name = await self.get_augment_by_name(augment_name)
 
                 if not dynamic_id or not image_url:
-                    print(f"No augment found for `{augment_name}`.")
+                    await ctx.send(f"No augment found for `{augment_name}`.")
                     return
 
                 # Iterate over the 'singles' list in the JSON data to match with dynamic ID
@@ -86,7 +101,7 @@ class AugCommands(commands.Cog):
                         top4_rate = base_data.get('top4', 'N/A')
                         win_rate = base_data.get('won', 'N/A')
 
-                        # Create an embed with stats and image
+                        # Create an embed with stats
                         embed = discord.Embed(
                             title=f"{found_name}",
                             description=f"Patch {self.latest_version} {patch_suffix}",
@@ -96,18 +111,23 @@ class AugCommands(commands.Cog):
                         embed.add_field(name="Top 4 Rate", value=f"{top4_rate}%", inline=False)
                         embed.add_field(name="Win Rate", value=f"{win_rate}%", inline=False)
 
-                        # Add the augment image to the embed
-                        embed.set_image(url=image_url)
-                        embed.set_footer(text=f"Data sourced from tactics.tools | Patch {self.latest_version}")
+                        embed.set_footer(text=f"Data sourced from tactics.tools")
 
+                        # Resize the image
+                        resized_image_bytes = await self.resize_image(image_url, size=(48, 48))
+
+                        # Send the embed first
                         await ctx.send(embed=embed)
+
+                        # Send the resized image as an attachment
+                        await ctx.send(file=discord.File(resized_image_bytes, filename='image.png'))
                         break
 
             if found:
                 break
 
         if not found:
-            print(f"No augment stats found for `{augment_name}`.")
+            await ctx.send(f"No augment stats found for `{augment_name}`.")
 
 
 async def setup(bot, latest_version):

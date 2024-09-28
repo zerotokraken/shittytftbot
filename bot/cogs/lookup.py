@@ -145,6 +145,7 @@ class LookupCommands(commands.Cog):
             embed.add_field(name="Win %", value=f"{win_percentage:.2f}%", inline=False)
             embed.add_field(name="Top 4 %", value=f"{top4_percentage:.2f}%", inline=False)
             embed.add_field(name="Average Placement", value=f"{average_placement:.2f}", inline=False)
+            embed.set_footer(text=f"Data sourced from tactics.tools")
 
             if rank_image_url:
                 embed.set_thumbnail(url=rank_image_url)
