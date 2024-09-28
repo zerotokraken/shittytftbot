@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 import aiohttp
-import json
 import os
+import re
 
 
 class AugCommands(commands.Cog):
@@ -19,14 +19,44 @@ class AugCommands(commands.Cog):
             try:
                 async with session.get(url) as response:
                     if response.status == 200:
-                        # Directly parse the JSON response
-                        data = await response.json()
-                        return data
-                    elif response.status == 404:
-                        return None
+                        return await response.json()
+                    return None
             except aiohttp.ClientError as e:
                 print(f"Error fetching augment data: {str(e)}")
                 return None
+
+    async def get_augment_by_name(self, augment_name):
+        augment_data_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/data/en_US/tft-augments.json"
+        augment_data = await self.fetch_augment_data(augment_data_url)
+
+        if not augment_data:
+            print("Failed to retrieve augment data.")
+            return None, None, None
+
+        augments = augment_data.get('data', {}).values()
+
+        # Normalize the input augment name for case-insensitive comparison
+        augment_name = augment_name.lower().strip()
+
+        # Search through the augments for a matching name
+        for augment in augments:
+            if augment_name == augment['name'].lower():
+                augment_id = augment['id']
+
+                # Use regex to extract the number after "TFT" and the text after "Augment_"
+                match = re.search(r"TFT(\d+)_Augment_(.+)", augment_id)
+                if match:
+                    number = match.group(1)  # Get the number (like "12")
+                    augment_text = match.group(2)  # Get the augment suffix (like "NunuCarry")
+                    dynamic_id = f"{number}{augment_text}"
+
+                    # Get the image file from the augment data
+                    image_file = augment['image']['full']
+                    image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/img/tft-augment/{image_file}"
+
+                    return dynamic_id, image_url, augment['name']
+
+        return None, None, None
 
     @commands.command(help="Lookup augment data from tactics.tools, Usage: !aug <augment_name>")
     async def aug(self, ctx, *, augment_name: str):
@@ -39,26 +69,36 @@ class AugCommands(commands.Cog):
             json_data = await self.fetch_augment_data(url)
 
             if json_data:
-                # Iterate over the 'singles' list in the JSON data
+                # Extract augment details from the name
+                dynamic_id, image_url, found_name = await self.get_augment_by_name(augment_name)
+
+                if not dynamic_id or not image_url:
+                    await ctx.send(f"No augment found for `{augment_name}`.")
+                    return
+
+                # Iterate over the 'singles' list in the JSON data to match with dynamic ID
                 singles = json_data.get('singles', [])
                 for augment in singles:
-                    if search_term.lower() in augment['id'].lower():
+                    if dynamic_id.lower() in augment['id'].lower():
                         found = True
                         base_data = augment.get('base', {})
                         place = base_data.get('place', 'N/A')
                         top4_rate = base_data.get('top4', 'N/A')
                         win_rate = base_data.get('won', 'N/A')
 
-                        # Create an embed
+                        # Create an embed with stats and image
                         embed = discord.Embed(
-                            title=f"{augment_name}",
+                            title=f"{found_name}",
                             description=f"Patch {self.latest_version} {patch_suffix}",
                             color=discord.Color.blue()  # Customize color as needed
                         )
-                        embed.add_field(name="AVP", value=f"{place}", inline=False)
+                        embed.add_field(name="AVP (Average Placement)", value=f"{place}", inline=False)
                         embed.add_field(name="Top 4 Rate", value=f"{top4_rate}%", inline=False)
                         embed.add_field(name="Win Rate", value=f"{win_rate}%", inline=False)
-                        embed.set_footer(text="Data sourced from tactics.tools")
+
+                        # Add the augment image to the embed
+                        embed.set_image(url=image_url)
+                        embed.set_footer(text=f"Data sourced from tactics.tools | Patch {self.latest_version}")
 
                         await ctx.send(embed=embed)
                         break
@@ -67,7 +107,7 @@ class AugCommands(commands.Cog):
                 break
 
         if not found:
-            print(f"No augment found matching `{augment_name}`.")
+            await ctx.send(f"No augment stats found for `{augment_name}`.")
 
 
 async def setup(bot, latest_version):
