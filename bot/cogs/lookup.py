@@ -137,7 +137,7 @@ class LookupCommands(commands.Cog):
                 embed.add_field(name="Rank", value=f"{tier_key} ({league_points} LP)", inline=False)
             else:
                 embed.add_field(name="Rank", value=f"{tier_key} {rank} ({league_points} LP)", inline=False)
-            embed.add_field(name="Leaderboard", value=f"Top {display_rank} {region.capitalize}", inline=False)
+            embed.add_field(name="Leaderboard", value=f"Top {display_rank} {region.capitalize()}", inline=False)
             embed.add_field(name="Total Games", value=str(total_games), inline=False)
             embed.add_field(name="Win %", value=f"{win_percentage:.2f}%", inline=False)
             embed.add_field(name="Top 4 %", value=f"{top4_percentage:.2f}%", inline=False)
