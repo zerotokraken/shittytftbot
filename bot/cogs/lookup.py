@@ -3,6 +3,7 @@ from discord.ext import commands
 import requests
 import urllib.parse
 import os
+import re
 
 class LookupCommands(commands.Cog):
     def __init__(self, bot, apikey, latest_version):
@@ -132,12 +133,14 @@ class LookupCommands(commands.Cog):
                 color=embed_color
             )
 
+            region_cleaned = re.sub(r'\d+', '', region).upper()
+
             # Add fields based on tier
             if tier in ["CHALLENGER", "GRANDMASTER", "MASTER"]:
                 embed.add_field(name="Rank", value=f"{tier_key} ({league_points} LP)", inline=False)
             else:
                 embed.add_field(name="Rank", value=f"{tier_key} {rank} ({league_points} LP)", inline=False)
-            embed.add_field(name="Leaderboard", value=f"Top {display_rank} {region.capitalize()}", inline=False)
+            embed.add_field(name="Leaderboard", value=f"Top {display_rank} {region_cleaned}", inline=False)
             embed.add_field(name="Total Games", value=str(total_games), inline=False)
             embed.add_field(name="Win %", value=f"{win_percentage:.2f}%", inline=False)
             embed.add_field(name="Top 4 %", value=f"{top4_percentage:.2f}%", inline=False)
