@@ -66,7 +66,7 @@ class AugCommands(commands.Cog):
                 if response.status == 200:
                     img_data = await response.read()
                     img = Image.open(BytesIO(img_data))
-                    img = img.resize(size, Image.ANTIALIAS)
+                    img = img.resize(size, Image.LANCZOS)  # Use LANCZOS instead of ANTIALIAS
                     img_byte_array = BytesIO()
                     img.save(img_byte_array, format='PNG')
                     img_byte_array.seek(0)
