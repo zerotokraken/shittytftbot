@@ -141,7 +141,12 @@ class MiscCommands(commands.Cog):
 
     @commands.command()
     async def saida(self, ctx):
-        await ctx.send("https://clips.twitch.tv/ConcernedPoliteFlyShadyLulu-ZYsvLju7ZH8kualJ")
+        lines_saida = [
+            "https://clips.twitch.tv/ConcernedPoliteFlyShadyLulu-ZYsvLju7ZH8kualJ",
+            "https://clips.twitch.tv/EnjoyableGlamorousWalletHeyGuys-04szKrShCTmHm74L"
+        ]
+        selected_line_saida = random.choice(lines_saida)
+        await ctx.send(f'{selected_line_saida}')
 
 async def setup(bot):
     await bot.add_cog(MiscCommands(bot))

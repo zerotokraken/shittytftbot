@@ -22,6 +22,7 @@ with open(config_path, 'r') as config_file:
     config = json.load(config_file)
 
 # Load static data from config
+bot_spam = config['bot_spam_channel_id']
 guild_name = config['guild_name']
 versions_url = config['versions_url']
 base_champions_url = config['base_champions_url']

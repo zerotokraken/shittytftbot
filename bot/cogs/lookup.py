@@ -9,6 +9,7 @@ class LookupCommands(commands.Cog):
         self.bot = bot
         self.APIKEY = apikey  # Assigning API key correctly
         self.latest_version = latest_version
+        self.tt_url = os.getenv('tt_url')
 
     @commands.command(help="Lookup a player by name and tagline (format: name#tagline)")
     async def lookup(self, ctx, *, player: str):
@@ -72,21 +73,31 @@ class LookupCommands(commands.Cog):
             total_games = wins + losses
 
             # Fetch match stats for calculating Win %, Top 4 %, and Avg Placement
-            lol_chess_url = f"https://tft.dakgg.io/api/v1/summoners/na1/{shortened_gameName}-{tagLine}/overviews?season=set12"
-            lol_chess_response = requests.get(lol_chess_url)
+            tactics_url = f"{self.tt_url}/{region}/{gameName}/{tagLine}/120/0"
+            tactics_response = requests.get(tactics_url)
 
-            if lol_chess_response.status_code == 200:
-                data = lol_chess_response.json()
-                overview = data["summonerSeasonOverviews"][0]
+            if tactics_response.status_code == 200:
+                data = tactics_response.json()
+                overview = data["queueSeasonStats"]["1100"]
+                # icon_id = data["playerInfo"]["profileIconId"]
+                local_rank = data["playerInfo"]["localRank"]
+
+                # Unpack the array into two variables
+                rank_value, rank_probability = local_rank
+                # Determine which value to use for rank display
+
+                if rank_value <= 1000:
+                    display_rank = f"#{rank_value}"
+                else:
+                    display_rank = f"{rank_probability * 100:.2f}%"
 
                 # Calculate Win %, Top 4 %, and Average Placement
-                plays = overview["plays"]
-                wins = overview["wins"]
-                tops = overview["tops"]
-                sum_placement = overview["sumPlacement"]
+                plays = overview["games"]
+                wins = overview["win"]
+                tops = overview["top4"]
                 win_percentage = (wins / plays) * 100
                 top4_percentage = (tops / plays) * 100
-                average_placement = sum_placement / plays
+                average_placement = overview["avgPlace"]
 
             # Define colors based on rank
             rank_colors = {
@@ -126,7 +137,7 @@ class LookupCommands(commands.Cog):
                 embed.add_field(name="Rank", value=f"{tier_key} ({league_points} LP)", inline=False)
             else:
                 embed.add_field(name="Rank", value=f"{tier_key} {rank} ({league_points} LP)", inline=False)
-
+            embed.add_field(name="Leaderboard", value=f"Top {display_rank} {region.capitalize}", inline=False)
             embed.add_field(name="Total Games", value=str(total_games), inline=False)
             embed.add_field(name="Win %", value=f"{win_percentage:.2f}%", inline=False)
             embed.add_field(name="Top 4 %", value=f"{top4_percentage:.2f}%", inline=False)
