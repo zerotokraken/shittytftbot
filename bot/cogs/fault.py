@@ -10,7 +10,7 @@ class FaultCommand(commands.Cog):
         self.cache_duration = cache_duration
 
     @commands.command(help="Find a random message containing 'is it even my fault'.")
-    async def search_phrase(self, ctx):
+    async def myfault(self, ctx):
         current_time = time.time()
 
         # Check if the cache is expired
