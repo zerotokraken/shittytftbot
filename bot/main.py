@@ -140,12 +140,19 @@ async def refresh_cache_fault():
         return
 
     messages = []
+    included_channels = [1113421046029242381, 1113429363950616586, 1113495131841110126, 1214136434664017962]  # Add the IDs of channels to include
+
     try:
-        # Iterate through all text channels in the guild
-        for channel in guild.text_channels:
+        # Iterate through only the specified channels in the guild
+        for channel_id in included_channels:
+            channel = guild.get_channel(channel_id)
+            if channel is None:
+                print(f"Channel with ID {channel_id} not found.")
+                continue
+
             # Ensure the bot has permission to read messages in the channel
             try:
-                async for message in channel.history(limit=10000):
+                async for message in channel.history(limit=2500):
                     messages.append((channel.id, message.content))  # Store both channel ID and message content
             except discord.Forbidden:
                 print(f'Bot does not have permission to read messages in {channel.name}.')
@@ -155,9 +162,10 @@ async def refresh_cache_fault():
         # Cache the collected messages and update the timestamp
         cache_fault['messages'] = messages
         cache_fault['timestamp'] = time.time()
-        print('Cache refreshed for all channels.')
+        print('Cache refreshed for specified channels.')
     except Exception as e:
         print(f'Error refreshing cache: {e}')
+
 
 
 async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):

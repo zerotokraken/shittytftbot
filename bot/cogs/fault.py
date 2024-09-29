@@ -24,7 +24,11 @@ class FaultCommand(commands.Cog):
             return
 
         # Search for messages containing the phrase
-        matching_messages = [msg for msg in self.cache_fault['messages'] if 'is it even my fault' in msg.lower()]
+        matching_messages = [
+            msg for channel_id, msg in self.cache_fault['messages']
+            # Unpack the tuple into channel_id and message content
+            if 'is it even my fault' in msg.lower()
+        ]
 
         if not matching_messages:
             print("No messages found containing 'is it even my fault'.")
