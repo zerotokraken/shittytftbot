@@ -40,6 +40,12 @@ cache = {
     'timestamp': 0
 }
 
+# In-memory cache
+cache_fault = {
+    'messages': [],
+    'timestamp': 0
+}
+
 
 @bot.event
 async def on_ready():
@@ -64,11 +70,12 @@ async def on_ready():
         print('Guild or Channel ID not set. Check your configuration.')
     else:
         refresh_cache.start()
+        refresh_cache_fault.start()
 
     await fetch_latest_version()
     await fetch_champions_data()
 
-    await load_cogs(bot, config=config, cache=cache, cache_duration=3600, champions_data=champions_data,
+    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_duration=3600, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
     print(f'Bot {bot.user} is ready.')
@@ -125,8 +132,35 @@ async def refresh_cache():
     else:
         print(f'Guild with ID {guild_id} not found.')
 
+@tasks.loop(seconds=3600)  # Refresh every hour
+async def refresh_cache_fault():
+    guild = bot.get_guild(guild_id)  # Assuming guild_id is globally set
+    if guild is None:
+        print('Guild not found. Cannot refresh cache.')
+        return
 
-async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):
+    messages = []
+    try:
+        # Iterate through all text channels in the guild
+        for channel in guild.text_channels:
+            # Ensure the bot has permission to read messages in the channel
+            try:
+                async for message in channel.history(limit=10000):
+                    messages.append((channel.id, message.content))  # Store both channel ID and message content
+            except discord.Forbidden:
+                print(f'Bot does not have permission to read messages in {channel.name}.')
+            except discord.HTTPException as e:
+                print(f'Failed to fetch messages from {channel.name}: {e}')
+
+        # Cache the collected messages and update the timestamp
+        cache_fault['messages'] = messages
+        cache_fault['timestamp'] = time.time()
+        print('Cache refreshed for all channels.')
+    except Exception as e:
+        print(f'Error refreshing cache: {e}')
+
+
+async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
     for filename in os.listdir(cogs_dir):
@@ -155,6 +189,8 @@ async def load_cogs(bot, config=None, cache=None, cache_duration=None, champions
                         await cog_module.setup(bot, latest_version)
                     elif cog_name == 'cogs.lookup':
                         await cog_module.setup(bot, APIKEY, latest_version)
+                    elif cog_name == 'cogs.fault':
+                        await cog_module.setup(bot, cache_fault, cache_duration)
                     else:
                         await cog_module.setup(bot)
                 else:

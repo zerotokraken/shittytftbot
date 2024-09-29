@@ -1,35 +1,38 @@
 import discord
 from discord.ext import commands
-from collections import deque
-import asyncio
+import random
+import time
 
-class FaultCommands(commands.Cog):
-    def __init__(self, bot):
+class FaultCommand(commands.Cog):
+    def __init__(self, bot, cache_fault, cache_duration):
         self.bot = bot
-        self.message_cache = deque(maxlen=1000)
+        self.cache_fault = cache_fault
+        self.cache_duration = cache_duration
 
-    async def cache_messages(self, channel):
-        # Fetch the last 1000 messages and store them in the cache
-        async for message in channel.history(limit=1000):
-            self.message_cache.append(message)
+    @commands.command(help="Find a random message containing 'is it even my fault'.")
+    async def search_phrase(self, ctx):
+        current_time = time.time()
 
-    @commands.command(help="Fetch a random message containing 'is it even my fault'")
-    async def myfault(self, ctx):
-        search_phrase = "is it even my fault"
-        channel = ctx.channel
+        # Check if the cache is expired
+        if current_time - self.cache_fault['timestamp'] > self.cache_duration:
+            print('Cache is expired. Please wait for it to refresh.')
+            return
 
-        # If the cache is empty, populate it
-        if not self.message_cache:
-            await self.cache_messages(channel)
+        # Check if there are messages in the cache
+        if not self.cache_fault.get('messages', []):
+            print('No messages found in the cache.')
+            return
 
-        # Filter the cache for messages containing the search phrase
-        matching_messages = [msg for msg in self.message_cache if search_phrase in msg.content.lower()]
+        # Search for messages containing the phrase
+        matching_messages = [msg for msg in self.cache_fault['messages'] if 'is it even my fault' in msg.lower()]
 
-        if matching_messages:
-            random_message = random.choice(matching_messages)
-            await ctx.send(f"{random_message.content}")
-        else:
-            print(f"No messages found with the phrase '{search_phrase}'.")
+        if not matching_messages:
+            print("No messages found containing 'is it even my fault'.")
+            return
 
-async def setup(bot):
-    await bot.add_cog(FaultCommands(bot))
+        # Send a random matching message from the cache
+        random_message = random.choice(matching_messages)
+        await ctx.send(random_message)
+
+async def setup(bot, cache_fault, cache_duration):
+    await bot.add_cog(FaultCommand(bot, cache_fault, cache_duration))
