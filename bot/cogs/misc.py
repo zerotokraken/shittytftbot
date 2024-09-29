@@ -142,8 +142,8 @@ class MiscCommands(commands.Cog):
     @commands.command()
     async def saida(self, ctx):
         lines_saida = [
-            "https://clips.twitch.tv/ConcernedPoliteFlyShadyLulu-ZYsvLju7ZH8kualJ",
-            "https://clips.twitch.tv/EnjoyableGlamorousWalletHeyGuys-04szKrShCTmHm74L"
+            "https://clips.twitch.tv/ConcernedPoliteFlyShadyLulu-ZYsvLju7ZH8kualJ?embedo",
+            "https://clips.twitch.tv/EnjoyableGlamorousWalletHeyGuys-04szKrShCTmHm74L?embedo"
         ]
         selected_line_saida = random.choice(lines_saida)
         await ctx.send(f'{selected_line_saida}')
