@@ -199,6 +199,8 @@ async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_durati
                         await cog_module.setup(bot, APIKEY, latest_version)
                     elif cog_name == 'cogs.fault':
                         await cog_module.setup(bot, cache_fault, cache_duration)
+                    elif cog_name == 'cogs.top':
+                        await cog_module.setup(bot, APIKEY)
                     else:
                         await cog_module.setup(bot)
                 else:
