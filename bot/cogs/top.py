@@ -71,7 +71,7 @@ class LeaderboardCommands(commands.Cog):
         # Now use stripped_region in the embed title
         embed = discord.Embed(
             title=f"Top 5 Challenger - {stripped_region.upper()}",
-            color=discord.Color.blue()
+            color=discord.Color.yellow()
         )
 
         # Add each player to the embed
