@@ -65,10 +65,13 @@ class LeaderboardCommands(commands.Cog):
                     else:
                         print(f"Failed to fetch account name for puuid {puuid}.")
 
-        # Step 4: Create the embed with top 10 Challenger players
+        # Strip the number from the region (e.g., "na1" -> "na", "euw1" -> "euw")
+        stripped_region = ''.join([char for char in closest_region if not char.isdigit()])
+
+        # Now use stripped_region in the embed title
         embed = discord.Embed(
-            title=f"Top 10 Challenger Players - {closest_region.upper()}",
-            color=discord.Color.yellow()
+            title=f"Top 5 Challenger - {stripped_region.upper()}",
+            color=discord.Color.blue()
         )
 
         # Add each player to the embed
