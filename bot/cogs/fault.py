@@ -4,17 +4,17 @@ import random
 import time
 
 class FaultCommand(commands.Cog):
-    def __init__(self, bot, cache_fault, cache_duration):
+    def __init__(self, bot, cache_fault, cache_duration_fault):
         self.bot = bot
         self.cache_fault = cache_fault
-        self.cache_duration = cache_duration
+        self.cache_duration_fault = cache_duration_fault
 
     @commands.command(help="Find a random message containing 'is it even my fault'.")
     async def myfault(self, ctx):
         current_time = time.time()
 
         # Check if the cache is expired
-        if current_time - self.cache_fault['timestamp'] > self.cache_duration:
+        if current_time - self.cache_fault['timestamp'] > self.cache_duration_fault:
             print('Cache is expired. Please wait for it to refresh.')
             return
 
@@ -28,4 +28,4 @@ class FaultCommand(commands.Cog):
         await ctx.send(random_message)
 
 async def setup(bot, cache_fault, cache_duration):
-    await bot.add_cog(FaultCommand(bot, cache_fault, cache_duration))
+    await bot.add_cog(FaultCommand(bot, cache_fault, cache_duration_fault))

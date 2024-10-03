@@ -75,7 +75,7 @@ async def on_ready():
     await fetch_latest_version()
     await fetch_champions_data()
 
-    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_duration=3600, champions_data=champions_data,
+    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_duration=3600, cache_duration_fault=43200, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
     print(f'Bot {bot.user} is ready.')
@@ -176,7 +176,7 @@ async def refresh_cache_fault():
 
 
 
-async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_duration=None, champions_data=None, latest_version=None, shop_odds=None):
+async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_duration=None, cache_duration_fault=None, champions_data=None, latest_version=None, shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
     for filename in os.listdir(cogs_dir):
@@ -206,7 +206,7 @@ async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_durati
                     elif cog_name == 'cogs.lookup':
                         await cog_module.setup(bot, APIKEY, latest_version)
                     elif cog_name == 'cogs.fault':
-                        await cog_module.setup(bot, cache_fault, cache_duration)
+                        await cog_module.setup(bot, cache_fault, cache_duration_fault)
                     elif cog_name == 'cogs.top':
                         await cog_module.setup(bot, APIKEY)
                     else:
