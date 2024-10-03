@@ -27,5 +27,5 @@ class FaultCommand(commands.Cog):
         random_message = random.choice([msg for _, msg in self.cache_fault['messages']])
         await ctx.send(random_message)
 
-async def setup(bot, cache_fault, cache_duration):
+async def setup(bot, cache_fault, cache_duration_fault):
     await bot.add_cog(FaultCommand(bot, cache_fault, cache_duration_fault))
