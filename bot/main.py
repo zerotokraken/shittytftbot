@@ -132,7 +132,7 @@ async def refresh_cache():
     else:
         print(f'Guild with ID {guild_id} not found.')
 
-@tasks.loop(seconds=28000)  # Refresh every eight hour
+@tasks.loop(seconds=43200)  # Refresh every eight hour
 async def refresh_cache_fault():
     guild = bot.get_guild(guild_id)  # Assuming guild_id is globally set
     if guild is None:
@@ -141,7 +141,7 @@ async def refresh_cache_fault():
 
     messages = []
     included_channels = [1113421046029242381, 1113429363950616586, 1113495131841110126]  # Add the IDs of channels to include
-    max_messages = 50  # Adjust this to the number of messages you want to cache
+    max_messages = 100  # Adjust this to the number of messages you want to cache
 
     try:
         # Iterate through only the specified channels in the guild
