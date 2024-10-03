@@ -23,19 +23,8 @@ class FaultCommand(commands.Cog):
             print('No messages found in the cache.')
             return
 
-        # Search for messages containing the phrase
-        matching_messages = [
-            msg for channel_id, msg in self.cache_fault['messages']
-            # Unpack the tuple into channel_id and message content
-            if 'is it even my fault' in msg.lower()
-        ]
-
-        if not matching_messages:
-            print("No messages found containing 'is it even my fault'.")
-            return
-
-        # Send a random matching message from the cache
-        random_message = random.choice(matching_messages)
+        # Send a random message from the cached messages
+        random_message = random.choice([msg for _, msg in self.cache_fault['messages']])
         await ctx.send(random_message)
 
 async def setup(bot, cache_fault, cache_duration):
