@@ -26,7 +26,15 @@ class Personality(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        
+
+        main_match = 'shitty tft bot'
+        alternate_spellings = self.config['alternate_spellings']
+        greeting_words = self.config['greeting_words']
+        positive_responses = self.config['positive_responses']
+        negative_responses = self.config['negative_responses']
+        neutral_responses = self.config['neutral_responses']
+        greeting_responses = self.config['greeting_responses']
+
         # Ignore messages sent by the bot itself
         if message.author == self.bot.user:
             return
