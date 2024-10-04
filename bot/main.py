@@ -40,8 +40,12 @@ cache = {
     'timestamp': 0
 }
 
-# In-memory cache
 cache_fault = {
+    'messages': [],
+    'timestamp': 0
+}
+
+cache_psyop = {
     'messages': [],
     'timestamp': 0
 }
@@ -70,12 +74,12 @@ async def on_ready():
         print('Guild or Channel ID not set. Check your configuration.')
     else:
         refresh_cache.start()
-        refresh_cache_fault.start()
+        refresh_cache_custom.start()
 
     await fetch_latest_version()
     await fetch_champions_data()
 
-    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_duration=3600, cache_duration_fault=43200, champions_data=champions_data,
+    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_psyop=cache_psyop, cache_duration=3600, cache_duration_custom=21600, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
     print(f'Bot {bot.user} is ready.')
@@ -132,17 +136,20 @@ async def refresh_cache():
     else:
         print(f'Guild with ID {guild_id} not found.')
 
-@tasks.loop(seconds=43200)  # Refresh every eight hour
-async def refresh_cache_fault():
-    print("Beginning Cache Fault refresh")
+@tasks.loop(seconds=21600)  # Refresh every eight hours
+async def refresh_cache_custom():
+    print("Beginning Cache Custom refresh")
     guild = bot.get_guild(guild_id)  # Assuming guild_id is globally set
     if guild is None:
         print('Guild not found. Cannot refresh cache.')
         return
 
-    messages = []
+    # Initialize two separate message caches for 'fault' and 'psyop'
+    fault_messages = []
+    psyop_messages = []
+
     included_channels = [1113421046029242381, 1113429363950616586, 1113495131841110126]  # Add the IDs of channels to include
-    max_messages = 50  # Adjust this to the number of messages you want to cache
+    max_messages = 50  # Adjust this to the number of messages you want to cache for each category
 
     try:
         # Iterate through only the specified channels in the guild
@@ -153,22 +160,31 @@ async def refresh_cache_fault():
                 continue
 
             # Ensure the bot has permission to read messages in the channel
-            collected = 0  # Track the number of messages containing the phrase
+            collected_fault = 0  # Track the number of messages for 'fault'
+            collected_psyop = 0   # Track the number of messages for 'psyop'
             async for message in channel.history(limit=None):  # No limit on fetching messages
-                if 'is it even my fault' in message.content.lower():
-                    messages.append((channel.id, message.content))  # Store both channel ID and message content
-                    collected += 1
+                if 'is it even my fault' in message.content.lower() and collected_fault < max_messages:
+                    fault_messages.append((channel.id, message.content))  # Store both channel ID and message content
+                    collected_fault += 1
 
-                # Stop if we've collected the desired number of messages
-                if collected >= max_messages:
+                if 'psyop' in message.content.lower() and collected_psyop < max_messages:
+                    psyop_messages.append((channel.id, message.content))  # Store both channel ID and message content
+                    collected_psyop += 1
+
+                # Stop if we've collected the desired number of messages for both categories
+                if collected_fault >= max_messages and collected_psyop >= max_messages:
                     break
 
-            if collected >= max_messages:
+            # Check if we've collected enough messages from both categories
+            if collected_fault >= max_messages and collected_psyop >= max_messages:
                 break
 
         # Cache the collected messages and update the timestamp
-        cache_fault['messages'] = messages
+        cache_fault['messages'] = fault_messages
+        cache_psyop['messages'] = psyop_messages  # Assuming you have a similar cache structure for psyop
         cache_fault['timestamp'] = time.time()
+        cache_psyop['timestamp'] = time.time()  # Update the timestamp for psyop cache
+
         print('Cache refreshed for specified channels.')
     except Exception as e:
         print(f'Error refreshing cache: {e}')
@@ -176,7 +192,8 @@ async def refresh_cache_fault():
 
 
 
-async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_duration=None, cache_duration_fault=None, champions_data=None, latest_version=None, shop_odds=None):
+
+async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_psyop=None, cache_duration=None, cache_duration_custom=None, champions_data=None, latest_version=None, shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
     for filename in os.listdir(cogs_dir):
@@ -206,7 +223,9 @@ async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_durati
                     elif cog_name == 'cogs.lookup':
                         await cog_module.setup(bot, apikey, latest_version)
                     elif cog_name == 'cogs.fault':
-                        await cog_module.setup(bot, cache_fault, cache_duration_fault)
+                        await cog_module.setup(bot, cache_fault, cache_duration_custom)
+                    elif cog_name == 'cogs.psyop':
+                        await cog_module.setup(bot, cache_psyop, cache_duration_custom)
                     elif cog_name == 'cogs.top':
                         await cog_module.setup(bot, apikey)
                     else:
