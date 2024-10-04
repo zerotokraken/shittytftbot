@@ -5,11 +5,11 @@ import asyncio
 import json
 import os
 
-class MessageResponder(commands.Cog):
+class Personality(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'on_message.json')
+        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'personality.json')
         with open(config_path, 'r') as config_file:
             self.config = json.load(config_file)
 
@@ -67,4 +67,4 @@ class MessageResponder(commands.Cog):
             await message.channel.send(formatted_response)
 
 async def setup(bot):
-    await bot.add_cog(MessageResponder(bot))
+    await bot.add_cog(Personality(bot))

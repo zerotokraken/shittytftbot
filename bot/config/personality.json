@@ -77,19 +77,19 @@
         "like no one is even balancing the game"
     ],
     "greeting_responses": [
-        "Yo what up {message.author.display_name}",
-        "Hello, {message.author.display_name}",
-        "Hi, {message.author.display_name}, are you winning son?",
+        "Yo what up {display_name}",
+        "Hello, {display_name}",
+        "Hi, {display_name}, are you winning son?",
         "I am your shitty robot overlord. Please address me as such",
-        "Hiya {message.author.display_name}",
-        "Greetings, {message.author.display_name}!",
-        "What’s up, {message.author.display_name}?",
-        "Hey there, {message.author.display_name}!",
-        "Hello {message.author.display_name}, ready to go eif?",
-        "Hi {message.author.display_name}, how’s it going?",
-        "Welcome back, {message.author.display_name}!",
-        "Hey {message.author.display_name}, what’s new?",
-        "Good day, {message.author.display_name}!",
-        "Hi {message.author.display_name}, doing well today?"
+        "Hiya {display_name}",
+        "Greetings, {display_name}!",
+        "What’s up, {display_name}?",
+        "Hey there, {display_name}!",
+        "Hello {display_name}, ready to go eif?",
+        "Hi {display_name}, how’s it going?",
+        "Welcome back, {display_name}!",
+        "Hey {display_name}, what’s new?",
+        "Good day, {display_name}!",
+        "Hi {display_name}, doing well today?"
     ]
 }
