@@ -57,12 +57,14 @@ class MessageResponder(commands.Cog):
             else:
                 response = random.choice(neutral_responses)
 
+            # Format the response to include the author's display name if needed
+            formatted_response = response.format(display_name=message.author.display_name)
+
             # Add a 1-second delay before responding
             await asyncio.sleep(1)
 
-            # Send the appropriate response
-            await message.channel.send(response)
+            # Send the formatted response
+            await message.channel.send(formatted_response)
 
 async def setup(bot):
-    # Note: `config` should be passed in some other way, e.g., global or through a different method
     await bot.add_cog(MessageResponder(bot))
