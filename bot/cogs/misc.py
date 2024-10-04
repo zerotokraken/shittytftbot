@@ -33,13 +33,32 @@ class MiscCommands(commands.Cog):
         time_str = f"{hours} hours, {minutes} minutes, {seconds} seconds"
         await ctx.send(f"Vuhra is about to mald in {time_str}")
 
-    # Command to list all commands in alphabetical order
+    # Command to list main commands with custom descriptions, and clump remaining into one line
     @commands.command()
     async def shittycommands(self, ctx):
-        commands_list = sorted(self.bot.commands, key=lambda c: c.name)
-        command_names = [f'`{command.name}` {command.description}' for command in commands_list]
-        response = '\n'.join(command_names) or 'No commands available.'
-        await ctx.send(f'Available commands:\n{response}')
+        # Define a static list of main commands with custom descriptions
+        main_commands = {
+            'lookup': 'Look up a player’s TFT stats on tactics.tools, Include the player tag as well [!lookup BOT#TAG]',
+            'aug': 'Lookup the statistics for an augment on tactics.tools [!aug Sweet Tooth]',
+            'top': 'Look up the top 5 players in a region [!top na]',
+            'roll': 'Simulate a shop roll at a specific level [!roll #]',
+            'malding': 'Send up to 3 random messages from the malding channel. Refreshs once an hour',
+        }
+
+        # Prepare the response for main commands
+        main_response = '\n'.join([f'`{name}` {desc}' for name, desc in main_commands.items()])
+
+        # Get remaining commands that are not in the main list
+        remaining_commands = [
+            f'`{command.name}`' for command in self.bot.commands
+            if command.name not in main_commands
+        ]
+
+        # Create a one-line response for remaining commands
+        remaining_response = ', '.join(remaining_commands) if remaining_commands else 'No remaining commands.'
+
+        # Send the response
+        await ctx.send(f'**Primary commands:**\n{main_response}\n\n**Misc commands:**\n{remaining_response}')
 
     @commands.command()
     async def noob(self, ctx):

@@ -35,7 +35,7 @@ class StickersEmojis(commands.Cog):
         except discord.HTTPException as e:
             print(f"An error occurred: {e}")
 
-    @commands.command(name="69420")
+    @commands.command(name="420")
     async def sixninefourtwenty(self, ctx):
         guild = ctx.guild
         try:
