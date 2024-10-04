@@ -12,7 +12,7 @@ class RollCommands(commands.Cog):
         self.latest_version = latest_version
         self.shop_odds = shop_odds
 
-    @commands.command(help="Type the level you want to roll on")
+    @commands.command()
     async def roll(self, ctx, level: int = 5):
         if not self.champions_data:
             print("Champions data is not available. Please wait while we update it.")

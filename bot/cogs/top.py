@@ -19,7 +19,7 @@ class LeaderboardCommands(commands.Cog):
         return closest_region[0] if closest_region else None
 
     # Command to fetch top 10 Challenger players
-    @commands.command(help="Fetch top 10 Challenger players for the closest matching region.")
+    @commands.command()
     async def top(self, ctx, region_input: str):
         closest_region = self.get_closest_region(region_input)
         if not closest_region:

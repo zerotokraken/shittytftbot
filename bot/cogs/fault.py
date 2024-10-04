@@ -9,7 +9,7 @@ class FaultCommand(commands.Cog):
         self.cache_fault = cache_fault
         self.cache_duration_fault = cache_duration_fault
 
-    @commands.command(help="Find a random message containing 'is it even my fault'.")
+    @commands.command()
     async def myfault(self, ctx):
         current_time = time.time()
 

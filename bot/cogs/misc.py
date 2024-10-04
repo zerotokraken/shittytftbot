@@ -85,6 +85,12 @@ class MiscCommands(commands.Cog):
         # Send the embed response
         await ctx.send(embed=embed)
 
+    # Override the default help command to call shittycommands
+    @commands.command(name='help')
+    async def help_command(self, ctx):
+        # Just call the shittycommands command
+        await self.bot.get_command('shittycommands')(ctx)
+
     @commands.command()
     async def noob(self, ctx):
         members = [member for member in ctx.guild.members if not member.bot]

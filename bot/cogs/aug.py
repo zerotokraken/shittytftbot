@@ -73,7 +73,7 @@ class AugCommands(commands.Cog):
                     return img_byte_array
                 return None
 
-    @commands.command(help="Lookup augment data from tactics.tools, Usage: !aug <augment_name>")
+    @commands.command()
     async def aug(self, ctx, *, augment_name: str):
         search_term = augment_name.replace(' ', '')
         found = False

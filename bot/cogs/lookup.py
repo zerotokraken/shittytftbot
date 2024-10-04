@@ -12,7 +12,7 @@ class LookupCommands(commands.Cog):
         self.latest_version = latest_version
         self.tt_url = os.getenv('tt_url')
 
-    @commands.command(help="Lookup a player by name and tagline (format: name#tagline)")
+    @commands.command()
     async def lookup(self, ctx, *, player: str):
         try:
             # Split the player argument into gameName and tagLine
