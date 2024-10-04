@@ -16,7 +16,8 @@ class ShittyCommands(commands.Cog):
             'top': 'Look up the top 5 players in a region [!top na]',
             'roll': 'Simulate a shop roll at a specific level [!roll #]',
             'malding': 'Send up to 3 random messages from the malding channel. Refreshes once an hour',
-            'avp': 'Predict your average placement. Random integer between 1.0-8.0'
+            'avp': 'Predict your average placement. Random integer between 1.0-8.0',
+            'suggest': 'Suggest a command or feature [!suggest myidea]'
         }
 
         # Define a list of miscellaneous commands
