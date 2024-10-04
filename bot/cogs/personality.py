@@ -26,31 +26,32 @@ class Personality(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        
         # Ignore messages sent by the bot itself
         if message.author == self.bot.user:
             return
 
-        main_match = 'shitty tft bot'
-        alternate_spellings = self.config['alternate_spellings']
-        greeting_words = self.config['greeting_words']
-        positive_responses = self.config['positive_responses']
-        negative_responses = self.config['negative_responses']
-        neutral_responses = self.config['neutral_responses']
-        greeting_responses = self.config['greeting_responses']
+        # Check for bot mention or specific phrases
+        if (self.bot.user.mention in message.content or main_match in message.content.lower()
+                or any(alt in message.content.lower() for alt in alternate_spellings)):
 
-        message_content = message.content.lower()
+            # Lowercase the full message
+            message_content = message.content.lower()
 
-        if (self.bot.user.mention in message_content or main_match in message_content
-                or any(alt in message_content for alt in alternate_spellings)):
+            # Use TextBlob for sentiment analysis
+            analysis = TextBlob(message_content)
+            sentiment = analysis.sentiment
 
-            # Use sentiment analysis to determine the context
-            context = self.determine_sentiment(message_content)
-
-            # Handle greetings separately (if detected)
-            if any(word in message_content for word in greeting_words):
+            # Determine context based on sentiment polarity
+            context = 'neutral'
+            if sentiment.polarity < 0:  # Negative sentiment
+                context = 'negative'
+            elif sentiment.polarity > 0:  # Positive sentiment
+                context = 'positive'
+            elif any(word in message_content for word in greeting_words):  # Check for greeting
                 context = 'greeting'
 
-            # Select a random response based on the detected context
+            # Select a random response based on the context
             if context == 'positive':
                 response = random.choice(positive_responses)
             elif context == 'negative':
@@ -60,7 +61,7 @@ class Personality(commands.Cog):
             else:
                 response = random.choice(neutral_responses)
 
-            # Format the response with the author's display name
+            # Format the response to include the author's display name if needed
             formatted_response = response.format(display_name=message.author.display_name)
 
             # Add a 1-second delay before responding
