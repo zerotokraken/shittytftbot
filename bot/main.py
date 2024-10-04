@@ -14,7 +14,7 @@ intents.guilds = True  # Enable the guilds intent to get guild information
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
 botkey = os.getenv('botkey')
-APIKEY = os.getenv('APIKEY')
+apikey = os.getenv('apikey')
 
 # Load configuration from config.json
 config_path = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
@@ -51,8 +51,8 @@ cache_fault = {
 async def on_ready():
     global guild_id, channel_id
 
-    if APIKEY:
-        print(f"Riot API key was found with a value of: {APIKEY}")
+    if apikey:
+        print(f"Riot API key was found with a value of: {apikey}")
 
     # Fetch and print guild and channel information
     for guild in bot.guilds:
@@ -204,11 +204,11 @@ async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_durati
                     elif cog_name == 'cogs.aug':
                         await cog_module.setup(bot, latest_version)
                     elif cog_name == 'cogs.lookup':
-                        await cog_module.setup(bot, APIKEY, latest_version)
+                        await cog_module.setup(bot, apikey, latest_version)
                     elif cog_name == 'cogs.fault':
                         await cog_module.setup(bot, cache_fault, cache_duration_fault)
                     elif cog_name == 'cogs.top':
-                        await cog_module.setup(bot, APIKEY)
+                        await cog_module.setup(bot, apikey)
                     else:
                         await cog_module.setup(bot)
                 else:

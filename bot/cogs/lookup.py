@@ -8,7 +8,7 @@ import re
 class LookupCommands(commands.Cog):
     def __init__(self, bot, apikey, latest_version):
         self.bot = bot
-        self.APIKEY = apikey  # Assigning API key correctly
+        self.apikey = apikey  # Assigning API key correctly
         self.latest_version = latest_version
         self.tt_url = os.getenv('tt_url')
 
@@ -29,7 +29,7 @@ class LookupCommands(commands.Cog):
             # Try each account region to get puuid
             puuid = None
             for region in account_regions:
-                api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.APIKEY}"
+                api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.apikey}"
                 response = requests.get(api_url)
                 if response.status_code == 200:
                     player_data = response.json()
@@ -42,7 +42,7 @@ class LookupCommands(commands.Cog):
             # Try each summoner region to get summonerId
             summoner_id = None
             for region in summoner_regions:
-                summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={self.APIKEY}"
+                summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={self.apikey}"
                 summoner_response = requests.get(summoner_url)
                 if summoner_response.status_code == 200:
                     summoner_data = summoner_response.json()
@@ -55,7 +55,7 @@ class LookupCommands(commands.Cog):
             # Try each summoner region to get league data
             league_data = None
             for region in summoner_regions:
-                league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={self.APIKEY}"
+                league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={self.apikey}"
                 league_response = requests.get(league_url)
                 if league_response.status_code == 200:
                     league_data = league_response.json()
