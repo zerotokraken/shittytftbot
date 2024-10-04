@@ -2,20 +2,6 @@
     "alternate_spellings": [
         "shittytftbot", "shittytft", "shittytftbotapp", "shittytftb0t", "shittytftbotapp"
     ],
-    "positive_words": [
-        "ty", "good", "awesome", "fantastic", "love", "is the best", "great", "amazing", "best",
-        "excellent", "nice", "perfect", "brilliant", "wonderful", "incredible", "well done", "impressive",
-        "kudos", "legend", "fantastic", "superb", "outstanding", "stellar", "marvelous", "remarkable", "splendid",
-        "super", "outstanding", "fantastic", "awesome", "wonderful", "marvelous", "brilliant", "amazing", "excellent",
-        "top-notch"
-    ],
-    "negative_words": [
-        "fuck you", "terrible", "fraud", "hate", "sucks", "suck", "is the worst", "piece of shit", "awful", "garbage",
-        "trash", "stupid", "dumb", "idiot", "clown", "noob", "pathetic", "disappointing", "disgrace", "annoying",
-        "loser", "lame", "abysmal", "horrid", "dreadful", "shameful", "atrocious", "horrible", "inferior", "subpar",
-        "crap", "sucky", "terrible", "unsatisfactory", "miserable", "awful", "dismal", "poor", "unpleasant",
-        "disastrous", "flame"
-    ],
     "greeting_words": [
         "hello", "hi", "hey", "greetings", "sup", "yo", "what’s up", "morning", "afternoon", "evening",
         "hola", "bonjour", "good day", "howdy", "hiya", "hey there", "what’s happening", "how’s it going",
