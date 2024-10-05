@@ -100,6 +100,11 @@ class MiscCommands(commands.Cog):
     async def hyperroll(self, ctx):
         await ctx.send("unik is the last hope for NA hyperroll")
 
+    @commands.command(name="2021")
+    async def nolife(self, ctx):
+        await ctx.send("top 1 leaderboards got no life tbh bro")
+        await ctx.send("they still sweating their balls off since 2021")
+
     @commands.command()
     async def erhm(self, ctx):
         await ctx.send("what the sigma")

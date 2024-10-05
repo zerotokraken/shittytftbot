@@ -1,6 +1,6 @@
 {
     "alternate_spellings": [
-        "shittytftbot", "shittytft", "shittytftbotapp", "shittytftb0t", "shittytftbotapp"
+        "shittytftbot", "shittytft", "shittytftbotapp", "shittytftb0t", "shittytftbotapp", "tft bot"
     ],
     "greeting_words": [
         "hello", "hi", "hey", "greetings", "sup", "yo", "what’s up", "morning", "afternoon", "evening",
@@ -42,7 +42,8 @@
         "bro i'd school you in fortnite ur ez",
         "How many more matches until you admit ur hardstuck no kappa",
         "have you tried clicking you know the uh good augments for once?",
-        "do u want me to be honest or support your crackpot theories"
+        "do u want me to be honest or support your crackpot theories",
+        "Should we look at your metatft or...?"
     ],
     "neutral_responses": [
         "*yay*",
@@ -60,7 +61,8 @@
         "do these mods do anything around here? honestly",
         "i'm the best hyperroll player on this server dont @ me",
         "no scout no pivot /deafen",
-        "like no one is even balancing the game"
+        "like no one is even balancing the game",
+        "That ZTK guy is such a highroller fr",
     ],
     "greeting_responses": [
         "Yo what up {display_name}",

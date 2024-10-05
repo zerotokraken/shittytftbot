@@ -79,7 +79,7 @@ async def on_ready():
     await fetch_latest_version()
     await fetch_champions_data()
 
-    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_psyop=cache_psyop, cache_duration=3600, cache_duration_custom=21600, champions_data=champions_data,
+    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_psyop=cache_psyop, cache_duration=3600, cache_duration_custom=28800, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
     print(f'Bot {bot.user} is ready.')
@@ -136,7 +136,7 @@ async def refresh_cache():
     else:
         print(f'Guild with ID {guild_id} not found.')
 
-@tasks.loop(seconds=21600)  # Refresh every eight hours
+@tasks.loop(seconds=28800)  # Refresh every eight hours
 async def refresh_cache_custom():
     print("Beginning Cache Custom refresh")
     guild = bot.get_guild(guild_id)  # Assuming guild_id is globally set
