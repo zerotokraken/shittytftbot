@@ -101,7 +101,7 @@ class CutoffCommands(commands.Cog):
 
         # Create and send the embed with cutoff values
         embed_gm = discord.Embed(
-            title=f"Grandmaster Cutoff {stripped_region.upper()}",
+            title=f"Grandmaster {stripped_region.upper()}",
             color=discord.Color.from_rgb(255, 165, 0)
         )
         embed_gm.add_field(name="", value=f"{grandmaster_cutoff} LP", inline=False)
