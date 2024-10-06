@@ -55,13 +55,13 @@ class CutoffCommands(commands.Cog):
             combined_data.sort(key=lambda x: x['leaguePoints'], reverse=True)
 
             # Challenger cutoff: 250th player
-            if len(combined_challenger_gm) >= 250:
+            if len(combined_data) >= 250:
                 challenger_cutoff = combined_data[249]['leaguePoints']
             else:
                 challenger_cutoff = combined_data[-1]['leaguePoints']
 
             # Grandmaster cutoff: 750th player
-            if len(combined_gm_master) >= 750:
+            if len(combined_data) >= 750:
                 grandmaster_cutoff = combined_data[749]['leaguePoints']
             else:
                 grandmaster_cutoff = combined_data[-1]['leaguePoints']
