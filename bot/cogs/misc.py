@@ -138,6 +138,10 @@ class MiscCommands(commands.Cog):
         await ctx.send("You gotta give 'em that hawk tuah and spit on that thang")
 
     @commands.command()
+    async def regions(self, ctx):
+        await ctx.send("The available regions are: NA1, EUN1, EUW1, BR1, JP1, KR1, LA1, LA2, ME1, OC1, PH2, RU, SG2, TH2, TR1, TW2, VN2")
+        
+    @commands.command()
     async def saida(self, ctx):
         lines_saida = [
             "https://clips.twitch.tv/ConcernedPoliteFlyShadyLulu-ZYsvLju7ZH8kualJ?embedo",
