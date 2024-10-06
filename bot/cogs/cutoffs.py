@@ -42,7 +42,7 @@ class CutoffCommands(commands.Cog):
                     return
                 grandmaster_data = await grandmaster_response.json()
 
-            # Combine Challenger and Grandmaster players
+            # Combine Challenger and Grandmaster players for Challenger cutoff
             combined_challenger_gm = challenger_data['entries'] + grandmaster_data['entries']
             combined_challenger_gm.sort(key=lambda x: x['leaguePoints'], reverse=True)
 
@@ -61,18 +61,25 @@ class CutoffCommands(commands.Cog):
                     return
                 master_data = await master_response.json()
 
-            # Combine Grandmaster and Master players
+            # Combine Grandmaster and Master players for Grandmaster cutoff
             combined_gm_master = grandmaster_data['entries'] + master_data['entries']
             combined_gm_master.sort(key=lambda x: x['leaguePoints'], reverse=True)
 
-            # Grandmaster cutoff: 250th player
-            if len(combined_gm_master) >= 250:
-                grandmaster_cutoff = combined_gm_master[249]['leaguePoints']
+            # Grandmaster cutoff: 750th player
+            if len(combined_gm_master) >= 750:
+                grandmaster_cutoff = combined_gm_master[749]['leaguePoints']
             else:
                 grandmaster_cutoff = combined_gm_master[-1]['leaguePoints']
 
         # Strip the number from the region (e.g., "na1" -> "na", "euw1" -> "euw")
         stripped_region = ''.join([char for char in closest_region if not char.isdigit()])
+
+        # Enforce baseline cutoffs (500 LP for Challenger, 250 LP for Grandmaster)
+        if challenger_cutoff < 500:
+            challenger_cutoff = 500
+
+        if grandmaster_cutoff < 250:
+            grandmaster_cutoff = 250
 
         # Create and send the embed with cutoff values
         embed = discord.Embed(
