@@ -66,8 +66,8 @@ class CutoffCommands(commands.Cog):
             combined_gm_master.sort(key=lambda x: x['leaguePoints'], reverse=True)
 
             # Grandmaster cutoff: 750th player
-            if len(combined_gm_master) >= 750:
-                grandmaster_cutoff = combined_gm_master[749]['leaguePoints']
+            if len(combined_gm_master) >= 700:
+                grandmaster_cutoff = combined_gm_master[699]['leaguePoints']
             else:
                 grandmaster_cutoff = combined_gm_master[-1]['leaguePoints']
 
