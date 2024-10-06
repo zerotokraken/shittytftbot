@@ -96,7 +96,7 @@ class CutoffCommands(commands.Cog):
             title=f"Challenger Cutoff for {stripped_region.upper()} Region",
             color=discord.Color.from_rgb(255, 215, 0)
         )
-        embed_chall.add_field(value=f"{challenger_cutoff} LP", inline=False)
+        embed_chall.add_field(name=None, value=f"{challenger_cutoff} LP", inline=False)
         embed_chall.set_footer(text="Data sourced from Riot API")
 
         # Create and send the embed with cutoff values
@@ -104,7 +104,7 @@ class CutoffCommands(commands.Cog):
             title=f"Grandmaster Cutoff for {stripped_region.upper()} Region",
             color=discord.Color.from_rgb(255, 165, 0)
         )
-        embed_gm.add_field(value=f"{grandmaster_cutoff} LP", inline=False)
+        embed_gm.add_field(name=None, value=f"{grandmaster_cutoff} LP", inline=False)
         embed_gm.set_footer(text="Data sourced from Riot API")
 
         embed_chall.set_thumbnail(url=chall_image_url)
