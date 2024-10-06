@@ -6,10 +6,10 @@ import json
 import os
 
 class CutoffCommands(commands.Cog):
-    def __init__(self, bot, apikey):
+    def __init__(self, bot, apikey, latest_version):
         self.bot = bot
         self.apikey = apikey
-
+        self.latest_version = latest_version
         config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'cutoffs.json')
         with open(config_path, 'r') as config_file:
             self.config = json.load(config_file)
@@ -88,17 +88,30 @@ class CutoffCommands(commands.Cog):
         if grandmaster_cutoff < 200:
             grandmaster_cutoff = 200
 
-        # Create and send the embed with cutoff values
-        embed = discord.Embed(
-            title=f"Cutoffs for {stripped_region.upper()} Region",
-            color=discord.Color.gold()
-        )
-        embed.add_field(name="Challenger", value=f"{challenger_cutoff} LP", inline=False)
-        embed.add_field(name="Grandmaster", value=f"{grandmaster_cutoff} LP", inline=False)
-        embed.set_footer(text="Data sourced from Riot API")
+        chall_image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/img/tft-regalia/TFT_Regalia_Challenger.png"
+        gm_image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/img/tft-regalia/TFT_Regalia_GrandMaster.png"
 
-        await ctx.send(embed=embed)
+        # Create and send the embed with cutoff values
+        embed_chall = discord.Embed(
+            title=f"Challenger Cutoff for {stripped_region.upper()} Region",
+            color=discord.Color.from_rgb(255, 215, 0)
+        )
+        embed_chall.add_field(value=f"{challenger_cutoff} LP", inline=False)
+        embed_chall.set_footer(text="Data sourced from Riot API")
+
+        # Create and send the embed with cutoff values
+        embed_gm = discord.Embed(
+            title=f"Grandmaster Cutoff for {stripped_region.upper()} Region",
+            color=discord.Color.from_rgb(255, 165, 0)
+        )
+        embed_gm.add_field(value=f"{grandmaster_cutoff} LP", inline=False)
+        embed_gm.set_footer(text="Data sourced from Riot API")
+
+        embed_chall.set_thumbnail(url=chall_image_url)
+        embed_gm.set_thumbnail(url=gm_image_url)
+        await ctx.send(embed=embed_chall)
+        await ctx.send(embed=embed_gm)
 
 # Setup function for the cog
-async def setup(bot, apikey):
-    await bot.add_cog(CutoffCommands(bot, apikey))
+async def setup(bot, apikey, latest_version):
+    await bot.add_cog(CutoffCommands(bot, apikey, latest_version))
