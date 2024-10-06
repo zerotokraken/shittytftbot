@@ -71,9 +71,12 @@ class CutoffCommands(commands.Cog):
             else:
                 grandmaster_cutoff = combined_gm_master[-1]['leaguePoints']
 
+        # Strip the number from the region (e.g., "na1" -> "na", "euw1" -> "euw")
+        stripped_region = ''.join([char for char in closest_region if not char.isdigit()])
+
         # Create and send the embed with cutoff values
         embed = discord.Embed(
-            title=f"Cutoffs for {closest_region.upper()} Region",
+            title=f"Cutoffs for {stripped_region.upper()} Region",
             color=discord.Color.gold()
         )
         embed.add_field(name="Challenger", value=f"{challenger_cutoff} LP", inline=False)
