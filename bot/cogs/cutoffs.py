@@ -10,9 +10,9 @@ class CutoffCommands(commands.Cog):
         self.bot = bot
         self.apikey = apikey
 
-    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'cutoffs.json')
-    with open(config_path, 'r') as config_file:
-        self.config = json.load(config_file)
+        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'cutoffs.json')
+        with open(config_path, 'r') as config_file:
+            self.config = json.load(config_file)
 
     # List of available summoner regions
     summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2",
