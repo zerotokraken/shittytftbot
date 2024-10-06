@@ -64,7 +64,7 @@ class CutoffCommands(commands.Cog):
             region_config = next((region for region in self.config['regions'] if region['region'] == closest_region), None)
             if region_config:
                 challenger_players_count = region_config['num_challenger_players']
-                grandmaster_players_count = region_config['num_grandmaster_players']
+                grandmaster_players_count = region_config['num_challenger_players'] + region_config['num_grandmaster_players']
 
             # Challenger cutoff: 250th player
             if len(combined_data) >= challenger_players_count:
