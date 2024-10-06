@@ -42,16 +42,6 @@ class CutoffCommands(commands.Cog):
                     return
                 grandmaster_data = await grandmaster_response.json()
 
-            # Combine Challenger and Grandmaster players for Challenger cutoff
-            combined_challenger_gm = challenger_data['entries'] + grandmaster_data['entries']
-            combined_challenger_gm.sort(key=lambda x: x['leaguePoints'], reverse=True)
-
-            # Challenger cutoff: 250th player
-            if len(combined_challenger_gm) >= 250:
-                challenger_cutoff = combined_challenger_gm[249]['leaguePoints']
-            else:
-                challenger_cutoff = combined_challenger_gm[-1]['leaguePoints']
-
             # Fetch Grandmaster + Master for Grandmaster cutoff
             master_url = f"https://{closest_region}.api.riotgames.com/tft/league/v1/master?queue=RANKED_TFT&api_key={self.apikey}"
 
@@ -60,16 +50,21 @@ class CutoffCommands(commands.Cog):
                     print(f"Failed to fetch Master data for {closest_region}.")
                     return
                 master_data = await master_response.json()
+            # Combine Challenger and Grandmaster players for Challenger cutoff
+            combined_data = challenger_data['entries'] + grandmaster_data['entries'] + master_data['entries']
+            combined_data.sort(key=lambda x: x['leaguePoints'], reverse=True)
 
-            # Combine Grandmaster and Master players for Grandmaster cutoff
-            combined_gm_master = grandmaster_data['entries'] + master_data['entries']
-            combined_gm_master.sort(key=lambda x: x['leaguePoints'], reverse=True)
+            # Challenger cutoff: 250th player
+            if len(combined_challenger_gm) >= 250:
+                challenger_cutoff = combined_data[249]['leaguePoints']
+            else:
+                challenger_cutoff = combined_data[-1]['leaguePoints']
 
             # Grandmaster cutoff: 750th player
-            if len(combined_gm_master) >= 700:
-                grandmaster_cutoff = combined_gm_master[699]['leaguePoints']
+            if len(combined_gm_master) >= 750:
+                grandmaster_cutoff = combined_data[749]['leaguePoints']
             else:
-                grandmaster_cutoff = combined_gm_master[-1]['leaguePoints']
+                grandmaster_cutoff = combined_data[-1]['leaguePoints']
 
         # Strip the number from the region (e.g., "na1" -> "na", "euw1" -> "euw")
         stripped_region = ''.join([char for char in closest_region if not char.isdigit()])
