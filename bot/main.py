@@ -228,6 +228,8 @@ async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_psyop=
                         await cog_module.setup(bot, cache_psyop, cache_duration_custom)
                     elif cog_name == 'cogs.top':
                         await cog_module.setup(bot, apikey)
+                    elif cog_name == 'cogs.cutoffs':
+                        await cog_module.setup(bot, apikey)
                     else:
                         await cog_module.setup(bot)
                 else:
