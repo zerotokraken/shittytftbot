@@ -2,11 +2,17 @@ import discord
 from discord.ext import commands
 import aiohttp
 import difflib  # For matching regions
+import json
+import os
 
 class CutoffCommands(commands.Cog):
     def __init__(self, bot, apikey):
         self.bot = bot
         self.apikey = apikey
+
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'cutoffs.json')
+    with open(config_path, 'r') as config_file:
+        self.config = json.load(config_file)
 
     # List of available summoner regions
     summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2",
@@ -54,15 +60,21 @@ class CutoffCommands(commands.Cog):
             combined_data = challenger_data['entries'] + grandmaster_data['entries'] + master_data['entries']
             combined_data.sort(key=lambda x: x['leaguePoints'], reverse=True)
 
+            # Store player counts in the config
+            region_config = next((region for region in self.config['regions'] if region['region'] == closest_region), None)
+            if region_config:
+                challenger_players_count = region_config['num_challenger_players']
+                grandmaster_players_count = region_config['num_grandmaster_players']
+
             # Challenger cutoff: 250th player
-            if len(combined_data) >= 250:
-                challenger_cutoff = combined_data[249]['leaguePoints']
+            if len(combined_data) >= challenger_players_count:
+                challenger_cutoff = combined_data[challenger_players_count - 1]['leaguePoints']
             else:
                 challenger_cutoff = combined_data[-1]['leaguePoints']
 
             # Grandmaster cutoff: 750th player
-            if len(combined_data) >= 750:
-                grandmaster_cutoff = combined_data[749]['leaguePoints']
+            if len(combined_data) >= grandmaster_players_count:
+                grandmaster_cutoff = combined_data[grandmaster_players_count - 1]['leaguePoints']
             else:
                 grandmaster_cutoff = combined_data[-1]['leaguePoints']
 
@@ -73,8 +85,8 @@ class CutoffCommands(commands.Cog):
         if challenger_cutoff < 500:
             challenger_cutoff = 500
 
-        if grandmaster_cutoff < 250:
-            grandmaster_cutoff = 250
+        if grandmaster_cutoff < 200:
+            grandmaster_cutoff = 200
 
         # Create and send the embed with cutoff values
         embed = discord.Embed(

@@ -1,0 +1,89 @@
+{
+  "regions": [
+    {
+      "region": "na1",
+      "num_challenger_players": 250,
+      "num_grandmaster_players": 750
+    },
+    {
+      "region": "eun1",
+      "num_challenger_players": 100,
+      "num_grandmaster_players": 200
+    },
+    {
+      "region": "euw1",
+      "num_challenger_players": 200,
+      "num_grandmaster_players": 400
+    },
+    {
+      "region": "br1",
+      "num_challenger_players": 50,
+      "num_grandmaster_players": 100
+    },
+    {
+      "region": "jp1",
+      "num_challenger_players": 50,
+      "num_grandmaster_players": 100
+    },
+    {
+      "region": "kr",
+      "num_challenger_players": 300,
+      "num_grandmaster_players": 600
+    },
+    {
+      "region": "la1",
+      "num_challenger_players": 30,
+      "num_grandmaster_players": 60
+    },
+    {
+      "region": "la2",
+      "num_challenger_players": 30,
+      "num_grandmaster_players": 60
+    },
+    {
+      "region": "me1",
+      "num_challenger_players": 30,
+      "num_grandmaster_players": 60
+    },
+    {
+      "region": "oc1",
+      "num_challenger_players": 100,
+      "num_grandmaster_players": 200
+    },
+    {
+      "region": "ph2",
+      "num_challenger_players": 20,
+      "num_grandmaster_players": 40
+    },
+    {
+      "region": "ru",
+      "num_challenger_players": 20,
+      "num_grandmaster_players": 40
+    },
+    {
+      "region": "sg2",
+      "num_challenger_players": 20,
+      "num_grandmaster_players": 40
+    },
+    {
+      "region": "th2",
+      "num_challenger_players": 20,
+      "num_grandmaster_players": 40
+    },
+    {
+      "region": "tr1",
+      "num_challenger_players": 50,
+      "num_grandmaster_players": 100
+    },
+    {
+      "region": "tw2",
+      "num_challenger_players": 50,
+      "num_grandmaster_players": 100
+    },
+    {
+      "region": "vn2",
+      "num_challenger_players": 450,
+      "num_grandmaster_players": 900
+    }
+  ]
+}
