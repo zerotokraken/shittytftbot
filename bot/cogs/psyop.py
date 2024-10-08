@@ -31,7 +31,7 @@ class PsyopCommand(commands.Cog):
                 ORDER BY RANDOM()
                 LIMIT 1;
             """
-            cursor.execute(query, (bot_id, bot_id, bot_id))
+            cursor.execute(query)
             result = cursor.fetchone()
             if result:
                 return result[0]  # Return the content of the message

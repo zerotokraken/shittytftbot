@@ -31,7 +31,7 @@ class MaldingCommand(commands.Cog):
                 ORDER BY RANDOM() 
                 LIMIT 1
             """
-            cursor.execute(query, (bot_id,))
+            cursor.execute(query)
             result = cursor.fetchone()
             cursor.close()
             return result[0] if result else None
