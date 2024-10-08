@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 import psycopg2
-import random
+import os
+
 
 class PsyopCommand(commands.Cog):
     def __init__(self, bot):
