@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands, tasks
+import psycopg2
+import asyncio
 import aiohttp
 import time
 import json
@@ -22,64 +24,83 @@ with open(config_path, 'r') as config_file:
     config = json.load(config_file)
 
 # Load static data from config
-bot_spam = config['bot_spam_channel_id']
-guild_name = config['guild_name']
 versions_url = config['versions_url']
 base_champions_url = config['base_champions_url']
 shop_odds = config['shop_odds']
-
-guild_id = None
-channel_id = None
 latest_version = None
-
 champions_data = {}
 
-# In-memory cache
-cache = {
-    'messages': [],
-    'timestamp': 0
-}
+def connect_to_db():
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    try:
+        return psycopg2.connect(DATABASE_URL, sslmode='require')
+    except psycopg2.Error as e:
+        print(f"Error connecting to the database: {e}")
+        return None
 
-cache_fault = {
-    'messages': [],
-    'timestamp': 0
-}
+# Check if a message already exists in a table
+def message_exists(cursor, table_name, message_id):
+    query = f"SELECT 1 FROM {table_name} WHERE message_id = %s"
+    cursor.execute(query, (message_id,))
+    return cursor.fetchone() is not None
 
-cache_psyop = {
-    'messages': [],
-    'timestamp': 0
-}
+# Insert a message into the appropriate table
+def insert_message_to_db(connection, cursor, table_name, message):
+    try:
+        query = f"""
+        INSERT INTO {table_name} (message_id, author_id, author_name, content, created_at)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (message.id, message.author.id, str(message.author), message.content, message.created_at))
+        connection.commit()
+        print(f"Inserted message {message.id} by {message.author} into {table_name}.")
+    except Exception as e:
+        connection.rollback()  # Rollback on failure
+        print(f"Error inserting message: {e}")
 
+# Fetch new messages from a channel and store them in the appropriate table
+async def fetch_new_messages(channel, table_name, connection, cursor):
+    print(f"Fetching messages from channel {channel.name}...")
+
+    async for message in channel.history(limit=None):
+        if message_exists(cursor, table_name, message.id):
+            print(f"Message {message.id} already in {table_name}, stopping.")
+            break
+        insert_message_to_db(connection, cursor, table_name, message)
+
+# Task loop to fetch messages every hour
+@tasks.loop(hours=1)
+async def fetch_messages_every_hour(client):
+    db_connection = connect_to_db()
+    if db_connection:
+        cursor = db_connection.cursor()
+
+        general_channel = client.get_channel(1113421046029242381)  # Replace with actual channel ID
+        advice_channel = client.get_channel(1113429363950616586)   # Replace with actual channel ID
+        malding_channel = client.get_channel(1113495131841110126)  # Replace with actual channel ID
+
+        if general_channel:
+            await fetch_new_messages(general_channel, "general_messages", db_connection, cursor)
+        if advice_channel:
+            await fetch_new_messages(advice_channel, "advice_messages", db_connection, cursor)
+        if malding_channel:
+            await fetch_new_messages(malding_channel, "malding_messages", db_connection, cursor)
+
+        cursor.close()
+        db_connection.close()
 
 @bot.event
 async def on_ready():
-    global guild_id, channel_id
 
     if apikey:
         print(f"Riot API key was found with a value of: {apikey}")
 
-    # Fetch and print guild and channel information
-    for guild in bot.guilds:
-        if guild.name == guild_name:
-            guild_id = guild.id
-            for channel in guild.channels:
-                if channel.name == "malding":
-                    channel_id = channel.id
-                    break
-            if channel_id is None:
-                print(f'No channel with name malding found in guild {guild_name}.')
-            else:
-                break
-    if guild_id is None or channel_id is None:
-        print('Guild or Channel ID not set. Check your configuration.')
-    else:
-        refresh_cache.start()
-        refresh_cache_custom.start()
+    fetch_messages_every_hour.start(bot)
 
     await fetch_latest_version()
     await fetch_champions_data()
 
-    await load_cogs(bot, config=config, cache=cache, cache_fault=cache_fault, cache_psyop=cache_psyop, cache_duration=3600, cache_duration_custom=28800, champions_data=champions_data,
+    await load_cogs(bot, config=config, champions_data=champions_data,
                     latest_version=latest_version, shop_odds=shop_odds)
 
     print(f'Bot {bot.user} is ready.')
@@ -110,90 +131,7 @@ async def fetch_champions_data():
                 print(f"Failed to fetch champions data: {response.status}")
 
 
-@tasks.loop(seconds=3600)  # Refresh every hour
-async def refresh_cache():
-    if guild_id is None or channel_id is None:
-        print('Guild or Channel ID not set. Cannot refresh cache.')
-        return
-
-    guild = bot.get_guild(guild_id)
-    if guild:
-        channel = guild.get_channel(channel_id)
-        if channel:
-            messages = []
-            try:
-                async for message in channel.history(limit=1000):
-                    messages.append(message.content)
-                cache['messages'] = messages
-                cache['timestamp'] = time.time()
-                print('Cache refreshed.')
-            except discord.Forbidden:
-                print('Bot does not have permission to read messages in this channel.')
-            except discord.HTTPException as e:
-                print(f'Failed to fetch messages: {e}')
-        else:
-            print(f'Channel with ID {channel} not found.')
-    else:
-        print(f'Guild with ID {guild_id} not found.')
-
-@tasks.loop(seconds=28800)  # Refresh every eight hours
-async def refresh_cache_custom():
-    print("Beginning Cache Custom refresh")
-    guild = bot.get_guild(guild_id)  # Assuming guild_id is globally set
-    if guild is None:
-        print('Guild not found. Cannot refresh cache.')
-        return
-
-    # Initialize two separate message caches for 'fault' and 'psyop'
-    fault_messages = []
-    psyop_messages = []
-
-    included_channels = [1113421046029242381, 1113429363950616586, 1113495131841110126]  # Add the IDs of channels to include
-    max_messages = 50  # Adjust this to the number of messages you want to cache for each category
-
-    try:
-        # Iterate through only the specified channels in the guild
-        for channel_id in included_channels:
-            channel = guild.get_channel(channel_id)
-            if channel is None:
-                print(f"Channel with ID {channel_id} not found.")
-                continue
-
-            # Ensure the bot has permission to read messages in the channel
-            collected_fault = 0  # Track the number of messages for 'fault'
-            collected_psyop = 0   # Track the number of messages for 'psyop'
-            async for message in channel.history(limit=None):  # No limit on fetching messages
-                if 'is it even my fault' in message.content.lower() and collected_fault < max_messages:
-                    fault_messages.append((channel.id, message.content))  # Store both channel ID and message content
-                    collected_fault += 1
-
-                if 'psyop' in message.content.lower() and collected_psyop < max_messages:
-                    psyop_messages.append((channel.id, message.content))  # Store both channel ID and message content
-                    collected_psyop += 1
-
-                # Stop if we've collected the desired number of messages for both categories
-                if collected_fault >= max_messages and collected_psyop >= max_messages:
-                    break
-
-            # Check if we've collected enough messages from both categories
-            if collected_fault >= max_messages and collected_psyop >= max_messages:
-                break
-
-        # Cache the collected messages and update the timestamp
-        cache_fault['messages'] = fault_messages
-        cache_psyop['messages'] = psyop_messages  # Assuming you have a similar cache structure for psyop
-        cache_fault['timestamp'] = time.time()
-        cache_psyop['timestamp'] = time.time()  # Update the timestamp for psyop cache
-
-        print('Cache refreshed for specified channels.')
-    except Exception as e:
-        print(f'Error refreshing cache: {e}')
-
-
-
-
-
-async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_psyop=None, cache_duration=None, cache_duration_custom=None, champions_data=None, latest_version=None, shop_odds=None):
+async def load_cogs(bot, config=None, champions_data=None, latest_version=None, shop_odds=None):
     cogs_dir = os.path.join(os.path.dirname(__file__), 'cogs')
 
     for filename in os.listdir(cogs_dir):
@@ -214,18 +152,12 @@ async def load_cogs(bot, config=None, cache=None, cache_fault=None, cache_psyop=
                 cog_module = importlib.import_module(cog_name)
 
                 if hasattr(cog_module, 'setup'):
-                    if cog_name == 'cogs.malding':
-                        await cog_module.setup(bot, cache, cache_duration)
-                    elif cog_name == 'cogs.roll':
+                    if cog_name == 'cogs.roll':
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
                     elif cog_name == 'cogs.aug':
                         await cog_module.setup(bot, latest_version)
                     elif cog_name == 'cogs.lookup':
                         await cog_module.setup(bot, apikey, latest_version)
-                    elif cog_name == 'cogs.fault':
-                        await cog_module.setup(bot, cache_fault, cache_duration_custom)
-                    elif cog_name == 'cogs.psyop':
-                        await cog_module.setup(bot, cache_psyop, cache_duration_custom)
                     elif cog_name == 'cogs.top':
                         await cog_module.setup(bot, apikey)
                     elif cog_name == 'cogs.cutoffs':

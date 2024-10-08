@@ -1,35 +1,50 @@
 import discord
 from discord.ext import commands
+import psycopg2
+import os
 import random
-import time
 
 class MaldingCommand(commands.Cog):
-    def __init__(self, bot, cache, cache_duration):
+    def __init__(self, bot):
         self.bot = bot
-        self.cache = cache
-        self.cache_duration = cache_duration
+        self.conn = self.connect_to_db()
+
+    def connect_to_db(self):
+        DATABASE_URL = os.environ.get('DATABASE_URL')
+        try:
+            return psycopg2.connect(DATABASE_URL, sslmode='require')
+        except psycopg2.Error as e:
+            print(f"Error connecting to the database: {e}")
+            return None
+
+    def get_random_malding_message(self):
+        if self.conn is None:
+            print("No database connection.")
+            return None
+
+        try:
+            cursor = self.conn.cursor()
+            query = "SELECT content FROM malding_messages ORDER BY RANDOM() LIMIT 1"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            cursor.close()
+            return result[0] if result else None
+        except psycopg2.Error as e:
+            print(f"Error fetching random message: {e}")
+            return None
 
     @commands.command()
     async def malding(self, ctx, num_messages: int = 1):
-        current_time = time.time()
-
-        # Check if cache is expired
-        if current_time - self.cache['timestamp'] > self.cache_duration:
-            print('Cache is expired. Please wait for it to refresh.')
-            return
-
-        # Check if there are messages in the cache
-        if not self.cache.get('messages', []):
-            print('No messages found in the cache.')
-            return
-
         # Ensure num_messages is within the limit
-        num_messages = min(max(num_messages, 1), 3)  # Adjust 10 to your desired limit
+        num_messages = min(max(num_messages, 1), 3)  # Adjust 3 to your desired limit
 
         for _ in range(num_messages):
-            # Send a random message from the cache
-            random_message = random.choice(self.cache['messages'])
-            await ctx.send(random_message)
+            # Get a random message from the database
+            random_message = self.get_random_malding_message()
+            if random_message:
+                await ctx.send(random_message)
+            else:
+                print("No malding messages found in the database.")
 
-async def setup(bot, cache, cache_duration):
-    await bot.add_cog(MaldingCommand(bot, cache, cache_duration))
+async def setup(bot):
+    await bot.add_cog(MaldingCommand(bot))
