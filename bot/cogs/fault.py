@@ -50,7 +50,7 @@ class FaultCommand(commands.Cog):
         if random_message:
             await ctx.send(random_message)
         else:
-            await ctx.send("No messages found containing 'is it even my fault'.")
+            print("No messages found containing 'is it even my fault'.")
 
 async def setup(bot):
     await bot.add_cog(FaultCommand(bot))
