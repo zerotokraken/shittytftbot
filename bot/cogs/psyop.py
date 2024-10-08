@@ -17,7 +17,7 @@ class PsyopCommand(commands.Cog):
             print(f"Error connecting to the database: {e}")
             return None
 
-    def fetch_random_psyop_message(self, connection, cursor):
+    def fetch_random_psyop_message(self, cursor):
         try:
             # Query to fetch a random message containing "psyop" with LIMIT 1
             query = """
@@ -43,8 +43,8 @@ class PsyopCommand(commands.Cog):
 
     @commands.command()
     async def psyop(self, ctx):
-        # Connect to the database
-        connection = connect_to_db()
+        # Connect to the database using the class method
+        connection = self.connect_to_db()
         if not connection:
             print("Error connecting to the database.")
             return
@@ -52,7 +52,7 @@ class PsyopCommand(commands.Cog):
         cursor = connection.cursor()
 
         # Fetch a random psyop message
-        message_content = self.fetch_random_psyop_message(connection, cursor)
+        message_content = self.fetch_random_psyop_message(cursor)
         if message_content:
             await ctx.send(message_content)
         else:
