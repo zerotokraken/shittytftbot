@@ -22,19 +22,20 @@ class FaultCommand(commands.Cog):
             return None
 
         try:
+            bot_id = self.bot.user.id  # Get bot's ID
             cursor = self.conn.cursor()
             query = """
                 SELECT content FROM (
-                    SELECT content FROM general_messages WHERE content ILIKE '%is it even my fault%'
+                    SELECT content FROM general_messages WHERE content ILIKE '%is it even my fault%' AND author_id != %s
                     UNION ALL
-                    SELECT content FROM advice_messages WHERE content ILIKE '%is it even my fault%'
+                    SELECT content FROM advice_messages WHERE content ILIKE '%is it even my fault%' AND author_id != %s
                     UNION ALL
-                    SELECT content FROM malding_messages WHERE content ILIKE '%is it even my fault%'
+                    SELECT content FROM malding_messages WHERE content ILIKE '%is it even my fault%' AND author_id != %s
                 ) AS combined
-                ORDER BY random()
+                ORDER BY RANDOM()
                 LIMIT 1;
             """
-            cursor.execute(query)
+            cursor.execute(query, (bot_id, bot_id, bot_id))
             result = cursor.fetchone()
             cursor.close()
             return result[0] if result else None

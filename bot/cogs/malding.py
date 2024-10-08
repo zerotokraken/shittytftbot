@@ -23,9 +23,16 @@ class MaldingCommand(commands.Cog):
             return None
 
         try:
+            bot_id = self.bot.user.id  # Get bot's ID
             cursor = self.conn.cursor()
-            query = "SELECT content FROM malding_messages ORDER BY RANDOM() LIMIT 1"
-            cursor.execute(query)
+            query = """
+                SELECT content 
+                FROM malding_messages 
+                WHERE author_id != %s 
+                ORDER BY RANDOM() 
+                LIMIT 1
+            """
+            cursor.execute(query, (bot_id,))
             result = cursor.fetchone()
             cursor.close()
             return result[0] if result else None
