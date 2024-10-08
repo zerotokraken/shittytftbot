@@ -6,6 +6,15 @@ import random
 class PsyopCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.conn = self.connect_to_db()
+
+    def connect_to_db(self):
+        DATABASE_URL = os.environ.get('DATABASE_URL')
+        try:
+            return psycopg2.connect(DATABASE_URL, sslmode='require')
+        except psycopg2.Error as e:
+            print(f"Error connecting to the database: {e}")
+            return None
 
     def fetch_random_psyop_message(self, connection, cursor):
         try:
