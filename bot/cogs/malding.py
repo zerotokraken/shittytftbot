@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import psycopg2
 import os
-import random
 
 class MaldingCommand(commands.Cog):
     def __init__(self, bot):
@@ -27,7 +26,7 @@ class MaldingCommand(commands.Cog):
             query = """
                 SELECT content 
                 FROM malding_messages 
-                WHERE author_id != 1285268322551726140 
+                WHERE author_id != 1285268322551726140  -- Replace this with self.bot.user.id for flexibility
                 ORDER BY RANDOM() 
                 LIMIT 1
             """
@@ -40,17 +39,19 @@ class MaldingCommand(commands.Cog):
             return None
 
     @commands.command()
-    async def malding(self, ctx, num_messages: int = 1):
-        # Ensure num_messages is within the limit
-        num_messages = min(max(num_messages, 1), 3)  # Adjust 3 to your desired limit
+    @commands.cooldown(1, 30, commands.BucketType.user)  # 30-second cooldown per user
+    async def malding(self, ctx):
+        # Always limit to one message
+        random_message = self.get_random_malding_message()
+        if random_message:
+            await ctx.send(random_message)
+        else:
+            print("No malding messages found in the database.")
 
-        for _ in range(num_messages):
-            # Get a random message from the database
-            random_message = self.get_random_malding_message()
-            if random_message:
-                await ctx.send(random_message)
-            else:
-                print("No malding messages found in the database.")
+    @malding.error
+    async def malding_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            print(f"Please wait {error.retry_after:.2f} seconds before using the command again.")
 
 async def setup(bot):
     await bot.add_cog(MaldingCommand(bot))
