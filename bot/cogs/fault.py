@@ -24,7 +24,7 @@ class FaultCommand(commands.Cog):
         try:
             cursor = self.conn.cursor()
             query = """
-                SELECT content FROM (
+                SELECT DISTINCT content FROM (
                     SELECT content FROM general_messages WHERE content ILIKE '%is it even my fault%' AND author_id != 1285268322551726140
                     UNION ALL
                     SELECT content FROM advice_messages WHERE content ILIKE '%is it even my fault%' AND author_id != 1285268322551726140
