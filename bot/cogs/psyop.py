@@ -20,14 +20,13 @@ class PsyopCommand(commands.Cog):
     def fetch_random_psyop_message(self, cursor):
         try:
             # Query to fetch a random message containing "psyop" with LIMIT 1
-            bot_id = self.bot.user.id  # Get bot's ID
             query = """
                 SELECT content FROM (
-                    SELECT content FROM general_messages WHERE content ILIKE '%psyop%' AND author_id != %s
+                    SELECT content FROM general_messages WHERE content ILIKE '%psyop%' AND author_id != 1285268322551726140
                     UNION ALL
-                    SELECT content FROM advice_messages WHERE content ILIKE '%psyop%' AND author_id != %s
+                    SELECT content FROM advice_messages WHERE content ILIKE '%psyop%' AND author_id != 1285268322551726140
                     UNION ALL
-                    SELECT content FROM malding_messages WHERE content ILIKE '%psyop%' AND author_id != %s
+                    SELECT content FROM malding_messages WHERE content ILIKE '%psyop%' AND author_id != 1285268322551726140
                 ) AS combined
                 ORDER BY RANDOM()
                 LIMIT 1;

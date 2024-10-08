@@ -23,12 +23,11 @@ class MaldingCommand(commands.Cog):
             return None
 
         try:
-            bot_id = self.bot.user.id  # Get bot's ID
             cursor = self.conn.cursor()
             query = """
                 SELECT content 
                 FROM malding_messages 
-                WHERE author_id != %s 
+                WHERE author_id != 1285268322551726140 
                 ORDER BY RANDOM() 
                 LIMIT 1
             """
