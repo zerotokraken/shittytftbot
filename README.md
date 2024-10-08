@@ -8,19 +8,25 @@ The bot is deployed via pipeline from Github to Heroku. When commits are made th
 
 # Features
 
-Lookup Command: Retrieve player data by name and tagline when '!lookup gameName#tagline' is used.
+Database Integration: Retrieves messages from the three most popular discord channels once an hour and adds them to the database.
 
-Malding: Retrieves 1000 message cache from the channel and is able to output them when '!malding' is used. This cache updates hourly.
+Suggestion: Records to a database table when the command is used. Example: !suggest myideahere
 
-Augment Lookup: Scrapes Augment data from various websites when '!aug AugmentName' is used.
+Lookup: Retrieve player data by name and tagline when '!lookup gameName#tagline' is used.
 
-Roll Shop: Simulates rolling shops based on the requested level and outputs a rectangle shop sized image with your output units. Command is '!roll#'. The # is the level you wish to roll at.
+Cutoffs: Retrieves from Riot API the cutoff League Points number for a particular region depending on how many spots are available in that region for Challenger & Grandmaster.
+
+Malding/Fault/Psyop: Retrieves a random message fromt he database and outputs it when the command is used. This database table updates hourly.
+
+Augment Lookup: Pulls Augment data directly from tactics.tools when '!aug AugmentName' is used. Image is pull from Riot API.
+
+Roll Shop: Simulates rolling Teamfight Tactic's shops based on the requested level and outputs a rectangle shop sized image with your output units. Command is '!roll#'. The # is the level you wish to roll at.
 
 On-Message: Bot responses with a temperament system based on the contextual words. This is a very basic 'personality' attempt and will likely be expanded upon further. Activation involves typing the bot's name or tagging it.
 
-Misc Commands: Any one line jokes or small functions will be housed in here. Check the misc file to read through these.
+Misc: Any one line jokes or small functions will be housed in here. Check the misc file to read through these.
 
-Streamer Commands: These commands will output a line said by the streamer, an emoji/sticker or a clip of that streamer. Example: '!soju'
+Streamer: These commands will output a line said by the streamer, an emoji/sticker or a clip of that streamer. Example: '!soju'
 
 Stickers & Emojis: Outputs a specific sticker or emoji. Example: '!frog'
 

@@ -18,19 +18,7 @@ class RollCommands(commands.Cog):
             print("Champions data is not available. Please wait while we update it.")
             await self.fetch_champions_data()
 
-        # If the roll is specifically "ZTK", force it to only pick tier 5 units
-        if str(ctx.author) == "zerotokraken":
-            print("Rigged roll enabled")
-            level = 5  # Set level to 5 for tier 5
-            odds = [0, 0, 0, 0, 5]  # Only roll tier 5 units
-        else:
-            print(f"Player: {ctx.author}, Simulating shop roll for level {level}")
-            if level not in self.shop_odds:
-                print("Invalid level. Please choose a level between 2 and 10.")
-                return
-
-            # Get the odds for the given level
-            odds = self.shop_odds[level]
+        odds = self.shop_odds[level]
 
         tiers = [1, 2, 3, 4, 5]
         results = []
