@@ -57,7 +57,7 @@ class MiscCommands(commands.Cog):
 
     @commands.command()
     async def ztk(self, ctx):
-        await ctx.send("ZTK is a filthy highroller")
+        await ctx.send("If ZTK has a million fans, then I am one of them. If ZTK has ten fans, then I am one of them. If ZTK has only one fan then that is me. If ZTK has no fans, then that means I am no longer on earth. If the world is against ZTK, then I am against the world")
 
     @commands.command()
     async def mods(self, ctx):
