@@ -68,7 +68,7 @@ class CommandErrorHandler(commands.Cog):
             self.log_unavailable_command(ctx.message.content, ctx.author.id)  # Use ctx.author.id
 
             # Optionally send a response to the user (or handle it silently)
-            await ctx.send("That command is not available.")  # Send message or comment this line out if not needed
+            print("That command is not available.")  # Send message or comment this line out if not needed
         else:
             # Handle other command errors (if needed)
             raise error
