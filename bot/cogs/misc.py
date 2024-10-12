@@ -3,26 +3,60 @@ from discord.ext import commands
 import aiohttp
 import random
 from datetime import timedelta
+import psycopg2
+import os
+
 
 class MiscCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.database_url = os.environ.get('DATABASE_URL')  # Get the database URL from environment variables
 
-    # Command to post an image from a URL
+    # Function to connect to the database and fetch the image
+    def fetch_image_from_db(self, image_name):
+        try:
+            # Establish connection to PostgreSQL
+            conn = psycopg2.connect(self.database_url, sslmode='require')
+
+            with conn.cursor() as cursor:
+                # Fetch the image data from the database
+                cursor.execute("SELECT image_data FROM images WHERE image_name = %s", (image_name,))
+                result = cursor.fetchone()
+
+                if result is not None:
+                    image_data = result[0]  # Extract binary image data
+                    return image_data
+                else:
+                    print(f"No image found with the name '{image_name}'.")
+                    return None
+
+        except psycopg2.Error as e:
+            print(f"Error fetching image from the database: {e}")
+            return None
+
+        finally:
+            if conn:
+                conn.close()
+
+    # Command to post an image from the database
     @commands.command()
     async def vuhra(self, ctx):
-        url = 'https://media.discordapp.net/attachments/1113421046029242381/1207801587506872391/8fzdyz.png?ex=66e94ca2&is=66e7fb22&hm=a0748e79b2b3adc627c6b12290b6fbd125682fa572c440fc310bf5adbd55e4d8&=&format=webp&quality=lossless'
+        image_name = 'vuhra'  # The name of the image to fetch from the database
+        image_data = self.fetch_image_from_db(image_name)
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                if resp.status == 200:
-                    image_data = await resp.read()
-                    with open('temp_image.png', 'wb') as f:
-                        f.write(image_data)
-                    await ctx.send(file=discord.File('temp_image.png'))
-                    os.remove('temp_image.png')  # Optionally delete the temporary file
-                else:
-                    print('Failed to fetch the image.')
+        if image_data is not None:
+            # Save the image data to a temporary file
+            temp_filename = f"{image_name}.png"
+            with open(temp_filename, 'wb') as f:
+                f.write(image_data)
+
+            # Send the image file in the Discord channel
+            await ctx.send(file=discord.File(temp_filename))
+
+            # Remove the temporary file after sending
+            os.remove(temp_filename)
+        else:
+            print(f"Image '{image_name}' not found in the database.")
 
     @commands.command()
     async def vuhramald(self, ctx):
