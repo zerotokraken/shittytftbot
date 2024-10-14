@@ -37,18 +37,15 @@ class StickersEmojis(commands.Cog):
 
     @commands.command()
     async def tuh(self, ctx):
-        guild = ctx.guild
-        try:
-            # Fetch the sticker from the guild
-            sticker = await guild.fetch_sticker(1208829201323655250)
-            # Send the sticker
-            await ctx.send(stickers=[sticker])
-        except discord.NotFound:
-            print("Sticker not found.")
-        except discord.Forbidden:
-            print("I don't have permission to use that sticker.")
-        except discord.HTTPException as e:
-            print(f"An error occurred: {e}")
+        # Emoji ID of the specific emoji
+        emoji_id = 1208829201323655250
+        # Retrieve the emoji object from the server using the ID
+        emoji = discord.utils.get(ctx.guild.emojis, id=emoji_id)
+
+        if emoji:
+            await ctx.send(f'{emoji}')
+        else:
+            print("Emoji not found or not available in this server.")
 
     @commands.command(name="420")
     async def sixninefourtwenty(self, ctx):
