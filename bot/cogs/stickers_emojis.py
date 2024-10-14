@@ -47,6 +47,18 @@ class StickersEmojis(commands.Cog):
         else:
             print("Emoji not found or not available in this server.")
 
+    @commands.command()
+    async def ta(self, ctx):
+        # Emoji ID of the specific emoji
+        emoji_id = 1114126122783883326
+        # Retrieve the emoji object from the server using the ID
+        emoji = discord.utils.get(ctx.guild.emojis, id=emoji_id)
+
+        if emoji:
+            await ctx.send(f'{emoji}')
+        else:
+            print("Emoji not found or not available in this server.")
+
     @commands.command(name="420")
     async def sixninefourtwenty(self, ctx):
         guild = ctx.guild
