@@ -35,9 +35,9 @@ class GuideCommand(commands.Cog):
         }
 
         esports = {
-            'EMEA TFT Esports': ('Competitive events, ladder snapshots & signups for EMEA here', 'https://emeatftesports.teamfighttactics.leagueoflegends.com/'),
-            'America TFT Esports': ('Competitive events, ladder snapshots & signups for America here', 'https://americastftesports.teamfighttactics.leagueoflegends.com/'),
-            'APAC TFT Esports': ('Competitive events, ladder snapshots & signups for APAC here', 'https://apactftesports.teamfighttactics.leagueoflegends.com/'),
+            'EMEA TFT Esports': ('Competitive events, ladder snapshots & signups', 'https://emeatftesports.teamfighttactics.leagueoflegends.com/'),
+            'America TFT Esports': ('Competitive events, ladder snapshots & signups', 'https://americastftesports.teamfighttactics.leagueoflegends.com/'),
+            'APAC TFT Esports': ('Competitive events, ladder snapshots & signups', 'https://apactftesports.teamfighttactics.leagueoflegends.com/'),
             'TFT Liquipedia': ('Past events and player history', 'https://liquipedia.net/tft/Main_Page')
         }
 
