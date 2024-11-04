@@ -4,6 +4,7 @@ import requests
 import urllib.parse
 import os
 import re
+import random
 
 class TrainerCommands(commands.Cog):
     def __init__(self, bot, apikey, latest_version):
