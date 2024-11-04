@@ -164,6 +164,14 @@ class MiscCommands(commands.Cog):
         await ctx.send("what the sigma")
 
     @commands.command()
+    async def saki(self, ctx):
+        await ctx.send("where the heck is saki")
+
+    @commands.command()
+    async def lobby(self, ctx):
+        await ctx.send("she's waiting down in the lobby")
+
+    @commands.command()
     async def mortdog(self, ctx):
         await ctx.send("ah man i'm getting mortdogged again")
 
