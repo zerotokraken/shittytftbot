@@ -168,6 +168,11 @@ class MiscCommands(commands.Cog):
         await ctx.send("where the heck is saki")
 
     @commands.command()
+    async def utrash(self, ctx):
+        await ctx.send("yea, u trash")
+
+
+    @commands.command()
     async def lobby(self, ctx):
         await ctx.send("she's waiting down in the lobby")
 
