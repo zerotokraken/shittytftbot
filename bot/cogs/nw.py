@@ -11,10 +11,27 @@ class NoobWatchCommand(commands.Cog):
     def connect_to_db(self):
         DATABASE_URL = os.environ.get('DATABASE_URL')
         try:
-            return psycopg2.connect(DATABASE_URL, sslmode='require')
+            conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.create_table_if_not_exists(conn)  # Ensure the table exists
+            return conn
         except psycopg2.Error as e:
             print(f"Error connecting to the database: {e}")
             return None
+
+    def create_table_if_not_exists(self, conn):
+        # Create table if it doesn't exist
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS noobwatch (
+                    user_id BIGINT PRIMARY KEY,
+                    count INTEGER DEFAULT 1
+                )
+            """)
+            conn.commit()
+            cursor.close()
+        except psycopg2.Error as e:
+            print(f"Error creating table: {e}")
 
     def update_noobwatch_count(self, user_id):
         if self.conn is None:
@@ -51,8 +68,7 @@ class NoobWatchCommand(commands.Cog):
             else:
                 print("There was an error updating the NoobWatch count.")
         else:
-            print("You did the command wrong that's a NoobWatch")
+            print("Please reply to a user's message to use this command.")
 
 async def setup(bot):
     await bot.add_cog(NoobWatchCommand(bot))
-
