@@ -68,7 +68,7 @@ class NoobWatchCommand(commands.Cog):
             else:
                 print("There was an error updating the NoobWatch count.")
         else:
-            await ctx.send("Please reply to a user's message to use this command.")
+            print("Please reply to a user's message to use this command.")
 
 async def setup(bot):
     await bot.add_cog(NoobWatchCommand(bot))
