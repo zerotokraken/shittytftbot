@@ -64,11 +64,11 @@ class NoobWatchCommand(commands.Cog):
             user = replied_to_message.author  # Get the user the command issuer replied to
             count = self.update_noobwatch_count(user.id)
             if count is not None:
-                await ctx.send(f"{user.name}'s NoobWatch count is now {count}.")
+                await ctx.send(f"{user.display_name}'s NoobWatch count is now {count}.")
             else:
                 print("There was an error updating the NoobWatch count.")
         else:
-            print("Please reply to a user's message to use this command.")
+            await ctx.send("Please reply to a user's message to use this command.")
 
 async def setup(bot):
     await bot.add_cog(NoobWatchCommand(bot))
