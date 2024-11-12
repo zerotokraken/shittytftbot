@@ -53,5 +53,6 @@ class NoobWatchCommand(commands.Cog):
         else:
             print("You did the command wrong that's a NoobWatch")
 
-def setup(bot):
-    bot.add_cog(NoobWatchCommand(bot))
+async def setup(bot):
+    await bot.add_cog(NoobWatchCommand(bot))
+
