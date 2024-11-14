@@ -93,16 +93,27 @@ class NoobWatchCommand(commands.Cog):
             print("Please reply to a user's message to use this command.")
 
     @commands.command()
-    async def topnoobs(self, ctx):
-        """Display the top 10 users in the NoobWatch leaderboard."""
+    async def leaderboard(self, ctx):
+        """Display the top 10 users in the NoobWatch leaderboard as an embed."""
         leaderboard = self.get_leaderboard()
         if leaderboard:
-            # Format leaderboard message
-            leaderboard_message = "**NoobWatch Leaderboard**\n"
+            # Create the embed
+            embed = discord.Embed(
+                title="🏆 NoobWatch Leaderboard",
+                color=discord.Color.gold()
+            )
+
+            # Add leaderboard entries to the embed
             for i, (user_id, count) in enumerate(leaderboard, start=1):
                 user = await self.bot.fetch_user(user_id)
-                leaderboard_message += f"{i}. {user.display_name if user else 'Unknown User'} - {count} points\n"
-            await ctx.send(leaderboard_message)
+                username = user.display_name if user else "Unknown User"
+                embed.add_field(
+                    name=f"{i}. {username}",
+                    value=f"Count: {count}",
+                    inline=False
+                )
+
+            await ctx.send(embed=embed)
         else:
             print("No leaderboard data available.")
 
