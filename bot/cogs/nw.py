@@ -56,6 +56,28 @@ class NoobWatchCommand(commands.Cog):
             print(f"Error updating noobwatch count: {e}")
             return None
 
+    def get_leaderboard(self):
+        """Fetch the top 10 users with the highest noobwatch count."""
+        if self.conn is None:
+            print("No database connection.")
+            return None
+
+        try:
+            cursor = self.conn.cursor()
+            query = """
+                SELECT user_id, count 
+                FROM noobwatch 
+                ORDER BY count DESC 
+                LIMIT 10
+            """
+            cursor.execute(query)
+            leaderboard = cursor.fetchall()
+            cursor.close()
+            return leaderboard
+        except psycopg2.Error as e:
+            print(f"Error fetching leaderboard: {e}")
+            return None
+
     @commands.command()
     @commands.cooldown(1, 3600, commands.BucketType.user)  # 1-hour cooldown per user
     async def noobwatch(self, ctx):
@@ -69,6 +91,20 @@ class NoobWatchCommand(commands.Cog):
                 print("There was an error updating the NoobWatch count.")
         else:
             print("Please reply to a user's message to use this command.")
+
+    @commands.command()
+    async def leaderboard(self, ctx):
+        """Display the top 10 users in the NoobWatch leaderboard."""
+        leaderboard = self.get_leaderboard()
+        if leaderboard:
+            # Format leaderboard message
+            leaderboard_message = "**NoobWatch Leaderboard**\n"
+            for i, (user_id, count) in enumerate(leaderboard, start=1):
+                user = await self.bot.fetch_user(user_id)
+                leaderboard_message += f"{i}. {user.display_name if user else 'Unknown User'} - {count} points\n"
+            await ctx.send(leaderboard_message)
+        else:
+            print("No leaderboard data available.")
 
 async def setup(bot):
     await bot.add_cog(NoobWatchCommand(bot))
