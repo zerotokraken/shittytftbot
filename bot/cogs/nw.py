@@ -93,7 +93,7 @@ class NoobWatchCommand(commands.Cog):
             print("Please reply to a user's message to use this command.")
 
     @commands.command()
-    async def leaderboard(self, ctx):
+    async def topnoobs(self, ctx):
         """Display the top 10 users in the NoobWatch leaderboard."""
         leaderboard = self.get_leaderboard()
         if leaderboard:
