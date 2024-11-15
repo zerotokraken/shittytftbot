@@ -23,7 +23,7 @@ class MessageLogger(commands.Cog):
 
         # Create an embed for the deleted message
         embed = discord.Embed(
-            title=f"{message.author.avatar.url} {message.author.display_name}",
+            title=f"{message.author.avatar} {message.author.display_name}",
             description=f"**Message deleted in {message.channel.mention}**",
             color=discord.Color.red(),
 
