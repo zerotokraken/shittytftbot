@@ -19,22 +19,31 @@ class MessageLogger(commands.Cog):
         if log_channel is None:
             print(f"Log channel with ID {self.log_channel_id} not found.")
             return
+
+        # Format the timestamp
         timestamp = message.created_at.strftime("%-m/%-d/%Y %-I:%M %p")
 
         # Create an embed for the deleted message
         embed = discord.Embed(
-            title=f"{message.author.avatar} {message.author.display_name}",
             description=f"**Message deleted in {message.channel.mention}**",
             color=discord.Color.red(),
+        )
 
+        # Set the author with the user's display name and avatar
+        embed.set_author(
+            name=message.author.display_name,
+            icon_url=message.author.avatar.url  # Set user's avatar as icon
         )
 
         # Add fields for content and message details
         if message.content:
-            embed.add_field(name="", value=message.content, inline=False)
+            embed.add_field(name="Content", value=message.content, inline=False)
         else:
-            embed.add_field(name="", value="(No text content)", inline=False)
-        embed.add_field(name="", value=f"Message ID: {message.id}", inline=False)
+            embed.add_field(name="Content", value="(No text content)", inline=False)
+
+        embed.add_field(name="Message Details", value=f"Message ID: {message.id}", inline=False)
+
+        # Set the footer with user ID and formatted timestamp
         embed.set_footer(text=f"User ID: {message.author.id} • {timestamp}")
 
         # Attach files if there were any in the message
