@@ -37,9 +37,9 @@ class MessageLogger(commands.Cog):
 
         # Add fields for content and message details
         if message.content:
-            embed.add_field(name="Content", value=message.content, inline=False)
+            embed.add_field(name="", value=message.content, inline=False)
         else:
-            embed.add_field(name="Content", value="(No text content)", inline=False)
+            embed.add_field(name="", value="(No text content)", inline=False)
 
         embed.add_field(name="Message Details", value=f"Message ID: {message.id}", inline=False)
 
