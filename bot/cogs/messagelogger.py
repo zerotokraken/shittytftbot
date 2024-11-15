@@ -41,7 +41,7 @@ class MessageLogger(commands.Cog):
         else:
             embed.add_field(name="", value="(No text content)", inline=False)
 
-        embed.add_field(name="Message Details", value=f"Message ID: {message.id}", inline=False)
+        embed.add_field(name="", value=f"Message ID: {message.id}", inline=False)
 
         # Set the footer with user ID and formatted timestamp
         embed.set_footer(text=f"User ID: {message.author.id} • {timestamp}")
