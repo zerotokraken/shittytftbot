@@ -50,7 +50,7 @@ class Timeout(commands.Cog):
             print("Invalid duration format. Please use the format like 3m, 6h, 2d, 1w.")
             return
 
-        timeout_until = datetime.utcnow() + timedelta(seconds=total_seconds)
+        timeout_duration = datetime.utcnow() + timedelta(seconds=total_seconds)
 
         try:
             await member.timeout(timeout_duration, reason=reason)
