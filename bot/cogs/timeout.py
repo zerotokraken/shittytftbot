@@ -48,6 +48,21 @@ class Timeout(commands.Cog):
         except discord.HTTPException as e:
             print(f"Failed to timeout {member.mention}. Error: {e}")
 
+    @commands.command()
+    async def timein(self, ctx, member: discord.Member):
+        """Remove the timeout from a member."""
+        if not self.has_allowed_role(ctx.author):
+            print(f"{ctx.author} does not have the required role to use this command.")
+            return
+
+        try:
+            await member.timeout(None)  # Remove timeout by setting it to None
+            await ctx.send(f"{member.mention}'s timeout has been removed.")
+        except discord.Forbidden:
+            print("I do not have permission to remove the timeout for this member.")
+        except discord.HTTPException as e:
+            print(f"Failed to remove timeout for {member.mention}. Error: {e}")
+
     @timeout.error
     async def timeout_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -57,6 +72,14 @@ class Timeout(commands.Cog):
         else:
             print("An error occurred while processing the command.")
 
+    @timein.error
+    async def timein_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            print("Please specify a member whose timeout you want to remove.")
+        elif isinstance(error, commands.BadArgument):
+            print("Invalid argument. Make sure to tag the user.")
+        else:
+            print("An error occurred while processing the command.")
 
 async def setup(bot):
     await bot.add_cog(Timeout(bot))
