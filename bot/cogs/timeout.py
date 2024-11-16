@@ -35,15 +35,21 @@ class Timeout(commands.Cog):
             )
 
     @commands.command()
-    async def timeout(self, ctx, nickname: str, duration: str, *, reason: str = None):
-        """Timeout a member for a custom duration (e.g., 3m, 6h, 2d, 1w) using their Discord nickname."""
-        if not self.has_allowed_role(ctx):
-            print(f"{ctx.author} does not have permission to use this command.")
+    async def timeout(self, ctx, member_name: str, duration: str, *, reason: str = None):
+        """Timeout a member for a custom duration (e.g., 3m, 6h, 2d, 1w)."""
+        if not self.has_allowed_role(ctx.author):
+            print(f"{ctx.author} does not have the required role to use this command.")
             return
 
-        member = self.get_member_by_nickname(ctx, nickname)
+        # First, try to find the member by exact name (case-sensitive)
+        member = discord.utils.get(ctx.guild.members, name=member_name)
+
+        # If no member found, attempt case-insensitive search
         if not member:
-            print(f"Member with nickname '{nickname}' not found.")
+            member = discord.utils.get(ctx.guild.members, name=lambda m: m.name.lower() == member_name.lower())
+
+        if not member:
+            print("Member not found. Please check the username and try again.")
             return
 
         total_seconds = self.parse_duration(duration)
@@ -51,10 +57,10 @@ class Timeout(commands.Cog):
             print("Invalid duration format. Please use the format like 3m, 6h, 2d, 1w.")
             return
 
-        timeout_duration = timedelta(seconds=total_seconds)
+        timeout_until = datetime.utcnow() + timedelta(seconds=total_seconds)
 
         try:
-            await member.timeout(timeout_duration, reason=reason)
+            await member.edit(timeout_until=timeout_until, reason=reason)
             await ctx.send(f"{member.mention} has been timed out for {duration}.")
         except discord.Forbidden:
             print("I do not have permission to timeout this member.")

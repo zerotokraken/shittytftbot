@@ -34,7 +34,7 @@ class AntiInvite(commands.Cog):
                     # Delete the message and send a warning
                     await message.delete()
                     await message.channel.send(
-                        f"{message.author.mention}, sharing invite links is not allowed here.",
+                        f"{message.author.mention}, sharing Discord invite links is not allowed here.",
                         delete_after=10
                     )
                 except discord.Forbidden:
