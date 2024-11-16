@@ -1,14 +1,14 @@
 import re
 import discord
 from discord.ext import commands
-from datetime import datetime, timedelta
+from datetime import timedelta
 from discord.utils import utcnow
 
 class Timeout(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # List of allowed roles
         self.allowed_roles = ["Hairy Frog", "Admin", "Discord Moderator"]  # Replace with your roles
+        self.log_channel_id = 1113518194712383578  # Replace with the ID of the channel you want to send messages to
 
     def has_allowed_role(self, member):
         """Check if the user has at least one of the allowed roles."""
@@ -26,6 +26,14 @@ class Timeout(commands.Cog):
         total_seconds = (int(weeks) * 604800) + (int(days) * 86400) + (int(hours) * 3600) + (int(minutes) * 60)
         return total_seconds
 
+    async def send_log_embed(self, guild, embed):
+        """Send an embed to the specified log channel."""
+        channel = guild.get_channel(self.log_channel_id)
+        if channel:
+            await channel.send(embed=embed)
+        else:
+            print(f"Log channel with ID {self.log_channel_id} not found.")
+
     @commands.command()
     async def timeout(self, ctx, member: discord.Member, duration: str, *, reason: str = None):
         """Timeout a member for a custom duration (e.g., 3m, 6h, 2d, 1w)."""
@@ -42,7 +50,17 @@ class Timeout(commands.Cog):
 
         try:
             await member.timeout(timeout_duration, reason=reason)
-            await ctx.send(f"{member.mention} has been timed out for {duration}. Reason: {reason}")
+            embed = discord.Embed(
+                title="🔒 Timeout Issued",
+                color=discord.Color.red(),
+                timestamp=utcnow(),
+            )
+            embed.add_field(name="Member", value=f"{member.mention} ({member.id})", inline=False)
+            embed.add_field(name="Duration", value=duration, inline=True)
+            embed.add_field(name="Reason", value=reason or "No reason provided", inline=False)
+            embed.add_field(name="Issued By", value=f"{ctx.author.mention}", inline=True)
+            embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+            await self.send_log_embed(ctx.guild, embed)
         except discord.Forbidden:
             print("I do not have permission to timeout this member.")
         except discord.HTTPException as e:
@@ -57,7 +75,15 @@ class Timeout(commands.Cog):
 
         try:
             await member.timeout(None)  # Remove timeout by setting it to None
-            await ctx.send(f"{member.mention}'s timeout has been removed.")
+            embed = discord.Embed(
+                title="✅ Timeout Removed",
+                color=discord.Color.green(),
+                timestamp=utcnow(),
+            )
+            embed.add_field(name="Member", value=f"{member.mention} ({member.id})", inline=False)
+            embed.add_field(name="Removed By", value=f"{ctx.author.mention}", inline=True)
+            embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+            await self.send_log_embed(ctx.guild, embed)
         except discord.Forbidden:
             print("I do not have permission to remove the timeout for this member.")
         except discord.HTTPException as e:
