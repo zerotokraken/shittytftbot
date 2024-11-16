@@ -42,7 +42,7 @@ class Timeout(commands.Cog):
 
         try:
             await member.timeout(timeout_duration, reason=reason)
-            await ctx.send(f"{member.mention} has been timed out for {duration}.")
+            await ctx.send(f"{member.mention} has been timed out for {duration}. Reason: {reason}")
         except discord.Forbidden:
             print("I do not have permission to timeout this member.")
         except discord.HTTPException as e:
