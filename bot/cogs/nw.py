@@ -81,6 +81,11 @@ class NoobWatchCommand(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 3600, commands.BucketType.user)  # 1-hour cooldown per user
     async def noobwatch(self, ctx):
+
+        if ctx.author.id == "372292699597832192":  # Replace with your Discord ID
+            # Reset the command's cooldown for this user
+            self.my_command.reset_cooldown(ctx)
+
         if ctx.message.reference:  # Check if the message is a reply
             replied_to_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             user = replied_to_message.author  # Get the user the command issuer replied to

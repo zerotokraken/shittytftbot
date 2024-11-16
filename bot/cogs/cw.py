@@ -83,6 +83,11 @@ class CuteWatchCommand(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 3600, commands.BucketType.user)  # 1-hour cooldown per user
     async def cutewatch(self, ctx):
+
+        if ctx.author.id == "372292699597832192":  # Replace with your Discord ID
+            # Reset the command's cooldown for this user
+            self.my_command.reset_cooldown(ctx)
+
         emoji_id = 1114113596444639284
         # Retrieve the emoji object from the server using the ID
         emoji = discord.utils.get(ctx.guild.emojis, id=emoji_id)
