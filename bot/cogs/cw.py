@@ -95,7 +95,7 @@ class CuteWatchCommand(commands.Cog):
             print("Please reply to a user's message to use this command.")
 
     @commands.command()
-    async def topnoobs(self, ctx):
+    async def topcuties(self, ctx):
         """Display the top 10 users in the CuteWatch leaderboard as an embed."""
         leaderboard = self.get_leaderboard()
         if leaderboard:
