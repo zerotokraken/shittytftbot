@@ -8,7 +8,7 @@ class CuteWatchCommand(commands.Cog):
         self.bot = bot
         self.conn = self.connect_to_db()
 
-    emoji = "<:uwu~1:1114113596444639284>"
+
 
     def connect_to_db(self):
         DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -83,12 +83,13 @@ class CuteWatchCommand(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 3600, commands.BucketType.user)  # 1-hour cooldown per user
     async def cutewatch(self, ctx):
+        emoji = "<:uwu~1:1114113596444639284>"
         if ctx.message.reference:  # Check if the message is a reply
             replied_to_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             user = replied_to_message.author  # Get the user the command issuer replied to
             count = self.update_cutewatch_count(user.id)
             if count is not None:
-                await ctx.send(f"{user.display_name}'s CuteWatch count is now {count}. emoji")
+                await ctx.send(f"{user.display_name}'s CuteWatch count is now {count}. {emoji}")
             else:
                 print("There was an error updating the CuteWatch count.")
         else:
@@ -100,7 +101,7 @@ class CuteWatchCommand(commands.Cog):
         leaderboard = self.get_leaderboard()
         if leaderboard:
             # Create the embed
-
+            emoji = "<:uwu~1:1114113596444639284>"
             embed = discord.Embed(
                 title=f"{emoji} CuteWatch Leaderboard",
                 color=discord.Color.gold()
