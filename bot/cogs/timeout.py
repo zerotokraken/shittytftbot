@@ -8,7 +8,7 @@ class Timeout(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # List of allowed roles (use role names or IDs)
-        self.allowed_roles = ["Moderator", "Admin"]  # Replace with your server's role names
+        self.allowed_roles = ["Hairy Frog", "Admin", "Discord Moderator"]  # Replace with your server's role names
 
     def parse_duration(self, duration_str):
         """Parse duration string and return the total duration in seconds."""
