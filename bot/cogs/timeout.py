@@ -1,44 +1,38 @@
+import re
 import discord
 from discord.ext import commands
-import re
 from datetime import datetime, timedelta
+from discord.utils import get
 
 
 class Timeout(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # List of allowed roles (use role names or IDs)
-        self.allowed_roles = ["Hairy Frog", "Admin", "Discord Moderator"]  # Replace with your server's role names
+        # List of allowed roles
+        self.allowed_roles = ["Hairy Frog", "Admin", "Discord Moderator"]   # Replace with your roles
+
+    def has_allowed_role(self, member):
+        """Check if the user has at least one of the allowed roles."""
+        allowed_roles = self.allowed_roles
+        user_roles = [role.name for role in member.roles]
+        return any(role in allowed_roles for role in user_roles)
 
     def parse_duration(self, duration_str):
         """Parse duration string and return the total duration in seconds."""
-        duration_regex = re.compile(r'(?:(\d+)w)?(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?')
+        duration_regex = re.compile(r"(?:(\d+)w)?(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?")
         match = duration_regex.fullmatch(duration_str)
         if not match:
             return None
 
-        weeks, days, hours, minutes = match.groups(default='0')
+        weeks, days, hours, minutes = match.groups(default="0")
         total_seconds = (int(weeks) * 604800) + (int(days) * 86400) + (int(hours) * 3600) + (int(minutes) * 60)
         return total_seconds
-
-    def has_allowed_role(self, ctx):
-        """Check if the user has at least one of the allowed roles."""
-        allowed_roles = self.allowed_roles
-        user_roles = [role.name for role in ctx.author.roles]
-        return any(role in allowed_roles for role in user_roles)
-
-    def get_member_by_nickname(self, ctx, nickname):
-        """Find a member by their nickname or username."""
-        return discord.utils.find(
-            lambda m: m.nick == nickname or m.name == nickname,
-            ctx.guild.members
-            )
 
     @commands.command()
     async def timeout(self, ctx, member_name: str, duration: str, *, reason: str = None):
         """Timeout a member for a custom duration (e.g., 3m, 6h, 2d, 1w)."""
-        if not self.has_allowed_role(ctx.author):
-            print(f"{ctx.author} does not have the required role to use this command.")
+        if not self.has_allowed_role(ctx.message.author):
+            print(f"{ctx.message.author} does not have the required role to use this command.")
             return
 
         # First, try to find the member by exact name (case-sensitive)
@@ -75,6 +69,7 @@ class Timeout(commands.Cog):
             print("Invalid argument. Please specify a valid member and duration.")
         else:
             print("An error occurred while processing the command.")
+
 
 async def setup(bot):
     await bot.add_cog(Timeout(bot))
