@@ -49,5 +49,5 @@ class Timeout(commands.Cog):
         else:
             print("An error occurred while processing the command.")
 
-def setup(bot):
-    bot.add_cog(Timeout(bot))
+async def setup(bot):
+    await bot.add_cog(Timeout(bot))
