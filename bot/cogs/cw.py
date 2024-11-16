@@ -83,7 +83,9 @@ class CuteWatchCommand(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 3600, commands.BucketType.user)  # 1-hour cooldown per user
     async def cutewatch(self, ctx):
-        emoji = "<:uwu~1:1114113596444639284>"
+        emoji_id = 1114113596444639284
+        # Retrieve the emoji object from the server using the ID
+        emoji = discord.utils.get(ctx.guild.emojis, id=emoji_id)
         if ctx.message.reference:  # Check if the message is a reply
             replied_to_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             user = replied_to_message.author  # Get the user the command issuer replied to
@@ -101,7 +103,9 @@ class CuteWatchCommand(commands.Cog):
         leaderboard = self.get_leaderboard()
         if leaderboard:
             # Create the embed
-            emoji = "<:uwu~1:1114113596444639284>"
+            emoji_id = 1114113596444639284
+            # Retrieve the emoji object from the server using the ID
+            emoji = discord.utils.get(ctx.guild.emojis, id=emoji_id)
             embed = discord.Embed(
                 title=f"{emoji} CuteWatch Leaderboard",
                 color=discord.Color.gold()
