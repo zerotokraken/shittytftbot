@@ -1,7 +1,18 @@
+
+There are a few issues in your code that need to be addressed:
+
+discord.utils.utcnow(): This does not exist in the discord library. Instead, use discord.utils.utcnow() or datetime.datetime.utcnow().
+discord.timedelta: timedelta is part of the datetime module, not discord.
+The Member.timeout() method: In the current discord.py API, there’s no timeout method directly on a Member object. The correct way is to use the edit() method with the timeout_until parameter.
+Here’s the fixed and updated code:
+
+python
+Copy code
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions, MissingPermissions
 import re
+from datetime import datetime, timedelta
 
 class Timeout(commands.Cog):
     def __init__(self, bot):
@@ -24,12 +35,14 @@ class Timeout(commands.Cog):
         """Timeout a member for a custom duration (e.g., 3m, 6h, 2d, 1w)."""
         total_seconds = self.parse_duration(duration)
         if total_seconds is None:
-            print("Invalid duration format. Please use the format like 3m, 6h, 2d, 1w.")
+            await ctx.send("Invalid duration format. Please use the format like 3m, 6h, 2d, 1w.")
             return
 
+        timeout_until = datetime.utcnow() + timedelta(seconds=total_seconds)
+
         try:
-            await member.timeout(discord.utils.utcnow() + discord.timedelta(seconds=total_seconds), reason=reason)
-            await ctx.send(f"{member.mention} has been timed out for {duration}")
+            await member.edit(timeout_until=timeout_until, reason=reason)
+            await ctx.send(f"{member.mention} has been timed out for {duration}.")
         except discord.Forbidden:
             print("I do not have permission to timeout this member.")
         except discord.HTTPException as e:
