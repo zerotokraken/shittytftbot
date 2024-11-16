@@ -2,8 +2,7 @@ import re
 import discord
 from discord.ext import commands
 from datetime import datetime, timedelta
-from discord.utils import get
-
+from discord.utils import get, utcnow
 
 class Timeout(commands.Cog):
     def __init__(self, bot):
@@ -50,7 +49,7 @@ class Timeout(commands.Cog):
             print("Invalid duration format. Please use the format like 3m, 6h, 2d, 1w.")
             return
 
-        timeout_duration = datetime.utcnow() + timedelta(seconds=total_seconds)
+        timeout_duration = utcnow() + timedelta(seconds=total_seconds)
 
         try:
             await member.timeout(timeout_duration, reason=reason)
