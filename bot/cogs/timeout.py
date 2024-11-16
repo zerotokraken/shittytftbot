@@ -1,13 +1,3 @@
-
-There are a few issues in your code that need to be addressed:
-
-discord.utils.utcnow(): This does not exist in the discord library. Instead, use discord.utils.utcnow() or datetime.datetime.utcnow().
-discord.timedelta: timedelta is part of the datetime module, not discord.
-The Member.timeout() method: In the current discord.py API, there’s no timeout method directly on a Member object. The correct way is to use the edit() method with the timeout_until parameter.
-Here’s the fixed and updated code:
-
-python
-Copy code
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions, MissingPermissions
