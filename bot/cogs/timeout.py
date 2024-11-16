@@ -53,7 +53,7 @@ class Timeout(commands.Cog):
         timeout_until = datetime.utcnow() + timedelta(seconds=total_seconds)
 
         try:
-            await member.edit(timeout_until=timeout_until, reason=reason)
+            await member.timeout(timeout_duration, reason=reason)
             await ctx.send(f"{member.mention} has been timed out for {duration}.")
         except discord.Forbidden:
             print("I do not have permission to timeout this member.")
