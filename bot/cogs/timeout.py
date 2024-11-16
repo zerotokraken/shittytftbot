@@ -37,9 +37,10 @@ class Timeout(commands.Cog):
         # First, try to find the member by exact name (case-sensitive)
         member = discord.utils.get(ctx.guild.members, nick=member_name)
 
-        # If no member found, attempt case-insensitive search
+        # If no member found, attempt case-insensitive search using filter
         if not member:
-            member = discord.utils.get(ctx.guild.members,lambda m: m.nick and m.nick.lower() == member_name.lower())
+            member = next((m for m in ctx.guild.members if m.nick and m.nick.lower() == member_name.lower()), None)
+
         if not member:
             print("Member not found. Please check the username and try again.")
             return
