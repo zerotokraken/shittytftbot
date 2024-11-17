@@ -60,7 +60,7 @@ class MiscCommands(commands.Cog):
 
     # Command to post an image from the database
     @commands.command()
-    async def family(self, ctx):
+    async def fam(self, ctx):
         image_name = 'family'  # The name of the image to fetch from the database
         image_data = self.fetch_image_from_db(image_name)
 
