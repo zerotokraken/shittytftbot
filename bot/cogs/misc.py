@@ -60,6 +60,26 @@ class MiscCommands(commands.Cog):
 
     # Command to post an image from the database
     @commands.command()
+    async def family(self, ctx):
+        image_name = 'family'  # The name of the image to fetch from the database
+        image_data = self.fetch_image_from_db(image_name)
+
+        if image_data is not None:
+            # Save the image data to a temporary file
+            temp_filename = f"{image_name}.png"
+            with open(temp_filename, 'wb') as f:
+                f.write(image_data)
+
+            # Send the image file in the Discord channel
+            await ctx.send(file=discord.File(temp_filename))
+
+            # Remove the temporary file after sending
+            os.remove(temp_filename)
+        else:
+            print(f"Image '{image_name}' not found in the database.")
+
+    # Command to post an image from the database
+    @commands.command()
     async def lowroll(self, ctx):
         image_name = 'lowroll'  # The name of the image to fetch from the database
         image_data = self.fetch_image_from_db(image_name)
