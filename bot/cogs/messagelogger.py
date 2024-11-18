@@ -53,6 +53,40 @@ class MessageLogger(commands.Cog):
         else:
             await log_channel.send(embed=embed)
 
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild, user):
+        log_channel = self.bot.get_channel(self.log_channel_id)
+        if log_channel is None:
+            print(f"Log channel with ID {self.log_channel_id} not found.")
+            return
+
+        embed = discord.Embed(
+            title="Member Banned",
+            description=f"{user.mention} ({user.name}#{user.discriminator}) was banned.",
+            color=discord.Color.dark_red(),
+        )
+        embed.set_footer(text=f"User ID: {user.id}")
+        await log_channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        # Check if the user was kicked (by checking the audit log)
+        guild = member.guild
+        log_channel = self.bot.get_channel(self.log_channel_id)
+        if log_channel is None:
+            print(f"Log channel with ID {self.log_channel_id} not found.")
+            return
+
+        async for entry in guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
+            if entry.target.id == member.id:
+                embed = discord.Embed(
+                    title="Member Kicked",
+                    description=f"{member.mention} ({member.name}#{member.discriminator}) was kicked by {entry.user.mention}.",
+                    color=discord.Color.orange(),
+                )
+                embed.set_footer(text=f"User ID: {member.id}")
+                await log_channel.send(embed=embed)
+                return
 
 # Add the cog to the bot
 async def setup(bot):
