@@ -7,9 +7,14 @@ class MessageLogger(commands.Cog):
         self.bot = bot
         # Specify the ID of the channel where you want to log deleted messages
         self.log_channel_id = 1273523623780552765  # Replace with your log channel's ID
+        self.target_guild_id = 1113421046029242378
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
+
+        # Check if the message is in the target guild
+        if message.guild is None or message.guild.id != self.target_guild_id:
+            return
         # Ignore messages from bots
         if message.author.bot:
             return
@@ -55,6 +60,10 @@ class MessageLogger(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
+
+        if guild.id != self.target_guild_id:
+            return
+
         log_channel = self.bot.get_channel(self.log_channel_id)
         if log_channel is None:
             print(f"Log channel with ID {self.log_channel_id} not found.")
@@ -70,6 +79,9 @@ class MessageLogger(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
+
+        if guild.id != self.target_guild_id:
+            return
         # Check if the user was kicked (by checking the audit log)
         guild = member.guild
         log_channel = self.bot.get_channel(self.log_channel_id)
