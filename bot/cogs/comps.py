@@ -23,9 +23,9 @@ class TeamCodesCog(commands.Cog):
 
         # Create the embed
         embed = discord.Embed(
-            title="Top Comps",
-            description="Import into team planner",
-            color=discord.Color.blue(),
+            title="Top AVP Comps",
+            description="Codes to import into your team planner",
+            color=discord.Color.red(),
         )
 
         # Add fields for each team
