@@ -30,7 +30,7 @@ class TeamCodesCog(commands.Cog):
 
         # Add fields for each team
         for team in teams:
-            embed.add_field(name=team["name"], value=f"Code: `{team['code']}`", inline=False)
+            embed.add_field(name=team["name"] + ":", value=f"`{team['code']}`", inline=False)
 
         # Send the embed
         await ctx.send(embed=embed)
