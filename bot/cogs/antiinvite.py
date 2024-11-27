@@ -8,7 +8,7 @@ class AntiInvite(commands.Cog):
         # Regular expression to detect Discord invite links
         self.invite_regex = re.compile(r"(discord\.gg/|discordapp\.com/invite/|discord\.com/invite/)")
         # List of allowed roles (use role names or IDs)
-        self.allowed_roles = ["Hairy Frog", "Admin", "Discord Moderator"]  # Replace with your server's role names
+        self.allowed_roles = ["Hairy Frog", "Admin", "Discord Moderator", "Little Buddy TFT bot", "Boyses", "Riot", "Subreddit Moderator", "Caster", "Tournament Organizer", "HEX"]  # Replace with your server's role names
 
     def has_allowed_role(self, member):
         """Check if the user has at least one of the allowed roles."""

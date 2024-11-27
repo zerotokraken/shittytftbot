@@ -18,7 +18,7 @@ class TeamCodesCog(commands.Cog):
             { "name": "Bruiser +1 Twitch", "code": "01122c0a260e10341a0700TFTSet13" },
             { "name": "Kog RR", "code": "010c03392738131c150f00TFTSet13" },
             { "name": "Family RR", "code": "010c0628273514371f0d00TFTSet13" },
-            { "name": "Enforcer +1", "code": "01122d1804330237070800TFTSet13" }
+            { "name": "Enforcer +1", "code": "01122d1804330237070800TFTSet13" },
         ]
 
         # Create the embed
