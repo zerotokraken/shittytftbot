@@ -18,7 +18,8 @@ class RollCommands(commands.Cog):
             print("Champions data is not available. Please wait while we update it.")
             await self.fetch_champions_data()
 
-        odds = self.shop_odds[level]
+        # Convert level to string when accessing shop_odds
+        odds = self.shop_odds[str(level)]
 
         tiers = [1, 2, 3, 4, 5]
         results = []
@@ -87,4 +88,3 @@ class RollCommands(commands.Cog):
 
 async def setup(bot, champions_data, latest_version, shop_odds):
     await bot.add_cog(RollCommands(bot, champions_data, latest_version, shop_odds))
-
