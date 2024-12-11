@@ -81,7 +81,7 @@ class LookupCommands(commands.Cog):
 
             if tactics_response.status_code == 200:
                 data = tactics_response.json()
-                overview = data["queueSeasonStats"][f"{set}00"]
+                overview = data["queueSeasonStats"][f"{self.set_number}00"]
                 # icon_id = data["playerInfo"]["profileIconId"]
                 local_rank = data["playerInfo"]["localRank"]
 
