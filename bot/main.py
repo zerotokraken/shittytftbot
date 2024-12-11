@@ -27,6 +27,7 @@ with open(config_path, 'r') as config_file:
 versions_url = config['versions_url']
 base_champions_url = config['base_champions_url']
 shop_odds = config['shop_odds']
+set_number = config['set']
 latest_version = None
 champions_data = {}
 
@@ -157,7 +158,7 @@ async def load_cogs(bot, config=None, champions_data=None, latest_version=None, 
                     elif cog_name == 'cogs.aug':
                         await cog_module.setup(bot, latest_version)
                     elif cog_name == 'cogs.lookup':
-                        await cog_module.setup(bot, apikey, latest_version)
+                        await cog_module.setup(bot, apikey, latest_version, set_number)
                     elif cog_name == 'cogs.trainer':
                         await cog_module.setup(bot, apikey, latest_version)
                     elif cog_name == 'cogs.top':

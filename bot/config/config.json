@@ -1,5 +1,6 @@
 {
     "guild_name": "Competitive TFT",
+    "set": "13",
     "versions_url": "https://ddragon.leagueoflegends.com/api/versions.json",
     "base_champions_url": "https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/tft-champion.json",
     "shop_odds": {

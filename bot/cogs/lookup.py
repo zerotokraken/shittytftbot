@@ -6,10 +6,11 @@ import os
 import re
 
 class LookupCommands(commands.Cog):
-    def __init__(self, bot, apikey, latest_version):
+    def __init__(self, bot, apikey, latest_version, set_number):
         self.bot = bot
         self.apikey = apikey  # Assigning API key correctly
         self.latest_version = latest_version
+        self.set= set_number
         self.tt_url = os.getenv('tt_url')
 
     @commands.command()
@@ -158,5 +159,5 @@ class LookupCommands(commands.Cog):
             print(f"An error occurred: {str(e)}")
 
 
-async def setup(bot, apikey, latest_version):
-    await bot.add_cog(LookupCommands(bot, apikey, latest_version))
+async def setup(bot, apikey, latest_version, set_number):
+    await bot.add_cog(LookupCommands(bot, apikey, latest_version, set_number))
