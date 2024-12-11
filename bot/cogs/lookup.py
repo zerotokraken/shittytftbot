@@ -14,6 +14,7 @@ class LookupCommands(commands.Cog):
         self.tt_url = os.getenv('tt_url')
 
 
+
     @commands.command()
     async def lookup(self, ctx, *, player: str):
         try:
@@ -76,12 +77,12 @@ class LookupCommands(commands.Cog):
             total_games = wins + losses
 
             # Fetch match stats for calculating Win %, Top 4 %, and Avg Placement
-            tactics_url = f"{self.tt_url}/{region}/{gameName}/{tagLine}/120/0"
+            tactics_url = f"{self.tt_url}/{region}/{gameName}/{tagLine}/{self.set_number}0/0"
             tactics_response = requests.get(tactics_url)
 
             if tactics_response.status_code == 200:
                 data = tactics_response.json()
-                overview = data["queueSeasonStats"][f"{self.set_number}00"]
+                overview = data["queueSeasonStats"]["1100"]
                 # icon_id = data["playerInfo"]["profileIconId"]
                 local_rank = data["playerInfo"]["localRank"]
 
