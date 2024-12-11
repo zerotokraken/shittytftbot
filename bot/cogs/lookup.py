@@ -10,8 +10,9 @@ class LookupCommands(commands.Cog):
         self.bot = bot
         self.apikey = apikey  # Assigning API key correctly
         self.latest_version = latest_version
-        self.set= set_number
+        self.set_number= set_number
         self.tt_url = os.getenv('tt_url')
+
 
     @commands.command()
     async def lookup(self, ctx, *, player: str):
