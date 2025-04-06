@@ -115,10 +115,6 @@ async def fetch_latest_version():
                 versions = await response.json()
                 if versions:
                     latest_version = versions[0]
-                    parts = versions[0].split('.')
-                    parts[0] = str(int(parts[0]) - 1)  # Subtract 1 from first number
-                    parts[1] = str(int(parts[1]) - 6)  # Subtract 6 from second number
-                    latest_version = '.'.join(parts)    # Join back together
                     print(f"Current TFT Patch: {latest_version}")
             else:
                 print(f"Failed to fetch versions data: {response.status}")
