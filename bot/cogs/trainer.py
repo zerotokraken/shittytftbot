@@ -20,7 +20,7 @@ class TrainerCommands(commands.Cog):
 
             # Define the ignore list and filter criteria
             ignore_list = {"TFT14_ViegoUniqueTrait", "TFT14_Overlord", "TFT14_Virus", "TFT14_BallisTek", "TFT14_Netgod"}
-            valid_traits = [trait for trait in data.values() if "TFT12" in trait["id"] and trait["id"] not in ignore_list]
+            valid_traits = [trait for trait in data.values() if "TFT14" in trait["id"] and trait["id"] not in ignore_list]
 
             # Randomly select three traits
             selected_traits = random.sample(valid_traits, 3) if len(valid_traits) >= 3 else valid_traits
