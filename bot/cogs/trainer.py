@@ -19,8 +19,7 @@ class TrainerCommands(commands.Cog):
             data = response.json()["data"]
 
             # Define the ignore list and filter criteria
-            ignore_list = {"TFT12_BatQueen", "TFT12_Druid", "TFT12_Explorer", "TFT12_Ascendant", "TFT12_Ravenous",
-                           "TFT12_Relic", "TFT12_Dragon"}
+            ignore_list = {"TFT14_ViegoUniqueTrait", "TFT14_Overlord", "TFT14_Virus", "TFT14_BallisTek", "TFT14_Netgod"}
             valid_traits = [trait for trait in data.values() if "TFT12" in trait["id"] and trait["id"] not in ignore_list]
 
             # Randomly select three traits
