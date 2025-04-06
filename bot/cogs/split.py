@@ -27,7 +27,7 @@ class SplitCommands(commands.Cog):
         ]
 
     @commands.command()
-    async def split(self, ctx):
+    async def shouldisplit(self, ctx):
         """Randomly decides if you should take guaranteed gold or split the pot with other players"""
         if random.random() < 0.5:  # 50% chance for either response
             response = random.choice(self.yes_responses)
