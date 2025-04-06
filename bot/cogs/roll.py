@@ -25,7 +25,7 @@ class RollCommands(commands.Cog):
         results = []
 
         # Filter out champions with "Tutorial" in their name
-        valid_champions = {name: details for name, details in self.champions_data.items() if "TFT13" in details['id']}
+        valid_champions = {name: details for name, details in self.champions_data.items() if "TFT14" in details['id']}
 
         # Roll champions based on the odds
         for tier in tiers:
