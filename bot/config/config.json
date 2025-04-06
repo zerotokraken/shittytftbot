@@ -1,6 +1,6 @@
 {
     "guild_name": "Competitive TFT",
-    "set": "13",
+    "set": "14",
     "versions_url": "https://ddragon.leagueoflegends.com/api/versions.json",
     "base_champions_url": "https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/tft-champion.json",
     "shop_odds": {
@@ -10,8 +10,8 @@
         "5": [45, 33, 20, 2, 0],
         "6": [30, 40, 25, 5, 0],
         "7": [19, 30, 40, 10, 1],
-        "8": [18, 25, 32, 22, 3],
-        "9": [15, 20, 25, 30, 10],
+        "8": [17, 24, 32, 24, 3],
+        "9": [15, 18, 25, 30, 12],
         "10": [5, 10, 20, 40, 25]
     },
     "bot_spam_channel_id": "1285382023887978526"
