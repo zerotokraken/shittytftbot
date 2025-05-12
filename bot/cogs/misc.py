@@ -247,5 +247,9 @@ class MiscCommands(commands.Cog):
         selected_line_saida = random.choice(lines_saida)
         await ctx.send(f'{selected_line_saida}')
 
+    @commands.command()
+    async def toxic(self, ctx):
+        await ctx.send(f"{ctx.author.display_name}, I'm not sure what's going on but it seems like all of your posts have a layer of toxicness that really isn't helpful or should be a part of the tft community.\n\nYou clearly enjoy the game or you wouldn't be playing it this long, but what makes you feel like you need to communicate like this? You're a skilled player, and I wish you could set a better example.\n\nIf you think stuff needs changed, let us know, and we usually respond within a patch or two at the most.")
+
 async def setup(bot):
     await bot.add_cog(MiscCommands(bot))
