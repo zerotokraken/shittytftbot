@@ -242,7 +242,7 @@ class MiscCommands(commands.Cog):
             "https://clips.twitch.tv/ConcernedPoliteFlyShadyLulu-ZYsvLju7ZH8kualJ?embedo",
             "https://clips.twitch.tv/EnjoyableGlamorousWalletHeyGuys-04szKrShCTmHm74L?embedo",
             "https://clips.twitch.tv/BrainyRacyPoxOSsloth-3hAamOJIS7cvqKyn?embed0",
-            "https://clips.twitch.tv/embed?clip=EasyGrotesquePicklesTTours-L6zOHcrbOuODEY6f?embed0"
+            "https://clips.twitch.tv/embed?clip=EasyGrotesquePicklesTTours-L6zOHcrbOuODEY6f?embed0",
         ]
         selected_line_saida = random.choice(lines_saida)
         await ctx.send(f'{selected_line_saida}')
