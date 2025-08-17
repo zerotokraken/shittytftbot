@@ -11,13 +11,13 @@ class ShittyCommands(commands.Cog):
     async def shittycommands(self, ctx):
         # Define a static list of main commands with custom descriptions
         main_commands = {
-            'lookup': 'Look up a player’s TFT stats on tactics.tools, Include the player tag as well [!lookup BOT#TAG]',
-            'top': 'Look up the top 5 players in a region [!top na]',
-            'roll': 'Simulate a shop roll at a specific level [!roll #]',
+            'lookup': 'Look up a player’s TFT stats on tactics.tools, Include the player tag as well [.lookup BOT#TAG]',
+            'top': 'Look up the top 5 players in a region [.top na]',
+            'roll': 'Simulate a shop roll at a specific level [.roll #]',
             'malding': 'Send up to 3 random messages from the malding channel. Refreshes once an hour',
             'avp': 'Predict your average placement. Random integer between 1.0-8.0',
-            'suggest': 'Suggest a command or feature [!suggest myidea]',
-            'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [!cutoffs NA]',
+            'suggest': 'Suggest a command or feature [.suggest myidea]',
+            'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [.cutoffs NA]',
             'links': 'Large list of TFT resources to include webpages, discords, youtube and reddits'
         }
 

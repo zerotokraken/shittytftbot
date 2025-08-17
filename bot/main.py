@@ -13,7 +13,7 @@ intents = discord.Intents.default()
 intents.members = True  # Enable the members intent to access guild members
 intents.message_content = True  # To read message content
 intents.guilds = True  # Enable the guilds intent to get guild information
-bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
+bot = commands.Bot(command_prefix=".", intents=intents, help_command=None)
 
 botkey = os.getenv('botkey')
 apikey = os.getenv('apikey')
