@@ -282,7 +282,7 @@ class Last(commands.Cog):
             b = int(bg_color[5:7], 16)
             bg_color = f'#{r//2:02x}{g//2:02x}{b//2:02x}'
         
-        box_size = 65
+        box_size = 100  # Increased from 65 for larger text
         box_x = 20
         box_y = height//4 - 30
         
@@ -292,21 +292,17 @@ class Last(commands.Cog):
         draw.rectangle([box_x+1, box_y+1, box_x + box_size-1, box_y + box_size-1], 
                       outline=placement_color)
         
-        # Draw placement number (larger)
+        # Draw placement number
         text = str(placement)
         text_bbox = draw.textbbox((0, 0), text, font=self.font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
-        base_x = box_x + (box_size - text_width * 3) // 2
-        base_y = box_y + (box_size - text_height * 3) // 2
-        
-        # Draw text multiple times for thickness
-        for dx in range(3):
-            for dy in range(3):
-                draw.text((base_x + dx, base_y + dy), text, fill=placement_color, font=self.font)
+        text_x = box_x + (box_size - text_width) // 2
+        text_y = box_y + (box_size - text_height) // 2
+        draw.text((text_x, text_y), text, fill=placement_color, font=self.font)
         
         # Draw summoner icon
-        icon_size = 65
+        icon_size = 100  # Increased from 65 to match placement box
         icon_x = box_x + box_size + 20
         icon_y = box_y
         
@@ -339,14 +335,10 @@ class Last(commands.Cog):
         draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], 
                      outline='white', width=1)
         
-        # Draw level text (larger)
-        base_x = circle_x + circle_size/2 - text_width
-        base_y = circle_y + circle_size/2 - text_height
-        
-        # Draw text multiple times for thickness
-        for dx in range(2):
-            for dy in range(2):
-                draw.text((base_x + dx, base_y + dy), level_text, fill='white', font=self.font)
+        # Draw level text
+        text_x = circle_x + circle_size/2 - text_width/2
+        text_y = circle_y + circle_size/2 - text_height/2
+        draw.text((text_x, text_y), level_text, fill='white', font=self.font)
         
         # Draw units
         unit_start_x = left_margin
