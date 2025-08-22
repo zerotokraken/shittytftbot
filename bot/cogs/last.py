@@ -455,13 +455,8 @@ class Last(commands.Cog):
                         item_y = y_pos + 96 - item_size  # Position at bottom of unit icon
                         item_x = x_pos + (96 - len(items) * item_spacing) // 2
                         for j, item_name in enumerate(items):
-                            # Handle item names with set numbers (e.g., TFT7_Item_) and keep Artifact_ prefix
-                            item_id = item_name
-                            if item_name.startswith("TFT"):
-                                # Remove any TFTx_ prefix first
-                                item_id = "_".join(item_name.split("_")[1:])  # Skip the TFTx part
-                            item_id = item_id.replace("Item_", "")  # Remove just "Item_"
-                            item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/TFT_Item_{item_id}.png"
+                            # Use the full item name in the URL
+                            item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/{item_name}.png"
                             item_img = await self.download_image(item_url)
                             
                             if item_img:
