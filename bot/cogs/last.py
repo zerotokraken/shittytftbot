@@ -46,8 +46,10 @@ class Last(commands.Cog):
             8: '#808080'
         }
 
-        # Load default font
-        self.font = ImageFont.load_default()
+        # Create a custom bitmap font that's twice the size of the default
+        default_font = ImageFont.load_default()
+        default_size = default_font.getsize("0")[0]  # Get base size from a digit
+        self.font = default_font.font.resize((default_size * 2, default_size * 2))
 
     async def get_tactician_data(self):
         """Get TFT tactician data"""
@@ -237,7 +239,7 @@ class Last(commands.Cog):
                 count_text = str(num_units)
                 text_bbox = draw.textbbox((0, 0), count_text, font=self.font)
                 text_width = text_bbox[2] - text_bbox[0]
-                draw.text((x + 32 - text_width - 2, y + 32 - 14), count_text, fill='white', font=self.font)
+                draw.text((x + 32 - text_width - 2, y + 32 - 14), count_text, fill='black', font=self.font)
                 
                 return True
             except Exception as e:
