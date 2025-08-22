@@ -343,7 +343,7 @@ class Last(commands.Cog):
         right_margin = 20
         num_units = len(player_data['units'])
         width = left_margin + (unit_width + unit_spacing) * num_units + right_margin
-        height = 200
+        height = 220  # Increased from 200 to add padding
         
         # Create image
         img = Image.new('RGB', (width, height), color='#36393F')
@@ -363,7 +363,7 @@ class Last(commands.Cog):
         
         box_size = 100  # Increased from 65 for larger text
         box_x = 20
-        box_y = height//4 - 30
+        box_y = height//4 - 10  # Reduced from -30 to -10 to move placement box and summoner icon down
         
         # Draw placement box
         draw.rectangle([box_x, box_y, box_x + box_size, box_y + box_size], 
@@ -417,7 +417,7 @@ class Last(commands.Cog):
         
         # Draw units
         unit_start_x = left_margin
-        y_pos = 20
+        y_pos = 40  # Increased from 20 to add more top padding
         
         for i, unit in enumerate(player_data['units']):
             champion_name = self.clean_name(unit['character_id'])
