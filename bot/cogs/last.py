@@ -46,13 +46,32 @@ class Last(commands.Cog):
             8: '#808080'
         }
 
-        # Load fonts
+        # Load font for trait numbers
         self.font = ImageFont.load_default()
-        try:
-            self.large_font = ImageFont.truetype("arial.ttf", 48)  # Increased from 24 to 48
-        except:
-            print("Arial font not available, using default")
-            self.large_font = self.font
+
+    def draw_number(self, draw, number, x, y, size, color):
+        """Draw a large number using vector paths"""
+        # Define number paths (normalized to 100x100 grid)
+        number_paths = {
+            '1': [(40, 20), (60, 20), (60, 80), (40, 80)],
+            '2': [(30, 20), (70, 20), (70, 50), (30, 50), (30, 80), (70, 80)],
+            '3': [(30, 20), (70, 20), (70, 80), (30, 80), (70, 50), (30, 50)],
+            '4': [(30, 20), (30, 50), (70, 50), (70, 20), (70, 80)],
+            '5': [(70, 20), (30, 20), (30, 50), (70, 50), (70, 80), (30, 80)],
+            '6': [(70, 20), (30, 20), (30, 80), (70, 80), (70, 50), (30, 50)],
+            '7': [(30, 20), (70, 20), (70, 80)],
+            '8': [(30, 20), (70, 20), (70, 80), (30, 80), (30, 20), (30, 50), (70, 50)],
+            '9': [(70, 80), (70, 20), (30, 20), (30, 50), (70, 50)]
+        }
+
+        # Scale the path to desired size
+        scale = size / 100
+        path = number_paths.get(str(number))
+        if path:
+            # Scale and offset points
+            scaled_path = [(x + px * scale, y + py * scale) for px, py in path]
+            # Draw the path
+            draw.line(scaled_path, fill=color, width=int(size/10))
 
     def draw_large_text(self, draw, text, x, y, color, scale=2):
         """Draw text at a larger scale"""
@@ -337,12 +356,10 @@ class Last(commands.Cog):
         
         # Draw placement number
         text = str(placement)
-        text_bbox = draw.textbbox((0, 0), text, font=self.large_font)
-        text_width = text_bbox[2] - text_bbox[0]
-        text_height = text_bbox[3] - text_bbox[1]
-        text_x = box_x + (box_size - text_width) // 2
-        text_y = box_y + (box_size - text_height) // 2
-        draw.text((text_x, text_y), text, fill=placement_color, font=self.large_font)
+        number_size = 60  # Size of the number
+        text_x = box_x + (box_size - number_size) // 2
+        text_y = box_y + (box_size - number_size) // 2
+        self.draw_number(draw, text, text_x, text_y, number_size, placement_color)
         
         # Draw summoner icon
         icon_size = 100  # Increased from 65 to match placement box
@@ -365,11 +382,9 @@ class Last(commands.Cog):
         
         # Draw level
         level_text = str(player_data['level'])
-        text_bbox = draw.textbbox((0, 0), level_text, font=self.large_font)
-        text_width = text_bbox[2] - text_bbox[0]
-        text_height = text_bbox[3] - text_bbox[1]
+        number_size = 30  # Smaller size for level number
         
-        circle_size = max(text_width, text_height) + 12
+        circle_size = number_size + 12
         circle_x = icon_x + icon_size - circle_size - 2
         circle_y = icon_y + icon_size - circle_size - 2
         
@@ -379,9 +394,9 @@ class Last(commands.Cog):
                      outline='white', width=1)
         
         # Draw level text
-        text_x = circle_x + circle_size/2 - text_width/2
-        text_y = circle_y + circle_size/2 - text_height/2
-        draw.text((text_x, text_y), level_text, fill='white', font=self.large_font)
+        text_x = circle_x + (circle_size - number_size) // 2
+        text_y = circle_y + (circle_size - number_size) // 2
+        self.draw_number(draw, level_text, text_x, text_y, number_size, 'white')
         
         # Draw units
         unit_start_x = left_margin
