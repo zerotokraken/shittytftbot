@@ -321,7 +321,7 @@ class Last(commands.Cog):
         
         # Calculate dimensions
         unit_width = 120  # Increased from 100
-        unit_spacing = 24  # Increased from 20
+        unit_spacing = 20  # Increased from 20
         left_margin = 300  # Increased from 200 to give more space for summoner icon
         right_margin = 20
         num_units = len(player_data['units'])
@@ -433,7 +433,7 @@ class Last(commands.Cog):
                     
                     # Draw items
                     if items:
-                        item_y = y_pos + 65  # Adjusted for larger champion size
+                        item_y = y_pos + 55  # Adjusted for larger champion size
                         item_x = x_pos + (96 - len(items) * 27) // 2  # Adjusted for new champion size
                         for j, item_name in enumerate(items):
                             item_id = item_name.replace("TFT_Item_", "").replace("Artifact_", "")
@@ -451,9 +451,9 @@ class Last(commands.Cog):
                     print(f"Error processing unit {champion_name}: {str(e)}")
         
         # Draw traits
-        traits_y = y_pos + 130  # Adjusted for larger champion size
+        traits_y = y_pos + 110  # Adjusted for larger champion size
         traits_x = left_margin  # Start traits from the same position as units
-        trait_spacing = 6  # Increased from 4
+        trait_spacing = 8  # Increased from 4
         active_traits = [trait for trait in player_data.get('traits', []) if trait.get('tier_current', 0) > 0]
         active_traits.sort(key=lambda x: (-x['tier_current'], -x['style'], x['name']))
         for trait in active_traits:
