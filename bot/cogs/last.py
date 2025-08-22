@@ -46,8 +46,13 @@ class Last(commands.Cog):
             8: '#808080'
         }
 
-        # Load default font
+        # Load fonts
         self.font = ImageFont.load_default()
+        try:
+            self.large_font = ImageFont.truetype("arial.ttf", 48)  # Increased from 24 to 48
+        except:
+            print("Arial font not available, using default")
+            self.large_font = self.font
 
     def draw_large_text(self, draw, text, x, y, color, scale=2):
         """Draw text at a larger scale"""
@@ -332,12 +337,12 @@ class Last(commands.Cog):
         
         # Draw placement number
         text = str(placement)
-        text_bbox = draw.textbbox((0, 0), text, font=self.font)
+        text_bbox = draw.textbbox((0, 0), text, font=self.large_font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
         text_x = box_x + (box_size - text_width) // 2
         text_y = box_y + (box_size - text_height) // 2
-        draw.text((text_x, text_y), text, fill=placement_color, font=self.font)
+        draw.text((text_x, text_y), text, fill=placement_color, font=self.large_font)
         
         # Draw summoner icon
         icon_size = 100  # Increased from 65 to match placement box
@@ -360,7 +365,7 @@ class Last(commands.Cog):
         
         # Draw level
         level_text = str(player_data['level'])
-        text_bbox = draw.textbbox((0, 0), level_text, font=self.font)
+        text_bbox = draw.textbbox((0, 0), level_text, font=self.large_font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
         
@@ -376,7 +381,7 @@ class Last(commands.Cog):
         # Draw level text
         text_x = circle_x + circle_size/2 - text_width/2
         text_y = circle_y + circle_size/2 - text_height/2
-        draw.text((text_x, text_y), level_text, fill='white', font=self.font)
+        draw.text((text_x, text_y), level_text, fill='white', font=self.large_font)
         
         # Draw units
         unit_start_x = left_margin
@@ -436,9 +441,6 @@ class Last(commands.Cog):
         trait_spacing = 4
         active_traits = [trait for trait in player_data.get('traits', []) if trait.get('tier_current', 0) > 0]
         active_traits.sort(key=lambda x: (-x['tier_current'], -x['style'], x['name']))
-        
-        traits_x = left_margin
-        trait_spacing = 4
         for trait in active_traits:
             if traits_x + 32 + trait_spacing > width:
                 break
