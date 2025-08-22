@@ -500,7 +500,7 @@ class Last(commands.Cog):
                 cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (ctx.author.id,))
                 result = cursor.fetchone()
                 if not result:
-                    await ctx.send("Please set your TFT name and region first using `.set_name` (Name#Tag) and `.set_region` (americas, europe, asia, sea)")
+                    await ctx.send("Please set your TFT name and region first using `.set_name Name#Tag' and `.set_region myregionhere` (americas, europe, asia, sea)")
                     return
                 
                 name, tag, region = result
@@ -522,7 +522,7 @@ class Last(commands.Cog):
             await ctx.send(file=discord.File(img_bytes, 'last_match.png'))
             
         except Exception as e:
-            await ctx.send(f"An error occurred: {str(e)}")
+            await ctx.send(f"An error occurred, please check your name and region.")
 
 async def setup(bot, apikey, latest_version):
     await bot.add_cog(Last(bot, apikey, latest_version))
