@@ -21,7 +21,7 @@ class UserSettings(commands.Cog):
         cursor = conn.cursor()
         try:
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS user_settings (
+                CREATE TABLE IF NOT EXISTS tft_settings (
                     discord_id BIGINT PRIMARY KEY,
                     tft_name VARCHAR(255) NOT NULL,
                     tft_tag VARCHAR(255) NOT NULL,
@@ -54,7 +54,7 @@ class UserSettings(commands.Cog):
             
             # Use INSERT ... ON CONFLICT for upsert operation
             cursor.execute('''
-                INSERT INTO user_settings (discord_id, tft_name, tft_tag)
+                INSERT INTO tft_settings (discord_id, tft_name, tft_tag)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (discord_id)
                 DO UPDATE SET
@@ -71,7 +71,6 @@ class UserSettings(commands.Cog):
             await ctx.send(f"Successfully set your TFT name to: {name}#{tag}")
         except Exception as e:
             await ctx.message.add_reaction('❌')
-            await ctx.send(f"An error occurred: {str(e)}")
         finally:
             cursor.close()
             conn.close()
@@ -81,7 +80,7 @@ class UserSettings(commands.Cog):
         conn = self.get_db_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute('SELECT tft_name, tft_tag, region FROM user_settings WHERE discord_id = %s', (discord_id,))
+            cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id,))
             result = cursor.fetchone()
             return result if result else None
         finally:
@@ -107,7 +106,7 @@ class UserSettings(commands.Cog):
             
             # Update or insert the region
             cursor.execute('''
-                INSERT INTO user_settings (discord_id, region, tft_name, tft_tag)
+                INSERT INTO tft_settings (discord_id, region, tft_name, tft_tag)
                 VALUES (%s, %s, '', '')
                 ON CONFLICT (discord_id)
                 DO UPDATE SET region = EXCLUDED.region
@@ -122,7 +121,6 @@ class UserSettings(commands.Cog):
             await ctx.send(f"Successfully set your region to: {region}")
         except Exception as e:
             await ctx.message.add_reaction('❌')
-            await ctx.send(f"An error occurred: {str(e)}")
         finally:
             cursor.close()
             conn.close()
