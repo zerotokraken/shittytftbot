@@ -339,7 +339,7 @@ class Last(commands.Cog):
         # Calculate dimensions
         unit_width = 120
         unit_spacing = 10  # Reduced spacing between units
-        left_margin = 300  # Increased from 200 to give more space for summoner icon
+        left_margin = 250  # Increased from 200 to give more space for summoner icon
         right_margin = 20
         num_units = len(player_data['units'])
         width = left_margin + (unit_width + unit_spacing) * num_units + right_margin
