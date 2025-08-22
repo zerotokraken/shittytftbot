@@ -291,15 +291,15 @@ class Last(commands.Cog):
         
         if icon_img:
             try:
-                icon_img = icon_img.resize((42, 42))
+                icon_img = icon_img.resize((48, 48))  # Increased from 32x32
                 bg_color = self.TRAIT_COLORS.get(trait_style, '#5f5f5f')
-                draw.rectangle([x, y, x + 42, y + 42], fill=bg_color)
+                draw.rectangle([x, y, x + 48, y + 48], fill=bg_color)  # Increased from 32x32
                 img.paste(icon_img, (x, y), icon_img)
                 
                 count_text = str(num_units)
                 text_bbox = draw.textbbox((0, 0), count_text, font=self.font)
                 text_width = text_bbox[2] - text_bbox[0]
-                draw.text((x + 42 - text_width - 2, y + 42 - 14), count_text, fill='black', font=self.font)
+                draw.text((x + 48 - text_width - 2, y + 48 - 14), count_text, fill='black', font=self.font)  # Adjusted for new size
                 
                 return True
             except Exception as e:
@@ -320,8 +320,8 @@ class Last(commands.Cog):
             raise Exception("Player not found in match data")
         
         # Calculate dimensions
-        unit_width = 100
-        unit_spacing = 20
+        unit_width = 120  # Increased from 100
+        unit_spacing = 24  # Increased from 20
         left_margin = 300  # Increased from 200 to give more space for summoner icon
         right_margin = 20
         num_units = len(player_data['units'])
@@ -419,22 +419,22 @@ class Last(commands.Cog):
                     if unit_stars > 0:
                         star_width = 44
                         star_height = 17
-                        star_x = x_pos + (80 - star_width) // 2
+                        star_x = x_pos + (96 - star_width) // 2  # Adjusted for new champion size
                         star_y = y_pos - star_height - 3
                         self.draw_star_background(draw, star_x, star_y, star_width, star_height, unit_stars)
                     
                     # Draw champion border
                     border_color = self.RARITY_COLORS.get(rarity, '#FFFFFF')
-                    self.draw_bordered_rectangle(draw, x_pos-2, y_pos-2, 84, 84, border_color)
+                    self.draw_bordered_rectangle(draw, x_pos-2, y_pos-2, 100, 100, border_color)  # Increased from 84x84
                     
                     # Place champion
-                    champ_img = champ_img.resize((100, 100))
+                    champ_img = champ_img.resize((96, 96))  # Increased from 80x80
                     img.paste(champ_img, (x_pos, y_pos))
                     
                     # Draw items
                     if items:
-                        item_y = y_pos + 55
-                        item_x = x_pos + (80 - len(items) * 27) // 2
+                        item_y = y_pos + 65  # Adjusted for larger champion size
+                        item_x = x_pos + (96 - len(items) * 27) // 2  # Adjusted for new champion size
                         for j, item_name in enumerate(items):
                             item_id = item_name.replace("TFT_Item_", "").replace("Artifact_", "")
                             item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/TFT_Item_{item_id}.png"
@@ -451,17 +451,17 @@ class Last(commands.Cog):
                     print(f"Error processing unit {champion_name}: {str(e)}")
         
         # Draw traits
-        traits_y = y_pos + 110
+        traits_y = y_pos + 130  # Adjusted for larger champion size
         traits_x = left_margin  # Start traits from the same position as units
-        trait_spacing = 4
+        trait_spacing = 6  # Increased from 4
         active_traits = [trait for trait in player_data.get('traits', []) if trait.get('tier_current', 0) > 0]
         active_traits.sort(key=lambda x: (-x['tier_current'], -x['style'], x['name']))
         for trait in active_traits:
-            if traits_x + 32 + trait_spacing > width:
+            if traits_x + 48 + trait_spacing > width:  # Adjusted for new trait size
                 break
             
             if await self.draw_trait_icon(draw, img, traits_x, traits_y, trait['name'], trait['style'], trait['num_units']):
-                traits_x += 32 + trait_spacing
+                traits_x += 48 + trait_spacing  # Adjusted for new trait size
 
         # Save and return image bytes
         img_byte_arr = BytesIO()
