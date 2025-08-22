@@ -53,9 +53,10 @@ class Last(commands.Cog):
         """Draw a large number using vector paths"""
         # Define number paths (normalized to 100x100 grid)
         number_paths = {
+            '0': [(30, 20), (70, 20), (70, 80), (30, 80), (30, 20)],  # Added "0"
             '1': [(50, 20), (50, 80)],  # Simple vertical line for "1"
             '2': [(30, 20), (70, 20), (70, 50), (30, 50), (30, 80), (70, 80)],
-            '3': [(30, 20), (70, 20), (70, 50), (70, 80), (30, 80)],  # Simplified "3" without middle line
+            '3': [(30, 20), (70, 20), (70, 50), (30, 50), (70, 50), (70, 80), (30, 80)],  # Fixed "3" with middle connection
             '4': [(30, 20), (30, 50), (70, 50), (70, 20), (70, 80)],
             '5': [(70, 20), (30, 20), (30, 50), (70, 50), (70, 80), (30, 80)],
             '6': [(70, 20), (30, 20), (30, 80), (70, 80), (70, 50), (30, 50)],
@@ -64,14 +65,28 @@ class Last(commands.Cog):
             '9': [(70, 80), (70, 20), (30, 20), (30, 50), (70, 50)]
         }
 
-        # Scale the path to desired size
-        scale = size / 100
-        path = number_paths.get(str(number))
-        if path:
-            # Scale and offset points
-            scaled_path = [(x + px * scale, y + py * scale) for px, py in path]
-            # Draw the path
-            draw.line(scaled_path, fill=color, width=int(size/10))
+        # Handle multi-digit numbers
+        if len(str(number)) > 1:
+            # Draw each digit separately with spacing
+            digit_spacing = size * 0.7  # Adjust spacing between digits
+            for i, digit in enumerate(str(number)):
+                path = number_paths.get(digit)
+                if path:
+                    # Scale the path to desired size
+                    scale = size / 100
+                    # Scale and offset points, adding spacing for each digit after the first
+                    scaled_path = [(x + px * scale + (i * digit_spacing), y + py * scale) for px, py in path]
+                    # Draw the path
+                    draw.line(scaled_path, fill=color, width=int(size/10))
+        else:
+            # Handle single digit
+            scale = size / 100
+            path = number_paths.get(str(number))
+            if path:
+                # Scale and offset points
+                scaled_path = [(x + px * scale, y + py * scale) for px, py in path]
+                # Draw the path
+                draw.line(scaled_path, fill=color, width=int(size/10))
 
     def draw_large_text(self, draw, text, x, y, color, scale=2):
         """Draw text at a larger scale"""
@@ -440,7 +455,7 @@ class Last(commands.Cog):
                         item_y = y_pos + 96 - item_size  # Position at bottom of unit icon
                         item_x = x_pos + (96 - len(items) * item_spacing) // 2
                         for j, item_name in enumerate(items):
-                            item_id = item_name.replace("TFT_Item_", "").replace("Artifact_", "")
+                            item_id = item_name.replace("TFT_Item_", "")  # Keep Artifact_ prefix if it exists
                             item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/TFT_Item_{item_id}.png"
                             item_img = await self.download_image(item_url)
                             
