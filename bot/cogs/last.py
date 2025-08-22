@@ -46,10 +46,46 @@ class Last(commands.Cog):
             8: '#808080'
         }
 
-        # Create a custom bitmap font that's twice the size of the default
-        default_font = ImageFont.load_default()
-        default_size = default_font.getsize("0")[0]  # Get base size from a digit
-        self.font = default_font.font.resize((default_size * 2, default_size * 2))
+        # Load default font
+        self.font = ImageFont.load_default()
+
+    def draw_large_text(self, draw, text, x, y, color, scale=2):
+        """Draw text at a larger scale"""
+        # Get original text size
+        text_bbox = draw.textbbox((0, 0), text, font=self.font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
+        
+        # Create a temporary image for the text
+        text_img = Image.new('RGBA', (text_width * scale, text_height * scale), (0, 0, 0, 0))
+        text_draw = ImageDraw.Draw(text_img)
+        
+        # Draw text in white
+        text_draw.text((0, 0), text, font=self.font, fill='white')
+        
+        # Scale up the text
+        text_img = text_img.resize((text_width * scale, text_height * scale), Image.NEAREST)
+        
+        # Convert white to desired color
+        if color != 'white':
+            data = text_img.getdata()
+            new_data = []
+            for item in data:
+                if item[3] > 0:  # If pixel is not transparent
+                    # Convert hex color to RGB if needed
+                    if isinstance(color, str) and color.startswith('#'):
+                        r = int(color[1:3], 16)
+                        g = int(color[3:5], 16)
+                        b = int(color[5:7], 16)
+                        new_data.append((r, g, b, item[3]))
+                    else:
+                        new_data.append((*color, item[3]))
+                else:
+                    new_data.append(item)
+            text_img.putdata(new_data)
+        
+        # Paste onto main image
+        draw._image.paste(text_img, (x, y), text_img)
 
     async def get_tactician_data(self):
         """Get TFT tactician data"""
