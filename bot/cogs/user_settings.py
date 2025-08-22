@@ -3,6 +3,7 @@ from discord.ext import commands
 import psycopg2
 import os
 import re
+import asyncio
 
 class UserSettings(commands.Cog):
     def __init__(self, bot):
@@ -61,8 +62,11 @@ class UserSettings(commands.Cog):
             ''', (ctx.author.id, name, tag))
             
             conn.commit()
-            # Add checkmark reaction to the command message
+            # Add checkmark reaction and wait briefly
             await ctx.message.add_reaction('✅')
+            await asyncio.sleep(1)  # Wait 1 second for visibility
+            # Delete the command message and send success message
+            await ctx.message.delete()
             await ctx.send(f"Successfully set your TFT name to: {name}#{tag}")
         except Exception as e:
             await ctx.message.add_reaction('❌')
