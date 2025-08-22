@@ -296,10 +296,12 @@ class Last(commands.Cog):
                 draw.rectangle([x, y, x + 48, y + 48], fill=bg_color)  # Increased from 32x32
                 img.paste(icon_img, (x, y), icon_img)
                 
+                # Draw trait count using draw_number
                 count_text = str(num_units)
-                text_bbox = draw.textbbox((0, 0), count_text, font=self.font)
-                text_width = text_bbox[2] - text_bbox[0]
-                draw.text((x + 48 - text_width - 2, y + 48 - 14), count_text, fill='black', font=self.font)  # Adjusted for new size
+                number_size = 20  # Size for trait count
+                text_x = x + 48 - number_size - 2
+                text_y = y + 48 - number_size - 2
+                self.draw_number(draw, count_text, text_x, text_y, number_size, 'white')
                 
                 return True
             except Exception as e:
@@ -320,8 +322,8 @@ class Last(commands.Cog):
             raise Exception("Player not found in match data")
         
         # Calculate dimensions
-        unit_width = 120  # Increased from 100
-        unit_spacing = 20  # Increased from 20
+        unit_width = 120
+        unit_spacing = 10  # Reduced spacing between units
         left_margin = 300  # Increased from 200 to give more space for summoner icon
         right_margin = 20
         num_units = len(player_data['units'])
@@ -433,8 +435,10 @@ class Last(commands.Cog):
                     
                     # Draw items
                     if items:
-                        item_y = y_pos + 55  # Adjusted for larger champion size
-                        item_x = x_pos + (96 - len(items) * 27) // 2  # Adjusted for new champion size
+                        item_size = 32  # Increased from 25x25
+                        item_spacing = 35  # Increased spacing between items
+                        item_y = y_pos + 96 - item_size  # Position at bottom of unit icon
+                        item_x = x_pos + (96 - len(items) * item_spacing) // 2
                         for j, item_name in enumerate(items):
                             item_id = item_name.replace("TFT_Item_", "").replace("Artifact_", "")
                             item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/TFT_Item_{item_id}.png"
@@ -442,8 +446,8 @@ class Last(commands.Cog):
                             
                             if item_img:
                                 try:
-                                    item_img = item_img.resize((25, 25))
-                                    img.paste(item_img, (item_x + j * 27, item_y))
+                                    item_img = item_img.resize((item_size, item_size))
+                                    img.paste(item_img, (item_x + j * item_spacing, item_y))
                                 except Exception as e:
                                     print(f"Error processing item image {item_name}: {str(e)}")
                 
