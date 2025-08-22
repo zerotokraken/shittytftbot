@@ -18,7 +18,10 @@ class ShittyCommands(commands.Cog):
             'avp': 'Predict your average placement. Random integer between 1.0-8.0',
             'suggest': 'Suggest a command or feature [.suggest myidea]',
             'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [.cutoffs NA]',
-            'links': 'Large list of TFT resources to include webpages, discords, youtube and reddits'
+            'links': 'Large list of TFT resources to include webpages, discords, youtube and reddits',
+            'set_name': 'Set your TFT name for use in other commands [.set_name ZTK#TFT]',
+            'set_region': 'Set your region for use in other commands [.set_region americas]',
+            'last': 'Pull the match history from your last game [.last]'
         }
 
         # Define a list of miscellaneous commands

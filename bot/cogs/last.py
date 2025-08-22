@@ -485,7 +485,7 @@ class Last(commands.Cog):
                 cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (ctx.author.id,))
                 result = cursor.fetchone()
                 if not result:
-                    await ctx.send("Please set your TFT name and region first using `.set_name` and `.set_region`")
+                    await ctx.send("Please set your TFT name and region first using `.set_name` (Name#Tag) and `.set_region` (americas, europe, asia, sea)")
                     return
                 
                 name, tag, region = result
