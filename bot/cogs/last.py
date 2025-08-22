@@ -301,7 +301,7 @@ class Last(commands.Cog):
                 number_size = 20  # Size for trait count
                 text_x = x + 48 - number_size - 2
                 text_y = y + 48 - number_size - 2
-                self.draw_number(draw, count_text, text_x, text_y, number_size, 'white')
+                self.draw_number(draw, count_text, text_x, text_y, number_size, 'black')
                 
                 return True
             except Exception as e:
