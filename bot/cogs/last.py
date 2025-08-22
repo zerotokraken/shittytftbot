@@ -53,7 +53,7 @@ class Last(commands.Cog):
         """Draw a large number using vector paths"""
         # Define number paths (normalized to 100x100 grid)
         number_paths = {
-            '1': [(40, 20), (60, 20), (60, 80), (40, 80)],
+            '1': [(50, 20), (50, 80)],  # Simple vertical line for "1"
             '2': [(30, 20), (70, 20), (70, 50), (30, 50), (30, 80), (70, 80)],
             '3': [(30, 20), (70, 20), (70, 80), (30, 80), (70, 50), (30, 50)],
             '4': [(30, 20), (30, 50), (70, 50), (70, 20), (70, 80)],
