@@ -155,6 +155,8 @@ async def load_cogs(bot, config=None, champions_data=None, latest_version=None, 
                 if hasattr(cog_module, 'setup'):
                     if cog_name == 'cogs.roll':
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
+                    elif cog_name == 'cogs.last':
+                        await cog_module.setup(bot, apikey, latest_version)
                     elif cog_name == 'cogs.lookup':
                         await cog_module.setup(bot, apikey, latest_version, set_number)
                     elif cog_name == 'cogs.trainer':

@@ -68,7 +68,7 @@ class UserSettings(commands.Cog):
             await asyncio.sleep(1)  # Wait 1 second for visibility
             # Delete the command message and send success message
             await ctx.message.delete()
-            await ctx.send(f"Successfully set your TFT name to: {name}#{tag}")
+            await ctx.send(f"Successfully set your TFT name.")
         except Exception as e:
             await ctx.message.add_reaction('❌')
         finally:
@@ -118,7 +118,7 @@ class UserSettings(commands.Cog):
             await asyncio.sleep(1)  # Wait 1 second for visibility
             # Delete the command message and send success message
             await ctx.message.delete()
-            await ctx.send(f"Successfully set your region to: {region}")
+            await ctx.send(f"Successfully set your region.")
         except Exception as e:
             await ctx.message.add_reaction('❌')
         finally:
