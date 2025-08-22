@@ -291,15 +291,15 @@ class Last(commands.Cog):
         
         if icon_img:
             try:
-                icon_img = icon_img.resize((32, 32))
+                icon_img = icon_img.resize((42, 42))
                 bg_color = self.TRAIT_COLORS.get(trait_style, '#5f5f5f')
-                draw.rectangle([x, y, x + 32, y + 32], fill=bg_color)
+                draw.rectangle([x, y, x + 42, y + 42], fill=bg_color)
                 img.paste(icon_img, (x, y), icon_img)
                 
                 count_text = str(num_units)
                 text_bbox = draw.textbbox((0, 0), count_text, font=self.font)
                 text_width = text_bbox[2] - text_bbox[0]
-                draw.text((x + 32 - text_width - 2, y + 32 - 14), count_text, fill='black', font=self.font)
+                draw.text((x + 42 - text_width - 2, y + 42 - 14), count_text, fill='black', font=self.font)
                 
                 return True
             except Exception as e:
@@ -428,7 +428,7 @@ class Last(commands.Cog):
                     self.draw_bordered_rectangle(draw, x_pos-2, y_pos-2, 84, 84, border_color)
                     
                     # Place champion
-                    champ_img = champ_img.resize((80, 80))
+                    champ_img = champ_img.resize((100, 100))
                     img.paste(champ_img, (x_pos, y_pos))
                     
                     # Draw items
