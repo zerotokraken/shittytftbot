@@ -298,7 +298,7 @@ class Last(commands.Cog):
         # Calculate dimensions
         unit_width = 100
         unit_spacing = 20
-        left_margin = 200
+        left_margin = 300  # Increased from 200 to give more space for summoner icon
         right_margin = 20
         num_units = len(player_data['units'])
         width = left_margin + (unit_width + unit_spacing) * num_units + right_margin
@@ -432,6 +432,8 @@ class Last(commands.Cog):
         
         # Draw traits
         traits_y = y_pos + 110
+        traits_x = left_margin  # Start traits from the same position as units
+        trait_spacing = 4
         active_traits = [trait for trait in player_data.get('traits', []) if trait.get('tier_current', 0) > 0]
         active_traits.sort(key=lambda x: (-x['tier_current'], -x['style'], x['name']))
         
