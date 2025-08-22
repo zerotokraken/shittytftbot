@@ -46,6 +46,9 @@ class Last(commands.Cog):
             8: '#808080'
         }
 
+        # Load default font
+        self.font = ImageFont.load_default()
+
     async def get_tactician_data(self):
         """Get TFT tactician data"""
         try:
@@ -232,10 +235,9 @@ class Last(commands.Cog):
                 img.paste(icon_img, (x, y), icon_img)
                 
                 count_text = str(num_units)
-                font = ImageFont.truetype("arial.ttf", 14)
-                text_bbox = draw.textbbox((0, 0), count_text, font=font)
+                text_bbox = draw.textbbox((0, 0), count_text, font=self.font)
                 text_width = text_bbox[2] - text_bbox[0]
-                draw.text((x + 32 - text_width - 2, y + 32 - 14), count_text, fill='white', font=font)
+                draw.text((x + 32 - text_width - 2, y + 32 - 14), count_text, fill='white', font=self.font)
                 
                 return True
             except Exception as e:
@@ -268,15 +270,6 @@ class Last(commands.Cog):
         img = Image.new('RGB', (width, height), color='#36393F')
         draw = ImageDraw.Draw(img)
         
-        try:
-            font = ImageFont.truetype("arial.ttf", 48)
-            small_font = ImageFont.truetype("arial.ttf", 20)
-            medium_font = ImageFont.truetype("arial.ttf", 24)
-        except:
-            font = ImageFont.load_default()
-            small_font = ImageFont.load_default()
-            medium_font = ImageFont.load_default()
-
         # Draw placement box
         placement = player_data['placement']
         placement_color = self.PLACEMENT_COLORS.get(placement, '#808080')
@@ -301,12 +294,12 @@ class Last(commands.Cog):
         
         # Draw placement number
         text = str(placement)
-        text_bbox = draw.textbbox((0, 0), text, font=font)
+        text_bbox = draw.textbbox((0, 0), text, font=self.font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
         text_x = box_x + (box_size - text_width) // 2
         text_y = box_y + (box_size - text_height) // 3.5
-        draw.text((text_x, text_y), text, fill=placement_color, font=font)
+        draw.text((text_x, text_y), text, fill=placement_color, font=self.font)
         
         # Draw summoner icon
         icon_size = 65
@@ -329,8 +322,7 @@ class Last(commands.Cog):
         
         # Draw level
         level_text = str(player_data['level'])
-        font = ImageFont.truetype("arial.ttf", 18)
-        text_bbox = draw.textbbox((0, 0), level_text, font=font)
+        text_bbox = draw.textbbox((0, 0), level_text, font=self.font)
         text_width = text_bbox[2] - text_bbox[0]
         text_height = text_bbox[3] - text_bbox[1]
         
@@ -345,7 +337,7 @@ class Last(commands.Cog):
         
         text_x = circle_x + circle_size/2 - text_width/2
         text_y = circle_y + circle_size/2 - text_height/1.3
-        draw.text((text_x, text_y), level_text, fill='white', font=font)
+        draw.text((text_x, text_y), level_text, fill='white', font=self.font)
         
         # Draw units
         unit_start_x = left_margin
