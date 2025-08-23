@@ -39,12 +39,21 @@ class UserSettings(commands.Cog):
     VALID_REGIONS = ['americas', 'europe', 'asia', 'sea']
 
     @commands.command(name='set')
-    async def set_user_settings(self, ctx, riot_id: str, region: str):
+    async def set_user_settings(self, ctx, *, args):
         """Set your TFT name and region (Format: .set Name#TAG region)"""
+        # Split by space from the right to get region
+        parts = args.rsplit(' ', 1)
+        if len(parts) != 2:
+            await ctx.message.add_reaction('❌')
+            await ctx.send("Invalid format. Please use: `.set Name#TAG region`\nExample: `.set ZTK#TFT americas`")
+            return
+        
+        riot_id, region = parts
+        
         # Validate the name format
         if not re.match(r'^[^#]+#[^#]+$', riot_id):
             await ctx.message.add_reaction('❌')
-            await ctx.send("Invalid format. Please use: `.set Name#TAG region`\nExample: `.set ZTK#TFT americas` (americas, europe, asia, sea)")
+            await ctx.send("Invalid format. Please use: `.set Name#TAG region`\nExample: `.set ZTK#TFT americas`")
             return
 
         # Validate the region
