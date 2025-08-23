@@ -65,27 +65,25 @@ class Last(commands.Cog):
             '9': [(70, 80), (70, 20), (30, 20), (30, 50), (70, 50)]
         }
 
-        # Handle multi-digit numbers
-        if len(str(number)) > 1:
-            # Draw each digit separately with spacing
-            digit_spacing = size * 0.7  # Adjust spacing between digits
-            for i, digit in enumerate(str(number)):
-                path = number_paths.get(digit)
-                if path:
-                    # Scale the path to desired size
-                    scale = size / 100
-                    # Scale and offset points, adding spacing for each digit after the first
-                    scaled_path = [(x + px * scale + (i * digit_spacing), y + py * scale) for px, py in path]
-                    # Draw the path
-                    draw.line(scaled_path, fill=color, width=int(size/10))
-        else:
-            # Handle single digit
-            scale = size / 100
-            path = number_paths.get(str(number))
+        # Convert number to string and get number of digits
+        num_str = str(number)
+        num_digits = len(num_str)
+        
+        # Calculate spacing and total width
+        digit_spacing = size * 0.4  # Reduced spacing between digits
+        total_width = size + (digit_spacing * (num_digits - 1))  # Total width including spacing
+        
+        # Calculate starting x position to center the entire number
+        start_x = x - (total_width - size) / 2
+        
+        # Draw each digit
+        for i, digit in enumerate(num_str):
+            path = number_paths.get(digit)
             if path:
-                # Scale and offset points
-                scaled_path = [(x + px * scale, y + py * scale) for px, py in path]
-                # Draw the path
+                scale = size / 100
+                # Position each digit with the calculated spacing
+                digit_x = start_x + (i * digit_spacing)
+                scaled_path = [(digit_x + px * scale, y + py * scale) for px, py in path]
                 draw.line(scaled_path, fill=color, width=int(size/10))
 
     def draw_large_text(self, draw, text, x, y, color, scale=2):
