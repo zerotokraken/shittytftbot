@@ -5,7 +5,7 @@ import urllib.parse
 import os
 import re
 
-class LookupCommands(commands.Cog):
+class StatCommands(commands.Cog):
     def __init__(self, bot, apikey, latest_version, set_number):
         self.bot = bot
         self.apikey = apikey  # Assigning API key correctly
@@ -16,10 +16,23 @@ class LookupCommands(commands.Cog):
 
 
     @commands.command()
-    async def lookup(self, ctx, *, player: str):
+    async def stats(self, ctx):
         try:
-            # Split the player argument into gameName and tagLine
-            gameName, tagLine = player.split('#')
+            # Get user settings from database
+            conn = self.bot.get_cog('UserSettings').get_db_connection()
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (ctx.author.id,))
+                result = cursor.fetchone()
+                if not result:
+                    await ctx.send("Please set your TFT name and region first using `.set Name#TAG region`\nExample: `.set ZTK#TFT americas`")
+                    return
+                
+                gameName, tagLine, stored_region = result
+            finally:
+                cursor.close()
+                conn.close()
 
             shortened_gameName = gameName.strip()
             # Encode the gameName to handle spaces and special characters
@@ -29,17 +42,14 @@ class LookupCommands(commands.Cog):
             account_regions = ["americas", "asia", "europe"]
             summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2", "th2", "tr1", "tw2", "vn2"]
 
-            # Try each account region to get puuid
-            puuid = None
-            for region in account_regions:
-                api_url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.apikey}"
-                response = requests.get(api_url)
-                if response.status_code == 200:
-                    player_data = response.json()
-                    puuid = player_data['puuid']
-                    break
-            if not puuid:
-                print("Failed to lookup player in all account regions.")
+            # Get puuid using stored region
+            api_url = f"https://{stored_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.apikey}"
+            response = requests.get(api_url)
+            if response.status_code == 200:
+                player_data = response.json()
+                puuid = player_data['puuid']
+            else:
+                await ctx.send("Failed to lookup player. Please check your name and region.")
                 return
 
             # Try each summoner region to get summonerId
@@ -52,7 +62,7 @@ class LookupCommands(commands.Cog):
                     summoner_id = summoner_data['id']
                     break
             if not summoner_id:
-                print("Failed to get summoner data in all summoner regions.")
+                await ctx.send("Failed to get summoner data. Please check your name and region.")
                 return
 
             # Try each summoner region to get league data
@@ -63,9 +73,10 @@ class LookupCommands(commands.Cog):
                 if league_response.status_code == 200:
                     league_data = league_response.json()
                     if league_data:
+                        current_region = region  # Store the successful region
                         break
             if not league_data:
-                print("Failed to get league data in all summoner regions.")
+                await ctx.send("Failed to get league data. Please check your name and region.")
                 return
 
             # Extract the required data
@@ -77,7 +88,7 @@ class LookupCommands(commands.Cog):
             total_games = wins + losses
 
             # Fetch match stats for calculating Win %, Top 4 %, and Avg Placement
-            tactics_url = f"{self.tt_url}/{region}/{gameName}/{tagLine}/{self.set_number}0/0"
+            tactics_url = f"{self.tt_url}/{stored_region}/{gameName}/{tagLine}/{self.set_number}0/0"
             tactics_response = requests.get(tactics_url)
 
             if tactics_response.status_code == 200:
@@ -136,7 +147,7 @@ class LookupCommands(commands.Cog):
                 color=embed_color
             )
 
-            region_cleaned = re.sub(r'\d+', '', region).upper()
+            region_cleaned = re.sub(r'\d+', '', current_region).upper()
 
             # Add fields based on tier
             if tier in ["CHALLENGER", "GRANDMASTER", "MASTER"]:
@@ -155,11 +166,9 @@ class LookupCommands(commands.Cog):
 
             await ctx.send(embed=embed)
 
-        except ValueError:
-            print("Invalid format. Please use the format: name#tagline.")
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            await ctx.send(f"An error occurred while looking up your stats. Please check your name and region.")
 
 
 async def setup(bot, apikey, latest_version, set_number):
-    await bot.add_cog(LookupCommands(bot, apikey, latest_version, set_number))
+    await bot.add_cog(StatCommands(bot, apikey, latest_version, set_number))

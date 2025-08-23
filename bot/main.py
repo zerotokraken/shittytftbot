@@ -157,7 +157,7 @@ async def load_cogs(bot, config=None, champions_data=None, latest_version=None, 
                         await cog_module.setup(bot, champions_data, latest_version, shop_odds)
                     elif cog_name == 'cogs.last':
                         await cog_module.setup(bot, apikey, latest_version)
-                    elif cog_name == 'cogs.lookup':
+                    elif cog_name == 'cogs.stats':
                         await cog_module.setup(bot, apikey, latest_version, set_number)
                     elif cog_name == 'cogs.trainer':
                         await cog_module.setup(bot, apikey, latest_version)
