@@ -545,7 +545,7 @@ class Last(commands.Cog):
             player_region = await self.get_player_region(puuid, region)
             
             # Generate tactics.tools link
-            tactics_link = f"https://tactics.tools/player/{player_region}/{name}/{tag}/{match_id}"
+            tactics_link = f"https://tactics.tools/player/{player_region}/{name.replace(' ', '%')}/{tag}/{match_id}"
             
             # Send image and link
             await ctx.send(
