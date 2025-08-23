@@ -54,25 +54,10 @@ class StatCommands(commands.Cog):
                 await ctx.send("Failed to lookup player. Please check your name and region.")
                 return
 
-            # Try each summoner region to get summonerId
-            summoner_id = None
-            for region in summoner_regions:
-                summoner_url = f"https://{region}.api.riotgames.com/tft/summoner/v1/summoners/by-puuid/{puuid}?api_key={self.apikey}"
-                summoner_response = requests.get(summoner_url)
-                if summoner_response.status_code == 200:
-                    summoner_data = summoner_response.json()
-                    summoner_id = summoner_data['id']
-                    break
-            if not summoner_id:
-                print("Failed to get summoner_id from all regions.")
-                print(f"PUUID used: {puuid}")
-                await ctx.send("Failed to get summoner data. Please check your name and region.")
-                return
-
-            # Try each summoner region to get league data
+            # Get league data directly using PUUID
             league_data = None
             for region in summoner_regions:
-                league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-summoner/{summoner_id}?api_key={self.apikey}"
+                league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-puuid/{puuid}?api_key={self.apikey}"
                 league_response = requests.get(league_url)
                 if league_response.status_code == 200:
                     league_data = league_response.json()
@@ -81,7 +66,9 @@ class StatCommands(commands.Cog):
                         break
             if not league_data:
                 print("Failed to get league_data from all regions.")
-                print(f"Summoner ID used: {summoner_id}")
+                print(f"PUUID used: {puuid}")
+                print(f"Last response status: {league_response.status_code}")
+                print(f"Last response text: {league_response.text}")
                 await ctx.send("Failed to get league data. Please check your name and region.")
                 return
 
