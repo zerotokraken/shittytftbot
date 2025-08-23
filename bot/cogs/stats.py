@@ -38,37 +38,43 @@ class StatCommands(commands.Cog):
             # Encode the gameName to handle spaces and special characters
             encoded_gameName = urllib.parse.quote(gameName)
 
-            # Define the regions
-            account_regions = ["americas", "asia", "europe"]
-            summoner_regions = ["na1", "eun1", "euw1", "br1", "jp1", "kr", "la1", "la2", "me1", "oc1", "ph2", "ru", "sg2", "th2", "tr1", "tw2", "vn2"]
-
-            # Get puuid using stored region
+            # Get player region and puuid
             api_url = f"https://{stored_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.apikey}"
             response = requests.get(api_url)
             if response.status_code == 200:
                 player_data = response.json()
                 puuid = player_data['puuid']
+                # Get player's region
+                region_url = f"https://{stored_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
+                region_response = requests.get(region_url)
+                if region_response.status_code == 200:
+                    region_data = region_response.json()
+                    current_region = region_data['region'].lower()
+                else:
+                    print(f"Failed to get player region. Status code: {region_response.status_code}")
+                    print(f"Response: {region_response.text}")
+                    await ctx.send("Failed to get player region. Please check your name and region.")
+                    return
             else:
                 print(f"Failed to get puuid. Status code: {response.status_code}")
                 print(f"Response: {response.text}")
                 await ctx.send("Failed to lookup player. Please check your name and region.")
                 return
 
-            # Get league data directly using PUUID
-            league_data = None
-            for region in summoner_regions:
-                league_url = f"https://{region}.api.riotgames.com/tft/league/v1/entries/by-puuid/{puuid}?api_key={self.apikey}"
-                league_response = requests.get(league_url)
-                if league_response.status_code == 200:
-                    league_data = league_response.json()
-                    if league_data:
-                        current_region = region  # Store the successful region
-                        break
-            if not league_data:
-                print("Failed to get league_data from all regions.")
-                print(f"PUUID used: {puuid}")
-                print(f"Last response status: {league_response.status_code}")
-                print(f"Last response text: {league_response.text}")
+            # Get league data using PUUID and region
+            league_url = f"https://{current_region}.api.riotgames.com/tft/league/v1/entries/by-puuid/{puuid}?api_key={self.apikey}"
+            league_response = requests.get(league_url)
+            if league_response.status_code == 200:
+                league_data = league_response.json()
+                if not league_data:
+                    print("No league data found.")
+                    print(f"PUUID: {puuid}")
+                    print(f"Region: {current_region}")
+                    await ctx.send("No ranked data found for this player.")
+                    return
+            else:
+                print(f"Failed to get league data. Status code: {league_response.status_code}")
+                print(f"Response: {league_response.text}")
                 await ctx.send("Failed to get league data. Please check your name and region.")
                 return
 
