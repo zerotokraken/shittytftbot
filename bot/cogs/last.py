@@ -29,9 +29,9 @@ class Last(commands.Cog):
             0: '#808080',  # Gray for 1-cost
             1: '#11b288',  # Green for 2-cost
             2: '#207ac7',  # Blue for 3-cost
-            3: '#c440da',  # Purple for 4-cost
-            4: '#ffb93b',  # Gold for 5-cost
-            6: '#ff8c00'   # Orange for special units
+            4: '#c440da',  # Purple for 4-cost
+            5: '#ffb93b',  # Gold for special units
+            6: '#ffb93b'   # Gold for 5-cost
         }
 
         # Placement colors
