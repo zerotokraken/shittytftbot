@@ -451,7 +451,7 @@ class Last(commands.Cog):
                     # Draw items
                     if items:
                         item_size = 32  # Increased from 25x25
-                        item_spacing = item_size  # Make spacing equal to item size to remove gaps
+                        item_spacing = item_size + 2  # Add just 2 pixels of spacing between items
                         item_y = y_pos + 96 - item_size + 3  # Added 3 pixels of padding at bottom
                         # Calculate total width of items including gaps
                         total_items_width = (item_size * len(items)) + ((len(items) - 1) * (item_spacing - item_size))
