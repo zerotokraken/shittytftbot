@@ -36,16 +36,25 @@ class UserSettings(commands.Cog):
             cursor.close()
             conn.close()
 
-    @commands.command(name='set_name')
-    async def set_name(self, ctx, *, riot_id: str):
-        """Set your TFT name and tag (Format: Name#TAG)"""
-        # Validate the format
+    VALID_REGIONS = ['americas', 'europe', 'asia', 'sea']
+
+    @commands.command(name='set')
+    async def set_user_settings(self, ctx, riot_id: str, region: str):
+        """Set your TFT name and region (Format: .set Name#TAG region)"""
+        # Validate the name format
         if not re.match(r'^[^#]+#[^#]+$', riot_id):
             await ctx.message.add_reaction('❌')
-            await ctx.send("Invalid format. Please use: `.set_name Name#TAG`")
+            await ctx.send("Invalid format. Please use: `.set Name#TAG region`\nExample: `.set ZTK#TFT americas` (americas, europe, asia, sea)")
             return
 
-        # Split into name and tag
+        # Validate the region
+        region = region.lower()
+        if region not in self.VALID_REGIONS:
+            await ctx.message.add_reaction('❌')
+            await ctx.send(f"Invalid region. Please use one of: {', '.join(self.VALID_REGIONS)}")
+            return
+
+        # Split riot_id into name and tag
         name, tag = riot_id.split('#')
 
         try:
@@ -54,13 +63,14 @@ class UserSettings(commands.Cog):
             
             # Use INSERT ... ON CONFLICT for upsert operation
             cursor.execute('''
-                INSERT INTO tft_settings (discord_id, tft_name, tft_tag)
-                VALUES (%s, %s, %s)
+                INSERT INTO tft_settings (discord_id, tft_name, tft_tag, region)
+                VALUES (%s, %s, %s, %s)
                 ON CONFLICT (discord_id)
                 DO UPDATE SET
                     tft_name = EXCLUDED.tft_name,
-                    tft_tag = EXCLUDED.tft_tag
-            ''', (ctx.author.id, name, tag))
+                    tft_tag = EXCLUDED.tft_tag,
+                    region = EXCLUDED.region
+            ''', (ctx.author.id, name, tag, region))
             
             conn.commit()
             # Add checkmark reaction and wait briefly
@@ -68,9 +78,10 @@ class UserSettings(commands.Cog):
             await asyncio.sleep(1)  # Wait 1 second for visibility
             # Delete the command message and send success message
             await ctx.message.delete()
-            await ctx.send(f"Successfully set your TFT name.")
+            await ctx.send(f"Successfully set your TFT name and region.")
         except Exception as e:
             await ctx.message.add_reaction('❌')
+            print(f"Error setting user settings: {e}")
         finally:
             cursor.close()
             conn.close()
@@ -83,44 +94,6 @@ class UserSettings(commands.Cog):
             cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id,))
             result = cursor.fetchone()
             return result if result else None
-        finally:
-            cursor.close()
-            conn.close()
-
-    VALID_REGIONS = ['americas', 'europe', 'asia', 'sea']
-
-    @commands.command(name='set_region')
-    async def set_region(self, ctx, region: str):
-        """Set your TFT region (Options: americas, europe, asia, sea)"""
-        region = region.lower()
-        
-        # Validate the region
-        if region not in self.VALID_REGIONS:
-            await ctx.message.add_reaction('❌')
-            await ctx.send(f"Invalid region. Please use one of: {', '.join(self.VALID_REGIONS)}")
-            return
-
-        try:
-            conn = self.get_db_connection()
-            cursor = conn.cursor()
-            
-            # Update or insert the region
-            cursor.execute('''
-                INSERT INTO tft_settings (discord_id, region, tft_name, tft_tag)
-                VALUES (%s, %s, '', '')
-                ON CONFLICT (discord_id)
-                DO UPDATE SET region = EXCLUDED.region
-            ''', (ctx.author.id, region))
-            
-            conn.commit()
-            # Add checkmark reaction and wait briefly
-            await ctx.message.add_reaction('✅')
-            await asyncio.sleep(1)  # Wait 1 second for visibility
-            # Delete the command message and send success message
-            await ctx.message.delete()
-            await ctx.send(f"Successfully set your region.")
-        except Exception as e:
-            await ctx.message.add_reaction('❌')
         finally:
             cursor.close()
             conn.close()
