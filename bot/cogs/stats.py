@@ -49,6 +49,8 @@ class StatCommands(commands.Cog):
                 player_data = response.json()
                 puuid = player_data['puuid']
             else:
+                print(f"Failed to get puuid. Status code: {response.status_code}")
+                print(f"Response: {response.text}")
                 await ctx.send("Failed to lookup player. Please check your name and region.")
                 return
 
@@ -62,6 +64,8 @@ class StatCommands(commands.Cog):
                     summoner_id = summoner_data['id']
                     break
             if not summoner_id:
+                print("Failed to get summoner_id from all regions.")
+                print(f"PUUID used: {puuid}")
                 await ctx.send("Failed to get summoner data. Please check your name and region.")
                 return
 
@@ -76,6 +80,8 @@ class StatCommands(commands.Cog):
                         current_region = region  # Store the successful region
                         break
             if not league_data:
+                print("Failed to get league_data from all regions.")
+                print(f"Summoner ID used: {summoner_id}")
                 await ctx.send("Failed to get league data. Please check your name and region.")
                 return
 
@@ -89,7 +95,11 @@ class StatCommands(commands.Cog):
 
             # Fetch match stats for calculating Win %, Top 4 %, and Avg Placement
             tactics_url = f"{self.tt_url}/{stored_region}/{gameName}/{tagLine}/{self.set_number}0/0"
+            print(f"Tactics.tools URL: {tactics_url}")
             tactics_response = requests.get(tactics_url)
+            if tactics_response.status_code != 200:
+                print(f"Failed to get tactics.tools data. Status code: {tactics_response.status_code}")
+                print(f"Response: {tactics_response.text}")
 
             if tactics_response.status_code == 200:
                 data = tactics_response.json()
@@ -167,6 +177,11 @@ class StatCommands(commands.Cog):
             await ctx.send(embed=embed)
 
         except Exception as e:
+            import traceback
+            print(f"Error in stats command:")
+            print(f"Error message: {str(e)}")
+            print("Traceback:")
+            traceback.print_exc()
             await ctx.send(f"An error occurred while looking up your stats. Please check your name and region.")
 
 
