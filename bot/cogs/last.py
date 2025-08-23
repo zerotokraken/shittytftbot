@@ -163,6 +163,18 @@ class Last(commands.Cog):
             print(f"Error getting tactician icon: {str(e)}")
             return None
 
+    async def get_player_region(self, puuid, region):
+        """Get player's region for tactics.tools link"""
+        url = f"https://{region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=self.headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    # Remove any numbers from region (e.g., na1 -> na)
+                    return ''.join(c for c in data['region'].lower() if not c.isdigit())
+                else:
+                    raise Exception(f"Failed to get player region: {response.status}")
+
     async def get_puuid(self, name, tag, region):
         """Get PUUID from Riot ID"""
         url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
@@ -522,7 +534,17 @@ class Last(commands.Cog):
             # Create and send image
             img_bytes = await self.create_match_image(match_data, puuid)
             await message.delete()
-            await ctx.send(file=discord.File(img_bytes, 'last_match.png'))
+            # Get player's region for tactics.tools link
+            player_region = await self.get_player_region(puuid, region)
+            
+            # Generate tactics.tools link
+            tactics_link = f"https://tactics.tools/player/{player_region}/{name}/{tag}/{match_id}"
+            
+            # Send image and link
+            await ctx.send(
+                content=f"View detailed match history: {tactics_link}",
+                file=discord.File(img_bytes, 'last_match.png')
+            )
             
         except Exception as e:
             await ctx.send(f"An error occurred, please check your name and region.")
