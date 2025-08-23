@@ -326,8 +326,8 @@ class Last(commands.Cog):
                 # Draw trait count background circle
                 number_size = 16  # Reduced size for trait count
                 circle_size = number_size + 6  # Smaller circle with less padding
-                circle_x = x + 48 - circle_size - 2
-                circle_y = y + 48 - circle_size - 2
+                circle_x = x + 48 - circle_size + 1  # Moved right by 3 pixels
+                circle_y = y + 48 - circle_size + 1  # Moved down by 3 pixels
                 
                 # Draw dark circle background with white border
                 draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], 
