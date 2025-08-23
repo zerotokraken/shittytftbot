@@ -87,7 +87,7 @@ class StatCommands(commands.Cog):
             total_games = wins + losses
 
             # Fetch match stats for calculating Win %, Top 4 %, and Avg Placement
-            tactics_url = f"{self.tt_url}/{stored_region}/{gameName}/{tagLine}/{self.set_number}0/0"
+            tactics_url = f"{self.tt_url}/{current_region}/{gameName}/{tagLine}/{self.set_number}0/0"
             print(f"Tactics.tools URL: {tactics_url}")
             tactics_response = requests.get(tactics_url)
             if tactics_response.status_code != 200:
