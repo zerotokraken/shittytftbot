@@ -99,16 +99,6 @@ class MiscCommands(commands.Cog):
             print(f"Image '{image_name}' not found in the database.")
 
     @commands.command()
-    async def vuhramald(self, ctx):
-        random_seconds = random.randint(1, 86400)
-        time_delta = timedelta(seconds=random_seconds)
-        hours, remainder = divmod(time_delta.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        time_str = f"{hours} hours, {minutes} minutes, {seconds} seconds"
-        await ctx.send(f"Vuhra is about to mald in {time_str}")
-
-
-    @commands.command()
     async def noob(self, ctx):
         members = [member for member in ctx.guild.members if not member.bot]
         if members:
