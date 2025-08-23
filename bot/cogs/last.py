@@ -323,12 +323,21 @@ class Last(commands.Cog):
                 draw.rectangle([x, y, x + 48, y + 48], fill=bg_color)  # Increased from 32x32
                 img.paste(icon_img, (x, y), icon_img)
                 
-                # Draw trait count using draw_number
-                count_text = str(num_units)
+                # Draw trait count background circle
                 number_size = 20  # Size for trait count
-                text_x = x + 48 - number_size - 2
-                text_y = y + 48 - number_size - 2
-                self.draw_number(draw, count_text, text_x, text_y, number_size, 'black')
+                circle_size = number_size + 8  # Circle slightly larger than number
+                circle_x = x + 48 - circle_size - 2
+                circle_y = y + 48 - circle_size - 2
+                
+                # Draw dark circle background
+                draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], 
+                           fill='#2F3136')
+                
+                # Draw trait count
+                count_text = str(num_units)
+                text_x = circle_x + (circle_size - number_size) // 2
+                text_y = circle_y + (circle_size - number_size) // 2
+                self.draw_number(draw, count_text, text_x, text_y, number_size, 'white')
                 
                 return True
             except Exception as e:
@@ -468,7 +477,7 @@ class Last(commands.Cog):
                         # Calculate total width of items including gaps
                         total_items_width = (item_size * len(items)) + ((len(items) - 1) * (item_spacing - item_size))
                         # Center items by starting at half the remaining space
-                        item_x = x_pos + (96 - total_items_width) // 2
+                        item_x = x_pos + (96 - total_items_width) // 2 + 1  # Added 1 pixel to center
                         for j, item_name in enumerate(items):
                             # Use the full item name in the URL
                             item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/{item_name}.png"
@@ -542,7 +551,7 @@ class Last(commands.Cog):
             
             # Send image and link
             await ctx.send(
-                content=f"View detailed match history: <{tactics_link}>",
+                content=f"<{tactics_link}>",
                 file=discord.File(img_bytes, 'last_match.png')
             )
             
