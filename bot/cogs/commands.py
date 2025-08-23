@@ -8,10 +8,10 @@ class ShittyCommands(commands.Cog):
 
     # Command to list main commands with custom descriptions and clump remaining into one line
     @commands.command()
-    async def shittycommands(self, ctx):
+    async def commands(self, ctx):
         # Define a static list of main commands with custom descriptions
         main_commands = {
-            'lookup': 'Look up a player’s TFT stats on tactics.tools, Include the player tag as well [.lookup BOT#TAG]',
+            'stats': 'Look up your TFT stats on tactics.tools, Include the player tag as well [.stats or .mystats]',
             'top': 'Look up the top 5 players in a region [.top na]',
             'roll': 'Simulate a shop roll at a specific level [.roll #]',
             'malding': 'Send up to 3 random messages from the malding channel. Refreshes once an hour',

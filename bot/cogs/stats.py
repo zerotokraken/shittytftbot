@@ -15,8 +15,8 @@ class StatCommands(commands.Cog):
 
 
 
-    @commands.command()
-    async def mystats(self, ctx):
+    @commands.command(name='stats', aliases=['mystats'])
+    async def stats(self, ctx):
         try:
             # Get user settings from database
             conn = self.bot.get_cog('UserSettings').get_db_connection()
