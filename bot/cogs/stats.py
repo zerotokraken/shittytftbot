@@ -62,7 +62,7 @@ class StatCommands(commands.Cog):
                 return
 
             # Get league data using PUUID and region
-            league_url = f"https://{current_region}.api.riotgames.com/tft/league/v1/entries/by-puuid/{puuid}?api_key={self.apikey}"
+            league_url = f"https://{current_region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
             league_response = requests.get(league_url)
             if league_response.status_code == 200:
                 league_data = league_response.json()
