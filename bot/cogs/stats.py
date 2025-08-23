@@ -26,7 +26,7 @@ class StatCommands(commands.Cog):
                 cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (ctx.author.id,))
                 result = cursor.fetchone()
                 if not result:
-                    await ctx.send("Please set your TFT name and region first using `.set Name#TAG region`\nExample: `.set ZTK#TFT americas`")
+                    await ctx.send("Please set your TFT name and region first using `.setname Name#TAG region`\nExample: `.setname ZTK#TFT americas`")
                     return
                 
                 gameName, tagLine, stored_region = result
