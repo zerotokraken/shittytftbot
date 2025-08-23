@@ -192,7 +192,7 @@ class MiscCommands(commands.Cog):
 
     @commands.command()
     async def catboywife(self, ctx):
-        await ctx.send("yeah its kinda like when the crystal baddie lays out my life for me by saying the most nothingburger universal experiences such as "your childhood was full of mixed experiences, you are good at some things but bad at others, and you have an insatiable thirst for clown women" and then i relate to the crystals on a deeper level because if she knows my past so well surely she will know my future? she said that i will be satisfied in some ways but not in others. wisdomposting")
+        await ctx.send("yeah its kinda like when the crystal baddie lays out my life for me by saying the most nothingburger universal experiences such as 'your childhood was full of mixed experiences, you are good at some things but bad at others, and you have an insatiable thirst for clown women' and then i relate to the crystals on a deeper level because if she knows my past so well surely she will know my future? she said that i will be satisfied in some ways but not in others. wisdomposting")
 
     @commands.command()
     async def riot(self, ctx):
