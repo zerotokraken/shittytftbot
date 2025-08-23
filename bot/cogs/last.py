@@ -542,7 +542,7 @@ class Last(commands.Cog):
             
             # Send image and link
             await ctx.send(
-                content=f"View detailed match history: {tactics_link}",
+                content=f"View detailed match history: <{tactics_link}>",
                 file=discord.File(img_bytes, 'last_match.png')
             )
             
