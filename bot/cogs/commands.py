@@ -19,7 +19,7 @@ class ShittyCommands(commands.Cog):
             'suggest': 'Suggest a command or feature [.suggest myidea]',
             'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [.cutoffs NA]',
             'links': 'Large list of TFT resources to include webpages, discords, youtube and reddits',
-            'set': 'Set your TFT name/region for use in other commands [.set_name ZTK#TFT americas] (americas, europe, asia, sea)',
+            'setname': 'Set your TFT name/region for use in other commands [.setname ZTK#TFT americas] (americas, europe, asia, sea)',
             'last': 'Pull the match history from your last game [.last]'
         }
 
