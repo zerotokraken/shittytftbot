@@ -87,7 +87,9 @@ class UserSettings(commands.Cog):
             await asyncio.sleep(1)  # Wait 1 second for visibility
             # Delete the command message and send success message
             await ctx.message.delete()
-            await ctx.send(f"Successfully set your TFT name and region.")
+            success_msg = await ctx.send(f"Successfully set your TFT name and region.")
+            await asyncio.sleep(3)  # Wait 3 seconds
+            await success_msg.delete()
         except Exception as e:
             await ctx.message.add_reaction('❌')
             print(f"Error setting user settings: {e}")
