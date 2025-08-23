@@ -453,7 +453,10 @@ class Last(commands.Cog):
                         item_size = 32  # Increased from 25x25
                         item_spacing = 35  # Increased spacing between items
                         item_y = y_pos + 96 - item_size  # Position at bottom of unit icon
-                        item_x = x_pos + (96 - len(items) * item_spacing) // 2
+                        # Calculate total width of items including gaps
+                        total_items_width = (item_size * len(items)) + ((len(items) - 1) * (item_spacing - item_size))
+                        # Center items by starting at half the remaining space
+                        item_x = x_pos + (96 - total_items_width) // 2
                         for j, item_name in enumerate(items):
                             # Use the full item name in the URL
                             item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/{item_name}.png"
