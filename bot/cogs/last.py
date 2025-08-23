@@ -324,14 +324,14 @@ class Last(commands.Cog):
                 img.paste(icon_img, (x, y), icon_img)
                 
                 # Draw trait count background circle
-                number_size = 20  # Size for trait count
-                circle_size = number_size + 8  # Circle slightly larger than number
+                number_size = 16  # Reduced size for trait count
+                circle_size = number_size + 6  # Smaller circle with less padding
                 circle_x = x + 48 - circle_size - 2
                 circle_y = y + 48 - circle_size - 2
                 
-                # Draw dark circle background
+                # Draw dark circle background with white border
                 draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], 
-                           fill='#2F3136')
+                           fill='#2F3136', outline='white')
                 
                 # Draw trait count
                 count_text = str(num_units)
