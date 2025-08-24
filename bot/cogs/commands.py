@@ -12,6 +12,7 @@ class ShittyCommands(commands.Cog):
         # Define a static list of main commands with custom descriptions
         main_commands = {
             'stats': 'Look up your TFT stats on tactics.tools, Include the player tag as well [.stats or .mystats]',
+            'lookup': 'Look up a specific item on a unit to return the delta [.lookup ashe flickerblades]',
             'top': 'Look up the top 5 players in a region [.top na]',
             'roll': 'Simulate a shop roll at a specific level [.roll #]',
             'malding': 'Send up to 3 random messages from the malding channel. Refreshes once an hour',
