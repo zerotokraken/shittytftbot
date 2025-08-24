@@ -163,6 +163,8 @@ async def load_cogs(bot, config=None, champions_data=None, latest_version=None, 
                         await cog_module.setup(bot, apikey, latest_version)
                     elif cog_name == 'cogs.top':
                         await cog_module.setup(bot, apikey)
+                    elif cog_name == 'cogs.leaderboard':
+                        await cog_module.setup(bot, apikey)                        
                     elif cog_name == 'cogs.cutoffs':
                         await cog_module.setup(bot, apikey, latest_version)
                     elif cog_name == 'cogs.lookup':
