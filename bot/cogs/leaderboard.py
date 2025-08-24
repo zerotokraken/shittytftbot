@@ -3,7 +3,7 @@ from discord.ext import commands
 import requests
 import urllib.parse
 
-class LeaderboardCommands(commands.Cog):
+class Leaderboard(commands.Cog):
     def __init__(self, bot, apikey):
         self.bot = bot
         self.apikey = apikey
@@ -144,4 +144,4 @@ class LeaderboardCommands(commands.Cog):
             await ctx.send("An error occurred while fetching the leaderboard.")
 
 async def setup(bot, apikey):
-    await bot.add_cog(LeaderboardCommands(bot, apikey))
+    await bot.add_cog(Leaderboard(bot, apikey))
