@@ -81,40 +81,45 @@ class Leaderboard(commands.Cog):
                     print(f"PUUID URL: {api_url}")
                     async with session.get(api_url) as response:
                         if response.status != 200:
+                            print(f"Failed to get PUUID for {name}: {response.status}")
                             return None
                         player_data = await response.json()
                         puuid = player_data['puuid']
 
-                        # Get player's sub-region for TFT
-                        region_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
-                        print(f"Region URL: {region_url}")
-                        async with session.get(region_url) as region_response:
-                            if region_response.status != 200:
-                                return None
-                            region_data = await region_response.json()
-                            sub_region = region_data['region'].lower()
-                            print(f"Using sub-region: {sub_region}")
+                    # Get player's sub-region for TFT
+                    region_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
+                    print(f"Region URL: {region_url}")
+                    async with session.get(region_url) as region_response:
+                        if region_response.status != 200:
+                            print(f"Failed to get region for {name}: {region_response.status}")
+                            return None
+                        region_data = await region_response.json()
+                        sub_region = region_data['region'].lower()
+                        print(f"Using sub-region: {sub_region}")
 
-                            # Get rank data using the correct sub-region
-                            league_url = f"https://{sub_region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
-                            print(f"League URL: {league_url}")
-                            async with session.get(league_url) as league_response:
-                                if league_response.status != 200:
-                                    return None
-                                league_data = await league_response.json()
-                                print(f"League data: {league_data}")
-                                if league_data:  # Player has ranked data
-                                    rank_data = league_data[0]
-                                    return {
-                                        'discord_id': discord_id,
-                                        'name': name,
-                                        'tier': rank_data['tier'],
-                                        'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
-                                        'lp': rank_data['leaguePoints'],
-                                        'wins': rank_data['wins'],
-                                        'losses': rank_data['losses']
-                                    }
-                    return None  # Return None if no ranked data found
+                    # Get rank data using the correct sub-region
+                    league_url = f"https://{sub_region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
+                    print(f"League URL: {league_url}")
+                    async with session.get(league_url) as league_response:
+                        if league_response.status != 200:
+                            print(f"Failed to get league data for {name}: {league_response.status}")
+                            return None
+                        league_data = await league_response.json()
+                        print(f"League data for {name}: {league_data}")
+                        if not league_data:  # Empty list means no ranked data
+                            print(f"No ranked data found for {name}")
+                            return None
+                        
+                        rank_data = league_data[0]
+                        return {
+                            'discord_id': discord_id,
+                            'name': name,
+                            'tier': rank_data['tier'],
+                            'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
+                            'lp': rank_data['leaguePoints'],
+                            'wins': rank_data['wins'],
+                            'losses': rank_data['losses']
+                        }
                 except Exception as e:
                     print(f"Error fetching data for {name}: {str(e)}")
                     return None
