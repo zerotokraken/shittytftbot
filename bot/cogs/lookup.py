@@ -32,12 +32,20 @@ class Lookup(commands.Cog):
         "jg": "JeweledGauntlet",
         "jeweled": "JeweledGauntlet",
         "gauntlet": "JeweledGauntlet",
-        "rfc": "RapidFirecannon",
+        "rfc": "Artifact_RapidFirecannon",
+        "rapidfirecannon": "Artifact_RapidFirecannon",
+        "rapid fire cannon": "Artifact_RapidFirecannon",
         "titans": "TitansResolve",
         "warmogs": "WarmogsArmor",
         "dcap": "RabadonsDeathcap",
         "rabadons": "RabadonsDeathcap",
-        "deathcap": "RabadonsDeathcap"
+        "deathcap": "RabadonsDeathcap",
+        "eon": "GuardianAngel",
+        "edge of night": "GuardianAngel",
+        "ga": "GuardianAngel",
+        "redbuff": "RapidFirecannon",
+        "red buff": "RapidFirecannon"
+
     }
 
     def __init__(self, bot, set_number):
@@ -110,7 +118,6 @@ class Lookup(commands.Cog):
                                 await ctx.send(f"Delta: {delta}")
                             return
                 
-
                 print(f"No data found for {item_name} on {unit_name}")
             
         except aiohttp.ClientError as e:
