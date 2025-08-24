@@ -132,14 +132,13 @@ class Leaderboard(commands.Cog):
 
             # Create embed
             embed = discord.Embed(
-                title="TFT Leaderboard",
+                title="Comp TFT Leaderboard",
                 color=discord.Color.blue()
             )
 
             # Add top 10 players to embed
             for i, player in enumerate(player_ranks[:10], 1):
                 total_games = player['wins'] + player['losses']
-                win_rate = (player['wins'] / total_games * 100) if total_games > 0 else 0
                 rank_str = self.format_rank(player['tier'], player['rank'], player['lp'])
                 
                 # Get member name if possible, otherwise use TFT name
@@ -148,7 +147,7 @@ class Leaderboard(commands.Cog):
                 
                 embed.add_field(
                     name=f"#{i} {display_name}",
-                    value=f"{rank_str}\nWin Rate: {win_rate:.1f}% ({player['wins']}/{total_games})",
+                    value=f"{rank_str}\nGames: {total_games}",
                     inline=False
                 )
 
