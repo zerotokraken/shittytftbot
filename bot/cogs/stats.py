@@ -18,6 +18,36 @@ class StatCommands(commands.Cog):
     @commands.command(name='stats', aliases=['mystats'])
     async def stats(self, ctx, member: discord.Member = None):
         try:
+            # Special case for when the bot is mentioned
+            if member and member.id == self.bot.user.id:
+                # Get the Challenger regalia image
+                regalia_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/data/en_US/tft-regalia.json"
+                regalia_response = requests.get(regalia_url)
+                regalia_data = regalia_response.json()
+                
+                rank_image_url = None
+                if "Challenger" in regalia_data["data"]["RANKED_TFT"]:
+                    rank_image = regalia_data["data"]["RANKED_TFT"]["Challenger"]["image"]["full"]
+                    rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/img/tft-regalia/{rank_image}"
+
+                embed = discord.Embed(
+                    title=f"{self.bot.user.name}",
+                    color=discord.Color.from_rgb(255, 215, 0)  # Challenger gold color
+                )
+                embed.add_field(name="Rank", value="God Tier", inline=False)
+                embed.add_field(name="Leaderboard", value="Rank 1 World", inline=False)
+                embed.add_field(name="Total Games", value="420", inline=False)
+                embed.add_field(name="Win %", value="69.69%", inline=False)
+                embed.add_field(name="Top 4 %", value="66.6%", inline=False)
+                embed.add_field(name="Average Placement", value="3.33", inline=False)
+                embed.set_footer(text="Data sourced from trust me bro")
+                
+                if rank_image_url:
+                    embed.set_thumbnail(url=rank_image_url)
+                
+                await ctx.send(embed=embed)
+                return
+
             # Get user settings from database
             conn = self.bot.get_cog('UserSettings').get_db_connection()
             cursor = conn.cursor()
