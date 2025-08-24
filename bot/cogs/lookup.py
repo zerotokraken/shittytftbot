@@ -4,6 +4,17 @@ import aiohttp
 import json
 
 class Lookup(commands.Cog):
+    # Special cases for unit names
+    special_cases = {
+        "mundo": "DrMundo",
+        "drmundo": "DrMundo",
+        "leesin": "LeeSin",
+        "twistedfate": "TwistedFate",
+        "kogmaw": "KogMaw",
+        "reksai": "RekSai",
+        "masteryi": "MasterYi"
+    }
+
     def __init__(self, bot, set_number):
         self.bot = bot
         self.set_number = set_number
@@ -19,8 +30,15 @@ class Lookup(commands.Cog):
     @commands.command(name='lookup')
     async def lookup_item(self, ctx, unit_name: str, item_name: str):
         """Look up item stats for a specific unit. Example: .lookup Ashe GuinsoosRageblade"""
-        # Format the unit name with TFT set prefix and capitalize
-        formatted_unit_name = f"TFT{self.set_number}_{unit_name.capitalize()}"
+        # Check for special cases in unit name (remove spaces and convert to lowercase)
+        unit_key = unit_name.replace(" ", "").lower()
+        if unit_key in self.special_cases:
+            unit_name = self.special_cases[unit_key]
+        else:
+            unit_name = unit_name.capitalize()
+        
+        # Format the unit name with TFT set prefix
+        formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
         url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
 
         payload = {
