@@ -77,25 +77,36 @@ class Leaderboard(commands.Cog):
                         player_data = response.json()
                         puuid = player_data['puuid']
 
-                        # Get rank data
-                        league_url = f"https://{region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
-                        print(f"League URL: {league_url}")
-                        league_response = requests.get(league_url)
-                        print(f"League Response status: {league_response.status_code}")
-                        if league_response.status_code == 200:
-                            league_data = league_response.json()
-                            print(f"League data: {league_data}")
-                            if league_data:  # Player has ranked data
-                                rank_data = league_data[0]
-                                player_ranks.append({
-                                    'discord_id': discord_id,
-                                    'name': name,
-                                    'tier': rank_data['tier'],
-                                    'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
-                                    'lp': rank_data['leaguePoints'],
-                                    'wins': rank_data['wins'],
-                                    'losses': rank_data['losses']
-                                })
+                        # Get player's sub-region for TFT
+                        region_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
+                        print(f"Region URL: {region_url}")
+                        region_response = requests.get(region_url)
+                        print(f"Region Response status: {region_response.status_code}")
+                        
+                        if region_response.status_code == 200:
+                            region_data = region_response.json()
+                            sub_region = region_data['region'].lower()
+                            print(f"Using sub-region: {sub_region}")
+
+                            # Get rank data using the correct sub-region
+                            league_url = f"https://{sub_region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
+                            print(f"League URL: {league_url}")
+                            league_response = requests.get(league_url)
+                            print(f"League Response status: {league_response.status_code}")
+                            if league_response.status_code == 200:
+                                league_data = league_response.json()
+                                print(f"League data: {league_data}")
+                                if league_data:  # Player has ranked data
+                                    rank_data = league_data[0]
+                                    player_ranks.append({
+                                        'discord_id': discord_id,
+                                        'name': name,
+                                        'tier': rank_data['tier'],
+                                        'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
+                                        'lp': rank_data['leaguePoints'],
+                                        'wins': rank_data['wins'],
+                                        'losses': rank_data['losses']
+                                    })
                 except Exception as e:
                     print(f"Error fetching data for {name}: {str(e)}")
                     continue
