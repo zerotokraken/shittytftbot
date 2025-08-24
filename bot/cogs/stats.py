@@ -16,17 +16,21 @@ class StatCommands(commands.Cog):
 
 
     @commands.command(name='stats', aliases=['mystats'])
-    async def stats(self, ctx):
+    async def stats(self, ctx, member: discord.Member = None):
         try:
             # Get user settings from database
             conn = self.bot.get_cog('UserSettings').get_db_connection()
             cursor = conn.cursor()
             
+            # Use mentioned member's ID if provided, otherwise use author's ID
+            discord_id = member.id if member else ctx.author.id
+            
             try:
-                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (ctx.author.id,))
+                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id,))
                 result = cursor.fetchone()
                 if not result:
-                    await ctx.send("Please set your TFT name and region first using `.setname Name#TAG region`\nExample: `.setname ZTK#TFT americas`")
+                    user_reference = "their" if member else "your"
+                    await ctx.send(f"This user has not registered their name and tag yet.")
                     return
                 
                 gameName, tagLine, stored_region = result

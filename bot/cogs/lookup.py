@@ -61,6 +61,7 @@ class Lookup(commands.Cog):
         "striker's flail": "PowerGauntlet",
         "strikers flail": "PowerGauntlet",
         "trenchcoat": "Artifact_SuspiciousTrenchCoat",
+        "trench": "Artifact_SuspiciousTrenchCoat",
         "trench coat": "Artifact_SuspiciousTrenchCoat"
     }
 
