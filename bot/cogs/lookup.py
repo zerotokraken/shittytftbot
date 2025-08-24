@@ -13,7 +13,8 @@ class Lookup(commands.Cog):
         "kogmaw": "KogMaw",
         "reksai": "RekSai",
         "masteryi": "MasterYi",
-        "ksante": "KSante"
+        "ksante": "KSante",
+        "kaisa": "KaiSa"
     }
 
     # Special cases for items

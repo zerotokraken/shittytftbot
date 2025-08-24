@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-import requests
+import aiohttp
+import asyncio
 import urllib.parse
 
 class Leaderboard(commands.Cog):
@@ -68,9 +69,7 @@ class Leaderboard(commands.Cog):
             # Add loading message
             message = await ctx.send("Fetching leaderboard data...")
 
-            # Fetch rank data for all players
-            player_ranks = []
-            for discord_id, name, tag, region in players:
+            async def fetch_player_data(session, discord_id, name, tag, region):
                 try:
                     print(f"\nProcessing player: {name}#{tag} ({region})")
                     # For SEA region, use asia region for account lookup
@@ -80,34 +79,33 @@ class Leaderboard(commands.Cog):
                     # Get PUUID
                     api_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{urllib.parse.quote(name)}/{tag}?api_key={self.apikey}"
                     print(f"PUUID URL: {api_url}")
-                    response = requests.get(api_url)
-                    print(f"PUUID Response status: {response.status_code}")
-                    if response.status_code == 200:
-                        player_data = response.json()
+                    async with session.get(api_url) as response:
+                        if response.status != 200:
+                            return None
+                        player_data = await response.json()
                         puuid = player_data['puuid']
 
                         # Get player's sub-region for TFT
                         region_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
                         print(f"Region URL: {region_url}")
-                        region_response = requests.get(region_url)
-                        print(f"Region Response status: {region_response.status_code}")
-                        
-                        if region_response.status_code == 200:
-                            region_data = region_response.json()
+                        async with session.get(region_url) as region_response:
+                            if region_response.status != 200:
+                                return None
+                            region_data = await region_response.json()
                             sub_region = region_data['region'].lower()
                             print(f"Using sub-region: {sub_region}")
 
                             # Get rank data using the correct sub-region
                             league_url = f"https://{sub_region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
                             print(f"League URL: {league_url}")
-                            league_response = requests.get(league_url)
-                            print(f"League Response status: {league_response.status_code}")
-                            if league_response.status_code == 200:
-                                league_data = league_response.json()
+                            async with session.get(league_url) as league_response:
+                                if league_response.status != 200:
+                                    return None
+                                league_data = await league_response.json()
                                 print(f"League data: {league_data}")
                                 if league_data:  # Player has ranked data
                                     rank_data = league_data[0]
-                                    player_ranks.append({
+                                    return {
                                         'discord_id': discord_id,
                                         'name': name,
                                         'tier': rank_data['tier'],
@@ -115,10 +113,16 @@ class Leaderboard(commands.Cog):
                                         'lp': rank_data['leaguePoints'],
                                         'wins': rank_data['wins'],
                                         'losses': rank_data['losses']
-                                    })
+                                    }
+                    return None  # Return None if no ranked data found
                 except Exception as e:
                     print(f"Error fetching data for {name}: {str(e)}")
-                    continue
+                    return None
+
+            # Fetch rank data for all players concurrently
+            async with aiohttp.ClientSession() as session:
+                tasks = [fetch_player_data(session, p[0], p[1], p[2], p[3]) for p in players]
+                player_ranks = [p for p in await asyncio.gather(*tasks) if p is not None]
 
             if not player_ranks:
                 await ctx.send("No ranked data found for any players.")
