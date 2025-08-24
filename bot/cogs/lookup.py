@@ -1,0 +1,64 @@
+import discord
+from discord.ext import commands
+import requests
+import json
+
+class Lookup(commands.Cog):
+    def __init__(self, bot, set_number):
+        self.bot = bot
+        self.set_number = set_number
+
+    @commands.command(name='lookup')
+    async def lookup_item(self, ctx, unit_name: str, item_name: str):
+        """Look up item stats for a specific unit. Example: .lookup Ashe GuinsoosRageblade"""
+        # Format the unit name with TFT set prefix
+        formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
+        url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
+
+        payload = {
+            "uid": "10116e73-3556-46cf-93fe-3d02a30b8183",
+            "filters": [
+                {
+                    "typ": "u",
+                    "value": formatted_unit_name,
+                    "tier": "0",
+                    "exclude": False
+                }
+            ]
+        }
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            
+            data = response.json()
+            await ctx.send(f"Searching for {item_name} stats on {unit_name}...")
+            
+            if isinstance(data, dict) and 'unitItems' in data:
+                for unit_item in data['unitItems']:
+                    if isinstance(unit_item, list) and len(unit_item) >= 4:
+                        current_unit = unit_item[0]
+                        current_item = unit_item[2]
+                        item_stats = unit_item[3]
+                        
+                        if current_unit == formatted_unit_name and current_item == item_name:
+                            delta = item_stats.get('delta', 'N/A')
+                            if delta != 'N/A':
+                                # Format to 2 decimal places and add + for positive numbers
+                                delta_formatted = '{:+.2f}'.format(delta)
+                                await ctx.send(f"Delta: {delta_formatted}")
+                            else:
+                                await ctx.send(f"Delta: {delta}")
+                            return
+                
+                await ctx.send(f"No data found for {item_name} on {unit_name}")
+            
+        except requests.exceptions.RequestException as e:
+            await ctx.send(f"Error occurred: {e}")
+
+async def setup(bot, set_number):
+    await bot.add_cog(Lookup(bot, set_number))
