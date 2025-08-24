@@ -15,12 +15,13 @@ class ShittyCommands(commands.Cog):
             'lookup': 'Look up a specific item on a unit to return the delta [.lookup ashe flickerblades]',
             'top': 'Look up the top 5 players in a region [.top na]',
             'roll': 'Simulate a shop roll at a specific level [.roll #]',
+            'leaderboard': 'Top 10 players that are registered with the bot [.leaderboard or .lb]',
             'malding': 'Send up to 3 random messages from the malding channel. Refreshes once an hour',
             'avp': 'Predict your average placement. Random integer between 1.0-8.0',
             'suggest': 'Suggest a command or feature [.suggest myidea]',
             'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [.cutoffs NA]',
             'links': 'Large list of TFT resources to include webpages, discords, youtube and reddits',
-            'setname': 'Set your TFT name/region for use in other commands [.setname ZTK#TFT americas] (americas, europe, asia, sea)',
+            'set': 'Set your TFT name/region for use in other commands [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)',
             'last': 'Pull the match history from your last game [.last]'
         }
 
