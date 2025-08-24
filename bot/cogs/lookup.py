@@ -41,6 +41,8 @@ class Lookup(commands.Cog):
         "rabadons": "RabadonsDeathcap",
         "deathcap": "RabadonsDeathcap",
         "eon": "GuardianAngel",
+        "seekers": "Artifact_SeekersArmguard",
+        "seekersarmguard": "Artifact_SeekersArmguard",
         "edge of night": "GuardianAngel",
         "ga": "GuardianAngel",
         "redbuff": "RapidFirecannon",
