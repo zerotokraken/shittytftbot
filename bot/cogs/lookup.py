@@ -16,7 +16,7 @@ class Lookup(commands.Cog):
         url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
 
         payload = {
-            "uid": "10116e73-3556-46cf-93fe-3d02a30b8183",
+            "uid": "",
             "filters": [
                 {
                     "typ": "u",
