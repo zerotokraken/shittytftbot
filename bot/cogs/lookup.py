@@ -4,8 +4,8 @@ import aiohttp
 import json
 
 class Lookup(commands.Cog):
-    # Special cases for unit names
-    special_cases = {
+    # Special cases for unit names and items
+    unit_special_cases = {
         "mundo": "DrMundo",
         "drmundo": "DrMundo",
         "leesin": "LeeSin",
@@ -13,6 +13,31 @@ class Lookup(commands.Cog):
         "kogmaw": "KogMaw",
         "reksai": "RekSai",
         "masteryi": "MasterYi"
+    }
+
+    # Special cases for items
+    item_special_cases = {
+        "visage": "Redemption",
+        "spirit": "Redemption",
+        "spirit visage": "Redemption",
+        "rageblade": "GuinsoosRageblade",
+        "grb": "GuinsoosRageblade",
+        "gs": "GiantSlayer",
+        "giantslayer": "GiantSlayer",
+        "ie": "InfinityEdge",
+        "bt": "BloodthirsterShadow",
+        "qss": "Quicksilver",
+        "hoj": "HandOfJustice",
+        "db": "Deathblade",
+        "jg": "JeweledGauntlet",
+        "jeweled": "JeweledGauntlet",
+        "gauntlet": "JeweledGauntlet",
+        "rfc": "RapidFirecannon",
+        "titans": "TitansResolve",
+        "warmogs": "WarmogsArmor",
+        "dcap": "RabadonsDeathcap",
+        "rabadons": "RabadonsDeathcap",
+        "deathcap": "RabadonsDeathcap"
     }
 
     def __init__(self, bot, set_number):
@@ -30,12 +55,17 @@ class Lookup(commands.Cog):
     @commands.command(name='lookup')
     async def lookup_item(self, ctx, unit_name: str, item_name: str):
         """Look up item stats for a specific unit. Example: .lookup Ashe GuinsoosRageblade"""
-        # Check for special cases in unit name (remove spaces and convert to lowercase)
+        # Check for special cases in unit name and item (remove spaces and convert to lowercase)
         unit_key = unit_name.replace(" ", "").lower()
-        if unit_key in self.special_cases:
-            unit_name = self.special_cases[unit_key]
+        item_key = item_name.replace(" ", "").lower()
+
+        if unit_key in self.unit_special_cases:
+            unit_name = self.unit_special_cases[unit_key]
         else:
             unit_name = unit_name.capitalize()
+
+        if item_key in self.item_special_cases:
+            item_name = self.item_special_cases[item_key]
         
         # Format the unit name with TFT set prefix
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
@@ -80,10 +110,11 @@ class Lookup(commands.Cog):
                                 await ctx.send(f"Delta: {delta}")
                             return
                 
-                await print(f"No data found for {item_name} on {unit_name}")
+
+                print(f"No data found for {item_name} on {unit_name}")
             
         except aiohttp.ClientError as e:
-            await print(f"Error occurred: {e}")
+            print(f"Error occurred: {e}")
 
 async def setup(bot, set_number):
     await bot.add_cog(Lookup(bot, set_number))
