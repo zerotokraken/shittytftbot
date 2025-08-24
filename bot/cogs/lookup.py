@@ -43,7 +43,7 @@ class Lookup(commands.Cog):
             async with self.session.post(url, json=payload, headers=headers) as response:
                 response.raise_for_status()
                 data = await response.json()
-            search_msg = await ctx.send(f"Searching for {item_name} stats on {unit_name}...")
+
             
             if isinstance(data, dict) and 'unitItems' in data:
                 for unit_item in data['unitItems']:
@@ -57,10 +57,8 @@ class Lookup(commands.Cog):
                             if delta != 'N/A':
                                 # Format to 2 decimal places and add + for positive numbers
                                 delta_formatted = '{:+.2f}'.format(delta)
-                                await search_msg.delete()
                                 await ctx.send(f"Delta: {delta_formatted}")
                             else:
-                                await search_msg.delete()
                                 await ctx.send(f"Delta: {delta}")
                             return
                 
