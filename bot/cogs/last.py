@@ -163,7 +163,9 @@ class Last(commands.Cog):
 
     async def get_player_region(self, puuid, region):
         """Get player's region for tactics.tools link"""
-        url = f"https://{region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}"
+        # For SEA region, we need to use asia region for account lookup
+        account_region = 'asia' if region.lower() == 'sea' else region
+        url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}"
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self.headers) as response:
                 if response.status == 200:
@@ -188,7 +190,9 @@ class Last(commands.Cog):
 
     async def get_last_match_id(self, puuid, region):
         """Get the last match ID for a player"""
-        url = f"https://{region}.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=1"
+        # For SEA region, we need to use sea region for match lookups
+        match_region = region
+        url = f"https://{match_region}.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=1"
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self.headers) as response:
                 if response.status == 200:
@@ -199,7 +203,9 @@ class Last(commands.Cog):
 
     async def get_match_details(self, match_id, region):
         """Get details for a specific match"""
-        url = f"https://{region}.api.riotgames.com/tft/match/v1/matches/{match_id}"
+        # For SEA region, we need to use sea region for match lookups
+        match_region = region
+        url = f"https://{match_region}.api.riotgames.com/tft/match/v1/matches/{match_id}"
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self.headers) as response:
                 if response.status == 200:
@@ -513,18 +519,21 @@ class Last(commands.Cog):
         return img_byte_arr
 
     @commands.command(name='last')
-    async def last_match(self, ctx):
+    async def last_match(self, ctx, member: discord.Member = None):
         """Show your last TFT match"""
         try:
             # Get user settings
             conn = self.bot.get_cog('UserSettings').get_db_connection()
             cursor = conn.cursor()
             
+            # Use mentioned member's ID if provided, otherwise use author's ID
+            discord_id = member.id if member else ctx.author.id
+            
             try:
-                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (ctx.author.id,))
+                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id,))
                 result = cursor.fetchone()
                 if not result:
-                    await ctx.send("Please set your TFT name and region first using `.set Name#TAG region`\nExample: `.set ZTK#TFT americas` (americas, europe, asia, sea)")
+                    await ctx.send(f"This user has not registered their name and tag yet.")
                     return
                 
                 name, tag, region = result
@@ -532,8 +541,8 @@ class Last(commands.Cog):
                 cursor.close()
                 conn.close()
 
-            # Add loading reaction
-            message = await ctx.send("Fetching your last match...")
+            # Add loading reaction with appropriate message
+            message = await ctx.send(f"Fetching {member.name}'s last match..." if member else "Fetching your last match...")
             
             # Get match data
             puuid = await self.get_puuid(name, tag, region)
