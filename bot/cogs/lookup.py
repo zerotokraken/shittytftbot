@@ -54,7 +54,9 @@ class Lookup(commands.Cog):
         "strikers": "PowerGauntlet",
         "flail": "PowerGauntlet",
         "striker's flail": "PowerGauntlet",
-        "strikers flail": "PowerGauntlet"
+        "strikers flail": "PowerGauntlet",
+        "trenchcoat": "Artifact_SuspiciousTrenchCoat",
+        "trench coat": "Artifact_SuspiciousTrenchCoat"
     }
 
     def __init__(self, bot, set_number):
