@@ -46,7 +46,11 @@ class Lookup(commands.Cog):
         "edge of night": "GuardianAngel",
         "ga": "GuardianAngel",
         "redbuff": "RapidFirecannon",
-        "red buff": "RapidFirecannon"
+        "red buff": "RapidFirecannon",
+        "manazane": "4OrnnMuramana",
+        "manamazane": "4OrnnMuramana",
+        "muramana": "4OrnnMuramana",
+        "masamune": "4OrnnMuramana"
 
     }
 
