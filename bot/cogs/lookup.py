@@ -52,7 +52,7 @@ class Lookup(commands.Cog):
                         current_item = unit_item[2]
                         item_stats = unit_item[3]
                         
-                        if current_unit == formatted_unit_name and current_item == item_name:
+                        if current_unit == formatted_unit_name and item_name.lower() in current_item.lower():
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
                                 # Format to 2 decimal places and add + for positive numbers
