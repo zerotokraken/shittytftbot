@@ -40,6 +40,15 @@ class Leaderboard(commands.Cog):
     @commands.command(name='leaderboard', aliases=['lb'])
     async def leaderboard(self, ctx):
         """Show top 10 ranked players"""
+        # Check if command is used in the correct channel
+        if ctx.channel.id != 1285382023887978526:
+            await ctx.send(f"This command can only be used in <#1285382023887978526>", delete_after=5)
+            try:
+                await ctx.message.delete()
+            except:
+                pass
+            return
+
         try:
             # Get all registered players from database
             conn = self.bot.get_cog('UserSettings').get_db_connection()
