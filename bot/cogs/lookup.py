@@ -1,12 +1,20 @@
 import discord
 from discord.ext import commands
-import requests
+import aiohttp
 import json
 
 class Lookup(commands.Cog):
     def __init__(self, bot, set_number):
         self.bot = bot
         self.set_number = set_number
+        self.session = None
+
+    async def cog_load(self):
+        self.session = aiohttp.ClientSession()
+
+    async def cog_unload(self):
+        if self.session:
+            await self.session.close()
 
     @commands.command(name='lookup')
     async def lookup_item(self, ctx, unit_name: str, item_name: str):
@@ -32,10 +40,9 @@ class Lookup(commands.Cog):
         }
 
         try:
-            response = requests.post(url, json=payload, headers=headers)
-            response.raise_for_status()
-            
-            data = response.json()
+            async with self.session.post(url, json=payload, headers=headers) as response:
+                response.raise_for_status()
+                data = await response.json()
             await ctx.send(f"Searching for {item_name} stats on {unit_name}...")
             
             if isinstance(data, dict) and 'unitItems' in data:
@@ -55,10 +62,10 @@ class Lookup(commands.Cog):
                                 await ctx.send(f"Delta: {delta}")
                             return
                 
-                await ctx.send(f"No data found for {item_name} on {unit_name}")
+                await print(f"No data found for {item_name} on {unit_name}")
             
-        except requests.exceptions.RequestException as e:
-            await ctx.send(f"Error occurred: {e}")
+        except aiohttp.ClientError as e:
+            await print(f"Error occurred: {e}")
 
 async def setup(bot, set_number):
     await bot.add_cog(Lookup(bot, set_number))
