@@ -19,8 +19,8 @@ class Lookup(commands.Cog):
     @commands.command(name='lookup')
     async def lookup_item(self, ctx, unit_name: str, item_name: str):
         """Look up item stats for a specific unit. Example: .lookup Ashe GuinsoosRageblade"""
-        # Format the unit name with TFT set prefix
-        formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
+        # Format the unit name with TFT set prefix and capitalize
+        formatted_unit_name = f"TFT{self.set_number}_{unit_name.capitalize()}"
         url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
 
         payload = {
