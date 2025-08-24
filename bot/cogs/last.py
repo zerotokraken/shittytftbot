@@ -175,7 +175,9 @@ class Last(commands.Cog):
 
     async def get_puuid(self, name, tag, region):
         """Get PUUID from Riot ID"""
-        url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+        # For SEA region, we need to use asia region for account lookup
+        account_region = 'asia' if region.lower() == 'sea' else region
+        url = f"https://{account_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self.headers) as response:
                 if response.status == 200:
@@ -459,8 +461,8 @@ class Last(commands.Cog):
                         star_y = y_pos - star_height - 3
                         self.draw_star_background(draw, star_x, star_y, star_width, star_height, unit_stars)
                     
-                    # Draw champion border
-                    border_color = self.RARITY_COLORS.get(rarity, '#FFFFFF')
+                    # Draw champion border - gold for 3-star units, otherwise based on rarity
+                    border_color = '#FFD700' if unit_stars == 3 else self.RARITY_COLORS.get(rarity, '#FFFFFF')
                     self.draw_bordered_rectangle(draw, x_pos-2, y_pos-2, 100, 100, border_color)  # Increased from 84x84
                     
                     # Place champion

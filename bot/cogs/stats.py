@@ -65,14 +65,17 @@ class StatCommands(commands.Cog):
             # Encode the gameName to handle spaces and special characters
             encoded_gameName = urllib.parse.quote(gameName)
 
+            # For SEA region, we need to use asia region for account lookup
+            account_region = 'asia' if stored_region.lower() == 'sea' else stored_region
+            
             # Get player region and puuid
-            api_url = f"https://{stored_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.apikey}"
+            api_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{encoded_gameName}/{tagLine}?api_key={self.apikey}"
             response = requests.get(api_url)
             if response.status_code == 200:
                 player_data = response.json()
                 puuid = player_data['puuid']
-                # Get player's region
-                region_url = f"https://{stored_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
+                # Get player's region (use account_region for this lookup as well)
+                region_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
                 region_response = requests.get(region_url)
                 if region_response.status_code == 200:
                     region_data = region_response.json()
