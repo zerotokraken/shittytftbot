@@ -138,7 +138,7 @@ class MiscCommands(commands.Cog):
         await ctx.send(
             f"dishsoap? good knowledge. setsuko? good scaling. robin? good tourney placements. emily? good content. kiyoon? good org. milk? good tech. {author}? good morning it's another 6.x masterclass")
 
-    @commands.command()
+    @commands.command(name='avp', aliases=['trueavp'])
     async def avp(self, ctx):
         random_number = random.uniform(1.0, 8.0)
         await ctx.send(f'That spot averages a {random_number:.1f} trust')

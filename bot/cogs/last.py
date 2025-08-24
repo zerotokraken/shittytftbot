@@ -555,8 +555,9 @@ class Last(commands.Cog):
             # Get player's region for tactics.tools link
             player_region = await self.get_player_region(puuid, region)
             
-            # Generate tactics.tools link
-            tactics_link = f"https://tactics.tools/player/{player_region}/{name.replace(' ', '%20')}/{tag}/{match_id}"
+            # Generate tactics.tools link (convert 'oc' to 'oce' for tactics.tools)
+            link_region = 'oce' if player_region == 'oc' else player_region
+            tactics_link = f"https://tactics.tools/player/{link_region}/{name.replace(' ', '%20')}/{tag}/{match_id}"
             
             # Send image and link
             await ctx.send(
