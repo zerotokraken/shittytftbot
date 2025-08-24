@@ -12,12 +12,17 @@ class Lookup(commands.Cog):
         "twistedfate": "TwistedFate",
         "kogmaw": "KogMaw",
         "reksai": "RekSai",
-        "masteryi": "MasterYi"
+        "masteryi": "MasterYi",
+        "ksante": "KSante"
     }
 
     # Special cases for items
     item_special_cases = {
         "visage": "Redemption",
+        "vow": "Frozen Heart",
+        "protectors": "Frozen Heart",
+        "protector's": "Frozen Heart",
+        "protector's vow": "Frozen Heart",
         "spirit": "Redemption",
         "spirit visage": "Redemption",
         "rageblade": "GuinsoosRageblade",
