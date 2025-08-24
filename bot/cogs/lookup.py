@@ -50,8 +50,11 @@ class Lookup(commands.Cog):
         "manazane": "4OrnnMuramana",
         "manamazane": "4OrnnMuramana",
         "muramana": "4OrnnMuramana",
-        "masamune": "4OrnnMuramana"
-
+        "masamune": "4OrnnMuramana",
+        "strikers": "PowerGauntlet",
+        "flail": "PowerGauntlet",
+        "striker's flail": "PowerGauntlet",
+        "strikers flail": "PowerGauntlet"
     }
 
     def __init__(self, bot, set_number):
