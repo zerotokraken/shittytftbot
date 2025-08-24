@@ -20,15 +20,8 @@ class StatCommands(commands.Cog):
         try:
             # Special case for when the bot is mentioned
             if member and member.id == self.bot.user.id:
-                # Get the Challenger regalia image
-                regalia_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/data/en_US/tft-regalia.json"
-                regalia_response = requests.get(regalia_url)
-                regalia_data = regalia_response.json()
-                
-                rank_image_url = None
-                if "Challenger" in regalia_data["data"]["RANKED_TFT"]:
-                    rank_image = regalia_data["data"]["RANKED_TFT"]["Challenger"]["image"]["full"]
-                    rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/img/tft-regalia/{rank_image}"
+                # Hardcode the Challenger image URL since we know it will always be the same
+                rank_image_url = f"https://ddragon.leagueoflegends.com/cdn/{self.latest_version}/img/tft-regalia/TFT_Regalia_Challenger.png"
 
                 embed = discord.Embed(
                     title=f"{self.bot.user.name}",
