@@ -41,17 +41,29 @@ class Lookup(commands.Cog):
             await ctx.send("Please provide an item name or unit and item names")
             return
 
-        # Check if first arg is a unit
-        first_arg = args[0].replace(" ", "").lower()
-        is_unit = first_arg in self.unit_special_cases or args[0][0].isupper()
+        # Check if first arg is a unit (case-insensitive)
+        first_arg = args[0].lower()
+        first_arg_no_spaces = first_arg.replace(" ", "")
+        is_unit = False
+
+        # Check unit special cases case-insensitively
+        for unit_key in self.unit_special_cases:
+            if first_arg_no_spaces == unit_key.lower():
+                is_unit = True
+                break
+        
+        # Also check if it's a champion name (starts with capital)
+        if not is_unit:
+            is_unit = args[0][0].upper() == args[0][0]
+
         print(f"\nUnit detection debug:")
         print(f"First arg: {args[0]}")
-        print(f"In special cases: {first_arg in self.unit_special_cases}")
-        print(f"Starts with uppercase: {args[0][0].isupper()}")
+        print(f"First arg (lowercase): {first_arg}")
+        print(f"First arg (no spaces): {first_arg_no_spaces}")
         print(f"Is unit: {is_unit}")
 
         # Handle item-only lookup
-        if len(args) == 1 or (not is_unit and len(args) > 1):
+        if len(args) == 1 or not is_unit:
             # If we have multiple args but first isn't a unit, combine them for lookup
             item_key = " ".join(args).lower()
             
@@ -101,11 +113,15 @@ class Lookup(commands.Cog):
         unit_name = args[0]
         item_name = " ".join(args[1:])  # Combine remaining args for item name
         
-        # Handle unit name
+        # Handle unit name (case-insensitive)
         unit_key = unit_name.replace(" ", "").lower()
-        if unit_key in self.unit_special_cases:
-            unit_name = self.unit_special_cases[unit_key]
-        else:
+        unit_found = False
+        for key, value in self.unit_special_cases.items():
+            if unit_key == key.lower():
+                unit_name = value
+                unit_found = True
+                break
+        if not unit_found:
             unit_name = unit_name.capitalize()
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
