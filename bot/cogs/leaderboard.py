@@ -195,7 +195,7 @@ class Leaderboard(commands.Cog):
                 
                 embed.add_field(
                     name=f"#{i} {display_name}",
-                    value=f"{rank_str}\nWin %: {player['win_rate']:.1f}%\nTop 4 %: {player['top4_rate']:.1f}%\nGames: {player['games']}",
+                    value=f"{rank_str}\nWin: {player['win_rate']:.1f}%\nTop 4: {player['top4_rate']:.1f}%\nGames: {player['games']}",
                     inline=False
                 )
 
