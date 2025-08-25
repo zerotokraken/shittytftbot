@@ -58,6 +58,11 @@ class Lookup(commands.Cog):
                 # Remove "radiant" from the search
                 words.remove("radiant")
                 item_key = "".join(words)
+            
+            # Also check if the item name ends with "radiant"
+            if item_key.endswith("radiant"):
+                is_radiant = True
+                item_key = item_key[:-7]  # remove "radiant" from the end
                 
             # Check if the base item name is in special cases
             if item_key in self.item_special_cases:
@@ -77,7 +82,7 @@ class Lookup(commands.Cog):
             else:
                 if is_radiant:
                     # Capitalize the first letter of each word for the base item name
-                    base_name = " ".join(word.capitalize() for word in words)
+                    base_name = " ".join(word.capitalize() for word in words) if words else item_key.capitalize()
                     item_name = f"5{base_name}Radiant"
 
             url = "https://d3.tft.tools/stats2/general/1100/15163/1"
@@ -120,6 +125,11 @@ class Lookup(commands.Cog):
             # Remove "radiant" from the search
             words.remove("radiant")
             item_key = "".join(words)
+            
+        # Also check if the item name ends with "radiant"
+        if item_key.endswith("radiant"):
+            is_radiant = True
+            item_key = item_key[:-7]  # remove "radiant" from the end
             
         # Check if the base item name is in special cases
         if item_key in self.item_special_cases:
