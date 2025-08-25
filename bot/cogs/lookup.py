@@ -51,31 +51,12 @@ class Lookup(commands.Cog):
             item_name = " ".join(args)
             item_key = item_name.replace(" ", "").lower()
             
-            # First check if it's a special case
+            # Check if it's in special cases
             if item_key in self.item_special_cases:
                 item_name = self.item_special_cases[item_key]
-            
-            # Handle radiant items (both "radiant x" and "xradiant" formats)
-            if "radiant" in item_key:
-                # Remove "radiant" and any spaces
-                base_key = item_key.replace("radiant", "").strip()
-                
-                # Check if the base item is in special cases
-                if base_key in self.item_special_cases:
-                    base_item = self.item_special_cases[base_key]
-                    # Handle special radiant mappings
-                    if base_item == "PowerGauntlet":
-                        item_name = "TrapClaw"
-                    elif base_item == "MadredsBloodrazor":
-                        item_name = "GiantSlayer"
-                    elif base_item == "UnstableConcoction":
-                        item_name = "HandOfJustice"
-                    else:
-                        item_name = f"5{base_item}Radiant"
-                else:
-                    # If not in special cases, capitalize each word
-                    base_name = "".join(word.capitalize() for word in base_key.split())
-                    item_name = f"5{base_name}Radiant"
+            else:
+                # If not in special cases, just capitalize
+                item_name = item_key.capitalize()
 
             url = "https://d3.tft.tools/stats2/general/1100/15163/1"
 
@@ -113,34 +94,11 @@ class Lookup(commands.Cog):
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
         # Handle item name
-        # First check if it's a special case
         if item_key in self.item_special_cases:
-            base_item = self.item_special_cases[item_key]
+            item_name = self.item_special_cases[item_key]
         else:
             # If not in special cases, just capitalize
-            base_item = item_key.capitalize()
-
-        # Check for radiant (as a word or suffix)
-        is_radiant = "radiant" in item_key
-        if is_radiant:
-            # Remove "radiant" and any spaces
-            base_key = item_key.replace("radiant", "").strip()
-            
-            # Check if the base item is in special cases
-            if base_key in self.item_special_cases:
-                base_item = self.item_special_cases[base_key]
-            
-            # Handle special radiant mappings
-            if base_item == "PowerGauntlet":
-                item_name = "TrapClaw"
-            elif base_item == "MadredsBloodrazor":
-                item_name = "GiantSlayer"
-            elif base_item == "UnstableConcoction":
-                item_name = "HandOfJustice"
-            else:
-                item_name = f"5{base_item}Radiant"
-        else:
-            item_name = base_item
+            item_name = item_key.capitalize()
         
         # For unit + item lookups, use the combos/explorer endpoint
         url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
