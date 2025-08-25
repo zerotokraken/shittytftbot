@@ -142,7 +142,7 @@ class Lookup(commands.Cog):
                         item_stats = unit_item[3]
                         
                         # Case-insensitive match for both unit and item
-                        if current_unit == formatted_unit_name and item_name.lower() in current_item.lower():
+                        if current_unit == formatted_unit_name and item_name == current_item:
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
                                 # Format to 2 decimal places and add + for positive numbers
