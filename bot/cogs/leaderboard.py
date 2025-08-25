@@ -102,7 +102,7 @@ class Leaderboard(commands.Cog):
                         return None
                     puuid = player_data['puuid']
 
-                    await asyncio.sleep(0.1)  # Small delay between requests
+                    await asyncio.sleep(0.5)  # Increased delay between requests
 
                     # Get player's sub-region for TFT
                     region_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
@@ -111,7 +111,7 @@ class Leaderboard(commands.Cog):
                         return None
                     sub_region = region_data['region'].lower()
 
-                    await asyncio.sleep(0.1)  # Small delay between requests
+                    await asyncio.sleep(0.5)  # Increased delay between requests
 
                     # Get rank data using the correct sub-region
                     league_url = f"https://{sub_region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
@@ -134,11 +134,21 @@ class Leaderboard(commands.Cog):
                     print(f"Error fetching data for {name}: {str(e)}")
                     return None
 
-            # Fetch rank data for all players concurrently with timeout and limits
-            timeout = aiohttp.ClientTimeout(total=60)  # 60 second total timeout
+            # Process players in chunks to avoid rate limits
+            timeout = aiohttp.ClientTimeout(total=120)  # Increased timeout for slower processing
+            chunk_size = 5  # Process 5 players at a time
+            player_ranks = []
+
             async with aiohttp.ClientSession(timeout=timeout) as session:
-                tasks = [fetch_player_data(session, p[0], p[1], p[2], p[3]) for p in players]
-                player_ranks = [p for p in await asyncio.gather(*tasks) if p is not None]
+                for i in range(0, len(players), chunk_size):
+                    chunk = players[i:i + chunk_size]
+                    tasks = [fetch_player_data(session, p[0], p[1], p[2], p[3]) for p in chunk]
+                    chunk_results = [p for p in await asyncio.gather(*tasks) if p is not None]
+                    player_ranks.extend(chunk_results)
+                    
+                    if i + chunk_size < len(players):  # If there are more chunks to process
+                        print(f"Processed {i + chunk_size}/{len(players)} players, waiting before next chunk...")
+                        await asyncio.sleep(2)  # Wait 2 seconds between chunks
 
             if not player_ranks:
                 await ctx.send("No ranked data found for any players.")
