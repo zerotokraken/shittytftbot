@@ -2,74 +2,27 @@ import discord
 from discord.ext import commands
 import aiohttp
 import json
+import os
 
 class Lookup(commands.Cog):
-    # Special cases for unit names and items
-    unit_special_cases = {
-        "mundo": "DrMundo",
-        "drmundo": "DrMundo",
-        "leesin": "LeeSin",
-        "twistedfate": "TwistedFate",
-        "kogmaw": "KogMaw",
-        "reksai": "RekSai",
-        "masteryi": "MasterYi",
-        "ksante": "KSante",
-        "kaisa": "KaiSa"
-    }
-
-    # Special cases for items
-    item_special_cases = {
-        "visage": "Redemption",
-        "vow": "Frozen Heart",
-        "protectors": "Frozen Heart",
-        "protector's": "Frozen Heart",
-        "protector's vow": "Frozen Heart",
-        "spirit": "Redemption",
-        "spirit visage": "Redemption",
-        "rageblade": "GuinsoosRageblade",
-        "grb": "GuinsoosRageblade",
-        "gs": "GiantSlayer",
-        "giantslayer": "GiantSlayer",
-        "ie": "InfinityEdge",
-        "bt": "BloodthirsterShadow",
-        "qss": "Quicksilver",
-        "hoj": "HandOfJustice",
-        "db": "Deathblade",
-        "jg": "JeweledGauntlet",
-        "jeweled": "JeweledGauntlet",
-        "gauntlet": "JeweledGauntlet",
-        "rfc": "Artifact_RapidFirecannon",
-        "rapidfirecannon": "Artifact_RapidFirecannon",
-        "rapid fire cannon": "Artifact_RapidFirecannon",
-        "titans": "TitansResolve",
-        "warmogs": "WarmogsArmor",
-        "dcap": "RabadonsDeathcap",
-        "rabadons": "RabadonsDeathcap",
-        "deathcap": "RabadonsDeathcap",
-        "eon": "GuardianAngel",
-        "seekers": "Artifact_SeekersArmguard",
-        "seekersarmguard": "Artifact_SeekersArmguard",
-        "edge of night": "GuardianAngel",
-        "ga": "GuardianAngel",
-        "redbuff": "RapidFirecannon",
-        "red buff": "RapidFirecannon",
-        "manazane": "4OrnnMuramana",
-        "manamazane": "4OrnnMuramana",
-        "muramana": "4OrnnMuramana",
-        "masamune": "4OrnnMuramana",
-        "strikers": "PowerGauntlet",
-        "flail": "PowerGauntlet",
-        "striker's flail": "PowerGauntlet",
-        "strikers flail": "PowerGauntlet",
-        "trenchcoat": "Artifact_SuspiciousTrenchCoat",
-        "trench": "Artifact_SuspiciousTrenchCoat",
-        "trench coat": "Artifact_SuspiciousTrenchCoat"
-    }
 
     def __init__(self, bot, set_number):
         self.bot = bot
         self.set_number = set_number
         self.session = None
+        self.unit_special_cases = {}
+        self.item_special_cases = {}
+        self.load_special_cases()
+
+    def load_special_cases(self):
+        config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config')
+        try:
+            with open(os.path.join(config_dir, 'units.json'), 'r') as f:
+                self.unit_special_cases = json.load(f)
+            with open(os.path.join(config_dir, 'items.json'), 'r') as f:
+                self.item_special_cases = json.load(f)
+        except Exception as e:
+            print(f"Error loading config files: {e}")
 
     async def cog_load(self):
         self.session = aiohttp.ClientSession()
@@ -79,9 +32,57 @@ class Lookup(commands.Cog):
             await self.session.close()
 
     @commands.command(name='lookup')
-    async def lookup_item(self, ctx, unit_name: str, item_name: str):
-        """Look up item stats for a specific unit. Example: .lookup Ashe GuinsoosRageblade"""
-        # Check for special cases in unit name and item (remove spaces and convert to lowercase)
+    async def lookup_item(self, ctx, *args):
+        """Look up item stats. Examples: 
+        .lookup rfc (lookup item stats)
+        .lookup Ashe rfc (lookup item stats for specific unit)"""
+        
+        if not args:
+            await ctx.send("Please provide an item name or unit and item names")
+            return
+
+        # Handle item-only lookup
+        if len(args) == 1:
+            item_name = args[0]
+            item_key = item_name.replace(" ", "").lower()
+            
+            if item_key in self.item_special_cases:
+                item_name = self.item_special_cases[item_key]
+
+            # Check if "radiant" is part of the name
+            is_radiant = "radiant" in item_key
+            if is_radiant:
+                item_key = item_key.replace("radiant", "").strip()
+                if item_key in self.item_special_cases:
+                    item_name = f"{self.item_special_cases[item_key]}Radiant"
+                else:
+                    item_name = f"{item_name}Radiant"
+
+            url = "https://d3.tft.tools/stats2/general/1100/15163/1"
+
+            try:
+                async with self.session.get(url) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+
+                if 'items' in data:
+                    for item in data['items']:
+                        if item_name.lower() in item['itemId'].lower():
+                            place = item.get('place', 'N/A')
+                            if place != 'N/A':
+                                await ctx.send(f"AVP: {place:.2f}")
+                                return
+                    
+                    await ctx.send(f"No data found for {item_name}")
+                else:
+                    await ctx.send("Error: Unexpected data format from API")
+                
+            except aiohttp.ClientError as e:
+                await ctx.send(f"Error occurred while fetching data: {str(e)}")
+            return
+
+        # Handle unit + item lookup
+        unit_name, item_name = args[0], args[1]
         unit_key = unit_name.replace(" ", "").lower()
         item_key = item_name.replace(" ", "").lower()
 
@@ -118,7 +119,6 @@ class Lookup(commands.Cog):
                 response.raise_for_status()
                 data = await response.json()
 
-            
             if isinstance(data, dict) and 'unitItems' in data:
                 for unit_item in data['unitItems']:
                     if isinstance(unit_item, list) and len(unit_item) >= 4:
@@ -136,10 +136,10 @@ class Lookup(commands.Cog):
                                 await ctx.send(f"Delta: {delta}")
                             return
                 
-                print(f"No data found for {item_name} on {unit_name}")
+                await ctx.send(f"No data found for {item_name} on {unit_name}")
             
         except aiohttp.ClientError as e:
-            print(f"Error occurred: {e}")
+            await ctx.send(f"Error occurred: {str(e)}")
 
 async def setup(bot, set_number):
     await bot.add_cog(Lookup(bot, set_number))
