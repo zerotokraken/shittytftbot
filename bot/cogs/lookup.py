@@ -44,9 +44,14 @@ class Lookup(commands.Cog):
         # Check if first arg is a unit
         first_arg = args[0].replace(" ", "").lower()
         is_unit = first_arg in self.unit_special_cases or args[0][0].isupper()
+        print(f"\nUnit detection debug:")
+        print(f"First arg: {args[0]}")
+        print(f"In special cases: {first_arg in self.unit_special_cases}")
+        print(f"Starts with uppercase: {args[0][0].isupper()}")
+        print(f"Is unit: {is_unit}")
 
         # Handle item-only lookup
-        if len(args) == 1 or not is_unit:
+        if len(args) == 1 or (not is_unit and len(args) > 1):
             # If we have multiple args but first isn't a unit, combine them for lookup
             item_key = " ".join(args).lower()
             
@@ -104,30 +109,31 @@ class Lookup(commands.Cog):
             unit_name = unit_name.capitalize()
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
-        # Handle item name - try with spaces first (e.g., "radiant gs")
+        # Handle item name
         print(f"\nUnit+Item lookup debug:")
         print(f"Input: {' '.join(args)}")
         print(f"Unit: {unit_name} -> {formatted_unit_name}")
         
-        item_key = item_name.lower()
-        print(f"Trying with spaces: '{item_key}'")
+        # Try just the first word first (e.g., "gs")
+        item_key = args[1].lower()
+        print(f"Trying first word: '{item_key}'")
         if item_key in self.item_special_cases:
             item_name = self.item_special_cases[item_key]
-            print(f"✓ Matched with spaces -> {item_name}")
+            print(f"✓ Matched first word -> {item_name}")
         else:
-            # Try without spaces (e.g., "radiantgs")
-            item_key = item_key.replace(" ", "")
-            print(f"Trying without spaces: '{item_key}'")
+            # Try with spaces (e.g., "radiant gs")
+            item_key = item_name.lower()
+            print(f"Trying with spaces: '{item_key}'")
             if item_key in self.item_special_cases:
                 item_name = self.item_special_cases[item_key]
-                print(f"✓ Matched without spaces -> {item_name}")
+                print(f"✓ Matched with spaces -> {item_name}")
             else:
-                # Try just the first word (e.g., "gs")
-                item_key = args[1].lower()
-                print(f"Trying first word: '{item_key}'")
+                # Try without spaces (e.g., "radiantgs")
+                item_key = item_key.replace(" ", "")
+                print(f"Trying without spaces: '{item_key}'")
                 if item_key in self.item_special_cases:
                     item_name = self.item_special_cases[item_key]
-                    print(f"✓ Matched first word -> {item_name}")
+                    print(f"✓ Matched without spaces -> {item_name}")
                 else:
                     print(f"✗ No match found for any format")
                     await ctx.send(f"Unknown item: {item_name}")
