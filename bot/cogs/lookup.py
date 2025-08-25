@@ -98,13 +98,14 @@ class Lookup(commands.Cog):
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
         # Handle item name
-        item_key = " ".join(args[1:]).lower()  # Try full item name first (e.g., "radiant gs")
+        # Try just the first word first (e.g., "rfc", "gs")
+        item_key = args[1].lower()
         if not item_key in self.item_special_cases:
-            # Try without spaces
-            item_key = item_key.replace(" ", "")
+            # Try full item name (e.g., "radiant gs")
+            item_key = " ".join(args[1:]).lower()
             if not item_key in self.item_special_cases:
-                # Try just the first word
-                item_key = args[1].lower()
+                # Try without spaces (e.g., "radiantgs")
+                item_key = item_key.replace(" ", "")
         
         if item_key in self.item_special_cases:
             item_name = self.item_special_cases[item_key]
@@ -146,8 +147,8 @@ class Lookup(commands.Cog):
                         current_item = unit_item[2]
                         item_stats = unit_item[3]
                         
-                        # Exact match for both unit and item
-                        if current_unit == formatted_unit_name and current_item in item_name:
+                        # Case-insensitive match for both unit and item
+                        if current_unit == formatted_unit_name and item_name.lower() in current_item.lower():
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
                                 # Format to 2 decimal places and add + for positive numbers
