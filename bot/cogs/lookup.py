@@ -46,9 +46,6 @@ class Lookup(commands.Cog):
             item_name = args[0]
             item_key = item_name.replace(" ", "").lower()
             
-            if item_key in self.item_special_cases:
-                item_name = self.item_special_cases[item_key]
-
             # Handle radiant items
             words = item_key.split()
             is_radiant = "radiant" in words
@@ -57,10 +54,23 @@ class Lookup(commands.Cog):
                 words.remove("radiant")
                 item_key = "".join(words)
                 
-                # Check if the base item name is in special cases
-                if item_key in self.item_special_cases:
-                    item_name = f"{self.item_special_cases[item_key]}Radiant"
+            # Check if the base item name is in special cases
+            if item_key in self.item_special_cases:
+                base_item = self.item_special_cases[item_key]
+                if is_radiant:
+                    # Handle special radiant mappings
+                    if base_item == "PowerGauntlet":
+                        item_name = "TrapClaw"
+                    elif base_item == "MadredsBloodrazor":
+                        item_name = "GiantSlayer"
+                    elif base_item == "UnstableConcoction":
+                        item_name = "HandOfJustice"
+                    else:
+                        item_name = f"{base_item}Radiant"
                 else:
+                    item_name = base_item
+            else:
+                if is_radiant:
                     # Capitalize the first letter of each word for the base item name
                     base_name = " ".join(word.capitalize() for word in words)
                     item_name = f"{base_name}Radiant"
@@ -98,8 +108,29 @@ class Lookup(commands.Cog):
         else:
             unit_name = unit_name.capitalize()
 
+        # Handle radiant items
+        words = item_key.split()
+        is_radiant = "radiant" in words
+        if is_radiant:
+            # Remove "radiant" from the search
+            words.remove("radiant")
+            item_key = "".join(words)
+            
+        # Check if the base item name is in special cases
         if item_key in self.item_special_cases:
-            item_name = self.item_special_cases[item_key]
+            base_item = self.item_special_cases[item_key]
+            if is_radiant:
+                # Handle special radiant mappings
+                if base_item == "PowerGauntlet":
+                    item_name = "TrapClaw"
+                elif base_item == "MadredsBloodrazor":
+                    item_name = "GiantSlayer"
+                elif base_item == "UnstableConcoction":
+                    item_name = "HandOfJustice"
+                else:
+                    item_name = f"{base_item}Radiant"
+            else:
+                item_name = base_item
         
         # Format the unit name with TFT set prefix
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
