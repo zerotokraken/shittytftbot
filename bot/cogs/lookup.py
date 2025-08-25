@@ -49,14 +49,21 @@ class Lookup(commands.Cog):
             if item_key in self.item_special_cases:
                 item_name = self.item_special_cases[item_key]
 
-            # Check if "radiant" is part of the name
-            is_radiant = "radiant" in item_key
+            # Handle radiant items
+            words = item_key.split()
+            is_radiant = "radiant" in words
             if is_radiant:
-                item_key = item_key.replace("radiant", "").strip()
+                # Remove "radiant" from the search
+                words.remove("radiant")
+                item_key = "".join(words)
+                
+                # Check if the base item name is in special cases
                 if item_key in self.item_special_cases:
                     item_name = f"{self.item_special_cases[item_key]}Radiant"
                 else:
-                    item_name = f"{item_name}Radiant"
+                    # Capitalize the first letter of each word for the base item name
+                    base_name = " ".join(word.capitalize() for word in words)
+                    item_name = f"{base_name}Radiant"
 
             url = "https://d3.tft.tools/stats2/general/1100/15163/1"
 
