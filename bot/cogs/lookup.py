@@ -41,9 +41,14 @@ class Lookup(commands.Cog):
             await ctx.send("Please provide an item name or unit and item names")
             return
 
+        # Check if first arg is a unit
+        first_arg = args[0].replace(" ", "").lower()
+        is_unit = first_arg in self.unit_special_cases or args[0][0].isupper()
+
         # Handle item-only lookup
-        if len(args) == 1:
-            item_name = args[0]
+        if len(args) == 1 or not is_unit:
+            # If we have multiple args but first isn't a unit, combine them
+            item_name = " ".join(args)
             item_key = item_name.replace(" ", "").lower()
             
             # Handle radiant items
@@ -132,74 +137,52 @@ class Lookup(commands.Cog):
             else:
                 item_name = base_item
         
-        # For radiant items, use the stats2/general endpoint
-        if is_radiant:
-            url = "https://d3.tft.tools/stats2/general/1100/15163/1"
-            try:
-                async with self.session.get(url) as response:
-                    response.raise_for_status()
-                    data = await response.json()
+        # For unit + item lookups, use the combos/explorer endpoint
+        formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
+        url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
 
-                if 'items' in data:
-                    for item in data['items']:
-                        if item_name.lower() in item['itemId'].lower():
-                            place = item.get('place', 'N/A')
-                            if place != 'N/A':
-                                await ctx.send(f"AVP: {place:.2f}")
-                                return
-                    
-                    await ctx.send(f"No data found for {item_name}")
-                else:
-                    await ctx.send("Error: Unexpected data format from API")
-            except aiohttp.ClientError as e:
-                await ctx.send(f"Error occurred while fetching data: {str(e)}")
-        else:
-            # For non-radiant items, use the combos/explorer endpoint
-            formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
-            url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
+        payload = {
+            "uid": "",
+            "filters": [
+                {
+                    "typ": "u",
+                    "value": formatted_unit_name,
+                    "tier": "0",
+                    "exclude": False
+                }
+            ]
+        }
 
-            payload = {
-                "uid": "",
-                "filters": [
-                    {
-                        "typ": "u",
-                        "value": formatted_unit_name,
-                        "tier": "0",
-                        "exclude": False
-                    }
-                ]
-            }
+        headers = {
+            'Content-Type': 'application/json'
+        }
 
-            headers = {
-                'Content-Type': 'application/json'
-            }
+        try:
+            async with self.session.post(url, json=payload, headers=headers) as response:
+                response.raise_for_status()
+                data = await response.json()
 
-            try:
-                async with self.session.post(url, json=payload, headers=headers) as response:
-                    response.raise_for_status()
-                    data = await response.json()
-
-                if isinstance(data, dict) and 'unitItems' in data:
-                    for unit_item in data['unitItems']:
-                        if isinstance(unit_item, list) and len(unit_item) >= 4:
-                            current_unit = unit_item[0]
-                            current_item = unit_item[2]
-                            item_stats = unit_item[3]
-                            
-                            if current_unit == formatted_unit_name and item_name.lower() in current_item.lower():
-                                delta = item_stats.get('delta', 'N/A')
-                                if delta != 'N/A':
-                                    # Format to 2 decimal places and add + for positive numbers
-                                    delta_formatted = '{:+.2f}'.format(delta)
-                                    await ctx.send(f"Delta: {delta_formatted}")
-                                else:
-                                    await ctx.send(f"Delta: {delta}")
-                                return
-                    
-                    await ctx.send(f"No data found for {item_name} on {unit_name}")
+            if isinstance(data, dict) and 'unitItems' in data:
+                for unit_item in data['unitItems']:
+                    if isinstance(unit_item, list) and len(unit_item) >= 4:
+                        current_unit = unit_item[0]
+                        current_item = unit_item[2]
+                        item_stats = unit_item[3]
+                        
+                        if current_unit == formatted_unit_name and item_name.lower() in current_item.lower():
+                            delta = item_stats.get('delta', 'N/A')
+                            if delta != 'N/A':
+                                # Format to 2 decimal places and add + for positive numbers
+                                delta_formatted = '{:+.2f}'.format(delta)
+                                await ctx.send(f"Delta: {delta_formatted}")
+                            else:
+                                await ctx.send(f"Delta: {delta}")
+                            return
                 
-            except aiohttp.ClientError as e:
-                await ctx.send(f"Error occurred: {str(e)}")
+                await ctx.send(f"No data found for {item_name} on {unit_name}")
+            
+        except aiohttp.ClientError as e:
+            await ctx.send(f"Error occurred: {str(e)}")
 
 async def setup(bot, set_number):
     await bot.add_cog(Lookup(bot, set_number))
