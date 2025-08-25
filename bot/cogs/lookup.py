@@ -51,23 +51,18 @@ class Lookup(commands.Cog):
             item_name = " ".join(args)
             item_key = item_name.replace(" ", "").lower()
             
-            # Handle radiant items
-            words = item_key.split()
-            is_radiant = "radiant" in words
-            if is_radiant:
-                # Remove "radiant" from the search
-                words.remove("radiant")
-                item_key = "".join(words)
-            
-            # Also check if the item name ends with "radiant"
-            if item_key.endswith("radiant"):
-                is_radiant = True
-                item_key = item_key[:-7]  # remove "radiant" from the end
-                
-            # Check if the base item name is in special cases
+            # First check if it's a special case
             if item_key in self.item_special_cases:
-                base_item = self.item_special_cases[item_key]
-                if is_radiant:
+                item_name = self.item_special_cases[item_key]
+            
+            # Handle radiant items (both "radiant x" and "xradiant" formats)
+            if "radiant" in item_key:
+                # Remove "radiant" and any spaces
+                base_key = item_key.replace("radiant", "").strip()
+                
+                # Check if the base item is in special cases
+                if base_key in self.item_special_cases:
+                    base_item = self.item_special_cases[base_key]
                     # Handle special radiant mappings
                     if base_item == "PowerGauntlet":
                         item_name = "TrapClaw"
@@ -78,11 +73,8 @@ class Lookup(commands.Cog):
                     else:
                         item_name = f"5{base_item}Radiant"
                 else:
-                    item_name = base_item
-            else:
-                if is_radiant:
-                    # Capitalize the first letter of each word for the base item name
-                    base_name = " ".join(word.capitalize() for word in words) if words else item_key.capitalize()
+                    # If not in special cases, capitalize each word
+                    base_name = "".join(word.capitalize() for word in base_key.split())
                     item_name = f"5{base_name}Radiant"
 
             url = "https://d3.tft.tools/stats2/general/1100/15163/1"
@@ -118,23 +110,18 @@ class Lookup(commands.Cog):
         else:
             unit_name = unit_name.capitalize()
 
-        # Handle radiant items
-        words = item_key.split()
-        is_radiant = "radiant" in words
-        if is_radiant:
-            # Remove "radiant" from the search
-            words.remove("radiant")
-            item_key = "".join(words)
-            
-        # Also check if the item name ends with "radiant"
-        if item_key.endswith("radiant"):
-            is_radiant = True
-            item_key = item_key[:-7]  # remove "radiant" from the end
-            
-        # Check if the base item name is in special cases
+        # First check if it's a special case
         if item_key in self.item_special_cases:
-            base_item = self.item_special_cases[item_key]
-            if is_radiant:
+            item_name = self.item_special_cases[item_key]
+        
+        # Handle radiant items (both "radiant x" and "xradiant" formats)
+        if "radiant" in item_key:
+            # Remove "radiant" and any spaces
+            base_key = item_key.replace("radiant", "").strip()
+            
+            # Check if the base item is in special cases
+            if base_key in self.item_special_cases:
+                base_item = self.item_special_cases[base_key]
                 # Handle special radiant mappings
                 if base_item == "PowerGauntlet":
                     item_name = "TrapClaw"
@@ -145,7 +132,9 @@ class Lookup(commands.Cog):
                 else:
                     item_name = f"5{base_item}Radiant"
             else:
-                item_name = base_item
+                # If not in special cases, capitalize each word
+                base_name = "".join(word.capitalize() for word in base_key.split())
+                item_name = f"5{base_name}Radiant"
         
         # For unit + item lookups, use the combos/explorer endpoint
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
@@ -179,7 +168,13 @@ class Lookup(commands.Cog):
                         current_item = unit_item[2]
                         item_stats = unit_item[3]
                         
-                        if current_unit == formatted_unit_name and item_name.lower() in current_item.lower():
+                        # Remove TFT15_ prefix for comparison
+                        current_unit_name = current_unit.replace(f"TFT{self.set_number}_", "")
+                        # Case-insensitive comparison for both unit and item
+                        if current_unit_name.lower() == unit_name.lower() and (
+                            item_name.lower() in current_item.lower() or 
+                            current_item.lower() in item_name.lower()
+                        ):
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
                                 # Format to 2 decimal places and add + for positive numbers
