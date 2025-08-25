@@ -69,63 +69,74 @@ class Leaderboard(commands.Cog):
             # Add loading message
             message = await ctx.send("Fetching leaderboard data...")
 
+            async def make_request(session, url, name, operation):
+                for attempt in range(3):  # Try up to 3 times
+                    try:
+                        async with session.get(url, timeout=10) as response:  # 10 second timeout
+                            if response.status == 429:  # Rate limit hit
+                                retry_after = int(response.headers.get('Retry-After', 1))
+                                print(f"Rate limit hit for {name}, waiting {retry_after}s")
+                                await asyncio.sleep(retry_after)
+                                continue
+                            elif response.status != 200:
+                                print(f"Failed {operation} for {name}: {response.status}")
+                                return None
+                            return await response.json()
+                    except asyncio.TimeoutError:
+                        print(f"Timeout for {operation} {name}, attempt {attempt + 1}")
+                        await asyncio.sleep(1)
+                    except Exception as e:
+                        print(f"Error in {operation} for {name}: {str(e)}")
+                        return None
+                return None
+
             async def fetch_player_data(session, discord_id, name, tag, region):
                 try:
                     print(f"\nProcessing player: {name}#{tag} ({region})")
-                    # For SEA region, use asia region for account lookup
                     account_region = 'asia' if region.lower() == 'sea' else region
-                    print(f"Using account region: {account_region}")
                     
                     # Get PUUID
                     api_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{urllib.parse.quote(name)}/{tag}?api_key={self.apikey}"
-                    print(f"PUUID URL: {api_url}")
-                    async with session.get(api_url) as response:
-                        if response.status != 200:
-                            print(f"Failed to get PUUID for {name}: {response.status}")
-                            return None
-                        player_data = await response.json()
-                        puuid = player_data['puuid']
+                    player_data = await make_request(session, api_url, name, "PUUID lookup")
+                    if not player_data:
+                        return None
+                    puuid = player_data['puuid']
+
+                    await asyncio.sleep(0.1)  # Small delay between requests
 
                     # Get player's sub-region for TFT
                     region_url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}?api_key={self.apikey}"
-                    print(f"Region URL: {region_url}")
-                    async with session.get(region_url) as region_response:
-                        if region_response.status != 200:
-                            print(f"Failed to get region for {name}: {region_response.status}")
-                            return None
-                        region_data = await region_response.json()
-                        sub_region = region_data['region'].lower()
-                        print(f"Using sub-region: {sub_region}")
+                    region_data = await make_request(session, region_url, name, "region lookup")
+                    if not region_data:
+                        return None
+                    sub_region = region_data['region'].lower()
+
+                    await asyncio.sleep(0.1)  # Small delay between requests
 
                     # Get rank data using the correct sub-region
                     league_url = f"https://{sub_region}.api.riotgames.com/tft/league/v1/by-puuid/{puuid}?api_key={self.apikey}"
-                    print(f"League URL: {league_url}")
-                    async with session.get(league_url) as league_response:
-                        if league_response.status != 200:
-                            print(f"Failed to get league data for {name}: {league_response.status}")
-                            return None
-                        league_data = await league_response.json()
-                        print(f"League data for {name}: {league_data}")
-                        if not league_data:  # Empty list means no ranked data
-                            print(f"No ranked data found for {name}")
-                            return None
-                        
-                        rank_data = league_data[0]
-                        return {
-                            'discord_id': discord_id,
-                            'name': name,
-                            'tier': rank_data['tier'],
-                            'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
-                            'lp': rank_data['leaguePoints'],
-                            'wins': rank_data['wins'],
-                            'losses': rank_data['losses']
-                        }
+                    league_data = await make_request(session, league_url, name, "league data")
+                    if not league_data or not league_data[0]:  # Check for empty list or missing data
+                        print(f"No ranked data found for {name}")
+                        return None
+                    
+                    rank_data = league_data[0]
+                    return {
+                        'discord_id': discord_id,
+                        'name': name,
+                        'tier': rank_data['tier'],
+                        'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
+                        'lp': rank_data['leaguePoints'],
+                        'wins': rank_data['wins'],
+                        'losses': rank_data['losses']
+                    }
                 except Exception as e:
                     print(f"Error fetching data for {name}: {str(e)}")
                     return None
 
-            # Fetch rank data for all players concurrently
-            async with aiohttp.ClientSession() as session:
+            # Fetch rank data for all players concurrently with timeout and limits
+            timeout = aiohttp.ClientTimeout(total=60)  # 60 second total timeout
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 tasks = [fetch_player_data(session, p[0], p[1], p[2], p[3]) for p in players]
                 player_ranks = [p for p in await asyncio.gather(*tasks) if p is not None]
 
