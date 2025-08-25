@@ -185,7 +185,12 @@ class Lookup(commands.Cog):
                             return
                 
                 # Debug output
-                await ctx.send(f"Looking for:\nUnit: {formatted_unit_name}\nItem: {item_name}\nNo matching data found.")
+                first_item = data['unitItems'][0] if data.get('unitItems') and data['unitItems'] else None
+                debug_msg = f"Looking for:\nUnit: {formatted_unit_name}\nItem: {item_name}\n"
+                if first_item:
+                    debug_msg += f"\nFirst item in response:\nUnit: {first_item[0]}\nItem: {first_item[2]}"
+                debug_msg += "\nNo matching data found."
+                await ctx.send(debug_msg)
             
         except aiohttp.ClientError as e:
             await ctx.send(f"Error occurred: {str(e)}")
