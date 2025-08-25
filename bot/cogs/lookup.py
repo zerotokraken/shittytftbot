@@ -95,7 +95,7 @@ class Lookup(commands.Cog):
 
                 if 'items' in data:
                     for item in data['items']:
-                        if item_name.lower() in item['itemId'].lower():
+                        if item_name.lower() == item['itemId'].lower():
                             place = item.get('place', 'N/A')
                             if place != 'N/A':
                                 await ctx.send(f"AVP: {place:.2f}")
@@ -192,7 +192,7 @@ class Lookup(commands.Cog):
                         print(f"Current item: {current_item}")
                         print(f"Looking for: {formatted_unit_name} with {item_name}")
                         
-                        if current_unit == formatted_unit_name and item_name.lower() == current_item.lower():
+                        if current_unit == formatted_unit_name and item_name == current_item:
                             print(f"✓ Found match!")
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
