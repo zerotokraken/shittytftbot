@@ -47,16 +47,20 @@ class Lookup(commands.Cog):
 
         # Handle item-only lookup
         if len(args) == 1 or not is_unit:
-            # If we have multiple args but first isn't a unit, combine them
-            item_name = " ".join(args)
-            item_key = item_name.replace(" ", "").lower()
+            # If we have multiple args but first isn't a unit, combine them for lookup
+            item_key = " ".join(args).lower()
             
             # Check if it's in special cases
             if item_key in self.item_special_cases:
                 item_name = self.item_special_cases[item_key]
             else:
-                # If not in special cases, just capitalize
-                item_name = item_key.capitalize()
+                # Try without spaces
+                no_spaces_key = item_key.replace(" ", "")
+                if no_spaces_key in self.item_special_cases:
+                    item_name = self.item_special_cases[no_spaces_key]
+                else:
+                    # If not in special cases, just capitalize
+                    item_name = item_key.capitalize()
 
             url = "https://d3.tft.tools/stats2/general/1100/15163/1"
 
@@ -93,12 +97,15 @@ class Lookup(commands.Cog):
             unit_name = unit_name.capitalize()
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
-        # Handle item name
-        if item_key in self.item_special_cases:
+        # Handle item name - try with and without spaces
+        item_with_spaces = " ".join(args[1:]).lower()
+        if item_with_spaces in self.item_special_cases:
+            item_name = self.item_special_cases[item_with_spaces]
+        elif item_key in self.item_special_cases:
             item_name = self.item_special_cases[item_key]
         else:
             # If not in special cases, just capitalize
-            item_name = item_key.capitalize()
+            item_name = item_with_spaces.capitalize()
         
         # For unit + item lookups, use the combos/explorer endpoint
         url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
