@@ -136,7 +136,7 @@ class Leaderboard(commands.Cog):
 
             # Process players in chunks to avoid rate limits
             timeout = aiohttp.ClientTimeout(total=120)  # Increased timeout for slower processing
-            chunk_size = 5  # Process 5 players at a time
+            chunk_size = 10  # Process 5 players at a time
             player_ranks = []
 
             async with aiohttp.ClientSession(timeout=timeout) as session:
