@@ -2,12 +2,15 @@ import discord
 from discord.ext import commands
 import aiohttp
 import asyncio
+import os
 import urllib.parse
 
 class Leaderboard(commands.Cog):
-    def __init__(self, bot, apikey):
+    def __init__(self, bot, apikey, set_number):
         self.bot = bot
         self.apikey = apikey
+        self.set_number = set_number
+        self.tt_url = os.getenv('tt_url')
 
     def get_rank_value(self, tier, rank, league_points):
         """Helper function to convert rank to a numeric value for sorting"""
@@ -42,7 +45,7 @@ class Leaderboard(commands.Cog):
     async def leaderboard(self, ctx):
         """Show top 10 ranked players"""
         # Check if command is used in the correct channel
-        if ctx.channel.id != 1285382023887978526 or 1308312472419307602:
+        if ctx.channel.id not in [1285382023887978526, 1308312472419307602]:
             await ctx.send(f"This command can only be used in <#1285382023887978526>", delete_after=5)
             try:
                 await ctx.message.delete()
@@ -121,14 +124,30 @@ class Leaderboard(commands.Cog):
                         return None
                     
                     rank_data = league_data[0]
+
+                    # Get tactics.tools data
+                    tactics_url = f"{self.tt_url}/{sub_region}/{name}/{tag}/{self.set_number}0/0"
+                    tactics_data = await make_request(session, tactics_url, name, "tactics.tools data")
+                    if not tactics_data:
+                        print(f"No tactics.tools data found for {name}")
+                        return None
+
+                    overview = tactics_data["queueSeasonStats"]["1100"]
+                    plays = overview["games"]
+                    wins = overview["win"]
+                    tops = overview["top4"]
+                    win_percentage = (wins / plays) * 100
+                    top4_percentage = (tops / plays) * 100
+
                     return {
                         'discord_id': discord_id,
                         'name': name,
                         'tier': rank_data['tier'],
                         'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
                         'lp': rank_data['leaguePoints'],
-                        'wins': rank_data['wins'],
-                        'losses': rank_data['losses']
+                        'games': plays,
+                        'win_rate': win_percentage,
+                        'top4_rate': top4_percentage
                     }
                 except Exception as e:
                     print(f"Error fetching data for {name}: {str(e)}")
@@ -168,7 +187,6 @@ class Leaderboard(commands.Cog):
 
             # Add top 10 players to embed
             for i, player in enumerate(player_ranks[:10], 1):
-                total_games = player['wins'] + player['losses']
                 rank_str = self.format_rank(player['tier'], player['rank'], player['lp'])
                 
                 # Get member name if possible, otherwise use TFT name
@@ -177,7 +195,7 @@ class Leaderboard(commands.Cog):
                 
                 embed.add_field(
                     name=f"#{i} {display_name}",
-                    value=f"{rank_str}\nGames: {total_games}",
+                    value=f"{rank_str}\nWin %: {player['win_rate']:.1f}%\nTop 4 %: {player['top4_rate']:.1f}%\nGames: {player['games']}",
                     inline=False
                 )
 
@@ -192,5 +210,5 @@ class Leaderboard(commands.Cog):
             traceback.print_exc()
             await ctx.send("An error occurred while fetching the leaderboard.")
 
-async def setup(bot, apikey):
-    await bot.add_cog(Leaderboard(bot, apikey))
+async def setup(bot, apikey, set_number):
+    await bot.add_cog(Leaderboard(bot, apikey, set_number))
