@@ -105,39 +105,44 @@ class Lookup(commands.Cog):
         unit_key = unit_name.replace(" ", "").lower()
         item_key = item_name.replace(" ", "").lower()
 
+        # Handle unit name
         if unit_key in self.unit_special_cases:
             unit_name = self.unit_special_cases[unit_key]
         else:
             unit_name = unit_name.capitalize()
+        formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
+        # Handle item name
         # First check if it's a special case
         if item_key in self.item_special_cases:
-            item_name = self.item_special_cases[item_key]
-        
-        # Handle radiant items (both "radiant x" and "xradiant" formats)
-        if "radiant" in item_key:
+            base_item = self.item_special_cases[item_key]
+        else:
+            # If not in special cases, just capitalize
+            base_item = item_key.capitalize()
+
+        # Check for radiant (as a word or suffix)
+        is_radiant = "radiant" in item_key
+        if is_radiant:
             # Remove "radiant" and any spaces
             base_key = item_key.replace("radiant", "").strip()
             
             # Check if the base item is in special cases
             if base_key in self.item_special_cases:
                 base_item = self.item_special_cases[base_key]
-                # Handle special radiant mappings
-                if base_item == "PowerGauntlet":
-                    item_name = "TrapClaw"
-                elif base_item == "MadredsBloodrazor":
-                    item_name = "GiantSlayer"
-                elif base_item == "UnstableConcoction":
-                    item_name = "HandOfJustice"
-                else:
-                    item_name = f"5{base_item}Radiant"
+            
+            # Handle special radiant mappings
+            if base_item == "PowerGauntlet":
+                item_name = "TrapClaw"
+            elif base_item == "MadredsBloodrazor":
+                item_name = "GiantSlayer"
+            elif base_item == "UnstableConcoction":
+                item_name = "HandOfJustice"
             else:
-                # If not in special cases, capitalize each word
-                base_name = "".join(word.capitalize() for word in base_key.split())
-                item_name = f"5{base_name}Radiant"
+                item_name = f"5{base_item}Radiant"
+        else:
+            item_name = base_item
         
         # For unit + item lookups, use the combos/explorer endpoint
-        formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
         url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
 
         payload = {
@@ -168,13 +173,8 @@ class Lookup(commands.Cog):
                         current_item = unit_item[2]
                         item_stats = unit_item[3]
                         
-                        # Remove TFT15_ prefix for comparison
-                        current_unit_name = current_unit.replace(f"TFT{self.set_number}_", "")
-                        # Case-insensitive comparison for both unit and item
-                        if current_unit_name.lower() == unit_name.lower() and (
-                            item_name.lower() in current_item.lower() or 
-                            current_item.lower() in item_name.lower()
-                        ):
+                        # Exact match for both unit and item
+                        if current_unit == formatted_unit_name and current_item == item_name:
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
                                 # Format to 2 decimal places and add + for positive numbers
@@ -184,7 +184,8 @@ class Lookup(commands.Cog):
                                 await ctx.send(f"Delta: {delta}")
                             return
                 
-                await ctx.send(f"No data found for {item_name} on {unit_name}")
+                # Debug output
+                await ctx.send(f"Looking for:\nUnit: {formatted_unit_name}\nItem: {item_name}\nNo matching data found.")
             
         except aiohttp.ClientError as e:
             await ctx.send(f"Error occurred: {str(e)}")
