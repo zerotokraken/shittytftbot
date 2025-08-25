@@ -66,14 +66,14 @@ class Lookup(commands.Cog):
                     elif base_item == "UnstableConcoction":
                         item_name = "HandOfJustice"
                     else:
-                        item_name = f"{base_item}Radiant"
+                        item_name = f"5{base_item}Radiant"
                 else:
                     item_name = base_item
             else:
                 if is_radiant:
                     # Capitalize the first letter of each word for the base item name
                     base_name = " ".join(word.capitalize() for word in words)
-                    item_name = f"{base_name}Radiant"
+                    item_name = f"5{base_name}Radiant"
 
             url = "https://d3.tft.tools/stats2/general/1100/15163/1"
 
@@ -128,7 +128,7 @@ class Lookup(commands.Cog):
                 elif base_item == "UnstableConcoction":
                     item_name = "HandOfJustice"
                 else:
-                    item_name = f"{base_item}Radiant"
+                    item_name = f"5{base_item}Radiant"
             else:
                 item_name = base_item
         
