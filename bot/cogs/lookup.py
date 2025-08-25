@@ -51,16 +51,23 @@ class Lookup(commands.Cog):
             item_key = " ".join(args).lower()
             
             # Check if it's in special cases
+            print(f"\nItem lookup debug:")
+            print(f"Input: {' '.join(args)}")
+            print(f"Trying with spaces: '{item_key}'")
             if item_key in self.item_special_cases:
                 item_name = self.item_special_cases[item_key]
+                print(f"✓ Matched with spaces -> {item_name}")
             else:
                 # Try without spaces
                 no_spaces_key = item_key.replace(" ", "")
+                print(f"Trying without spaces: '{no_spaces_key}'")
                 if no_spaces_key in self.item_special_cases:
                     item_name = self.item_special_cases[no_spaces_key]
+                    print(f"✓ Matched without spaces -> {item_name}")
                 else:
                     # If not in special cases, just capitalize
                     item_name = item_key.capitalize()
+                    print(f"✗ No match found, using capitalized: {item_name}")
 
             url = "https://d3.tft.tools/stats2/general/1100/15163/1"
 
@@ -86,7 +93,8 @@ class Lookup(commands.Cog):
             return
 
         # Handle unit + item lookup
-        unit_name, item_name = args[0], " ".join(args[1:])  # Combine remaining args for item name
+        unit_name = args[0]
+        item_name = " ".join(args[1:])  # Combine remaining args for item name
         
         # Handle unit name
         unit_key = unit_name.replace(" ", "").lower()
@@ -96,19 +104,34 @@ class Lookup(commands.Cog):
             unit_name = unit_name.capitalize()
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
-        # Handle item name
-        item_key = item_name.lower()  # Try with spaces first
-        if not item_key in self.item_special_cases:
-            item_key = item_key.replace(" ", "")  # Try without spaces
+        # Handle item name - try with spaces first (e.g., "radiant gs")
+        print(f"\nUnit+Item lookup debug:")
+        print(f"Input: {' '.join(args)}")
+        print(f"Unit: {unit_name} -> {formatted_unit_name}")
         
+        item_key = item_name.lower()
+        print(f"Trying with spaces: '{item_key}'")
         if item_key in self.item_special_cases:
             item_name = self.item_special_cases[item_key]
+            print(f"✓ Matched with spaces -> {item_name}")
         else:
-            await ctx.send(f"Unknown item: {item_name}")
-            return
-
-        # Debug output for item name resolution
-        print(f"Item key '{item_key}' resolved to '{item_name}'")
+            # Try without spaces (e.g., "radiantgs")
+            item_key = item_key.replace(" ", "")
+            print(f"Trying without spaces: '{item_key}'")
+            if item_key in self.item_special_cases:
+                item_name = self.item_special_cases[item_key]
+                print(f"✓ Matched without spaces -> {item_name}")
+            else:
+                # Try just the first word (e.g., "gs")
+                item_key = args[1].lower()
+                print(f"Trying first word: '{item_key}'")
+                if item_key in self.item_special_cases:
+                    item_name = self.item_special_cases[item_key]
+                    print(f"✓ Matched first word -> {item_name}")
+                else:
+                    print(f"✗ No match found for any format")
+                    await ctx.send(f"Unknown item: {item_name}")
+                    return
         
         # For unit + item lookups, use the combos/explorer endpoint
         url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
@@ -142,7 +165,13 @@ class Lookup(commands.Cog):
                         item_stats = unit_item[3]
                         
                         # Case-insensitive match for both unit and item
-                        if current_unit == formatted_unit_name and item_name == current_item:
+                        print(f"\nChecking API match:")
+                        print(f"Current unit: {current_unit}")
+                        print(f"Current item: {current_item}")
+                        print(f"Looking for: {formatted_unit_name} with {item_name}")
+                        
+                        if current_unit == formatted_unit_name and item_name.lower() == current_item.lower():
+                            print(f"✓ Found match!")
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
                                 # Format to 2 decimal places and add + for positive numbers
@@ -151,6 +180,8 @@ class Lookup(commands.Cog):
                             else:
                                 await ctx.send(f"Delta: {delta}")
                             return
+                        else:
+                            print(f"✗ No match")
                 
                 # Debug output
                 first_item = data['unitItems'][0] if data.get('unitItems') and data['unitItems'] else None
