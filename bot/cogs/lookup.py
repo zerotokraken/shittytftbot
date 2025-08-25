@@ -86,11 +86,10 @@ class Lookup(commands.Cog):
             return
 
         # Handle unit + item lookup
-        unit_name, item_name = args[0], args[1]
-        unit_key = unit_name.replace(" ", "").lower()
-        item_key = item_name.replace(" ", "").lower()
-
+        unit_name, item_name = args[0], " ".join(args[1:])  # Combine remaining args for item name
+        
         # Handle unit name
+        unit_key = unit_name.replace(" ", "").lower()
         if unit_key in self.unit_special_cases:
             unit_name = self.unit_special_cases[unit_key]
         else:
@@ -98,19 +97,14 @@ class Lookup(commands.Cog):
         formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
         # Handle item name
-        # Try just the first word first (e.g., "rfc", "gs")
-        item_key = args[1].lower()
+        item_key = item_name.lower()  # Try with spaces first
         if not item_key in self.item_special_cases:
-            # Try full item name (e.g., "radiant gs")
-            item_key = " ".join(args[1:]).lower()
-            if not item_key in self.item_special_cases:
-                # Try without spaces (e.g., "radiantgs")
-                item_key = item_key.replace(" ", "")
+            item_key = item_key.replace(" ", "")  # Try without spaces
         
         if item_key in self.item_special_cases:
             item_name = self.item_special_cases[item_key]
         else:
-            await ctx.send(f"Unknown item: {' '.join(args[1:])}")
+            await ctx.send(f"Unknown item: {item_name}")
             return
 
         # Debug output for item name resolution
