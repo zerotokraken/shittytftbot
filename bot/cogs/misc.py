@@ -228,7 +228,7 @@ class MiscCommands(commands.Cog):
 
     @commands.command()
     async def butthead(self, ctx):
-        await ctx.send("haha butthead")
+        await ctx.send("HAHAHAHAHA BUTTHEAD HAHA")
 
     @commands.command()
     async def boombot(self, ctx):
