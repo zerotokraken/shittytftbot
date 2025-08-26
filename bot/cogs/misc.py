@@ -215,12 +215,20 @@ class MiscCommands(commands.Cog):
         await ctx.send("galbia or jials, they're essentially the same person to me")
 
     @commands.command()
+    async def jialysis(self, ctx):
+        await ctx.send("Jialysis is a gaming treatment that cleans top 4 placements and excess LP from the match history when a player's mental facilites have failed.")
+
+    @commands.command()
     async def hawktuah(self, ctx):
         await ctx.send("You gotta give 'em that hawk tuah and spit on that thang")
 
     @commands.command()
     async def ye(self, ctx):
         await ctx.send("ye")
+
+    @commands.command()
+    async def butthead(self, ctx):
+        await ctx.send("haha butthead")
 
     @commands.command()
     async def boombot(self, ctx):
