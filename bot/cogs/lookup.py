@@ -128,7 +128,7 @@ class Lookup(commands.Cog):
             formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
             # Use base URL for unit stats
-            url = "https://d3.tft.tools/combos/base/1100/15170/1"
+            url = "https://d3.tft.tools/combos/explorer/1100/15170/1"
 
             payload = {
                 "uid": "",
@@ -151,6 +151,10 @@ class Lookup(commands.Cog):
                     response.raise_for_status()
                     data = await response.json()
 
+                # Debug: Print the response data
+                print(f"Star lookup response for {formatted_unit_name} tier {star_level}:")
+                print(json.dumps(data, indent=2))
+
                 if 'base' in data:
                     base_stats = data['base']
                     place = base_stats.get('place', 0)
@@ -158,6 +162,8 @@ class Lookup(commands.Cog):
                     if count > 0:
                         avg_placement = place / count
                         await ctx.send(f"Average Placement ({star_level}★): {avg_placement:.2f}")
+                        # Debug: Print the calculation
+                        print(f"Calculation: {place} / {count} = {avg_placement}")
                         return
                     
                     await ctx.send(f"No data found for {star_level}★ {unit_name}")
@@ -204,12 +210,6 @@ class Lookup(commands.Cog):
                 else:
                     await ctx.send("Error: Unexpected data format from API")
                 
-            except aiohttp.ClientError as e:
-                await ctx.send(f"Error occurred while fetching data: {str(e)}")
-            return
-
-        # Handle unit + item lookup
-        unit_name = args[0]
         item_name = " ".join(args[1:])  # Combine remaining args for item name
         
         # Handle unit name (case-insensitive)
