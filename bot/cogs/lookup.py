@@ -210,6 +210,12 @@ class Lookup(commands.Cog):
                 else:
                     await ctx.send("Error: Unexpected data format from API")
                 
+            except aiohttp.ClientError as e:
+                await ctx.send(f"Error occurred while fetching data: {str(e)}")
+            return
+
+        # Handle unit + item lookup
+        unit_name = args[0]
         item_name = " ".join(args[1:])  # Combine remaining args for item name
         
         # Handle unit name (case-insensitive)
