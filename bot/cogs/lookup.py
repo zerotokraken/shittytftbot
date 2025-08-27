@@ -56,6 +56,49 @@ class Lookup(commands.Cog):
         if not is_unit:
             is_unit = args[0][0].upper() == args[0][0]
 
+        # Handle unit-only lookup
+        if len(args) == 1 and is_unit:
+            unit_name = args[0]
+            # Format unit name
+            unit_key = unit_name.replace(" ", "").lower()
+            unit_found = False
+            for key, value in self.unit_special_cases.items():
+                if unit_key == key.lower():
+                    unit_name = value
+                    unit_found = True
+                    break
+            if not unit_found:
+                unit_name = unit_name.capitalize()
+            formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
+
+            # Use base URL for unit stats
+            url = "https://d3.tft.tools/combos/base/1100/15170/1"
+
+            try:
+                async with self.session.get(url) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+
+                if 'units' in data:
+                    for unit_data in data['units']:
+                        if isinstance(unit_data, list) and len(unit_data) == 2:
+                            current_unit, stats = unit_data
+                            if current_unit == formatted_unit_name:
+                                place = stats.get('place', 0)
+                                count = stats.get('count', 0)
+                                if count > 0:
+                                    avg_placement = place / count
+                                    await ctx.send(f"Average Placement: {avg_placement:.2f}")
+                                    return
+                    
+                    await ctx.send(f"No data found for {unit_name}")
+                else:
+                    await ctx.send("Error: Unexpected data format from API")
+                
+            except aiohttp.ClientError as e:
+                await ctx.send(f"Error occurred while fetching data: {str(e)}")
+            return
+
         # Handle item-only lookup
         if len(args) == 1 or not is_unit:
             # If we have multiple args but first isn't a unit, combine them for lookup
@@ -73,7 +116,7 @@ class Lookup(commands.Cog):
                     # If not in special cases, just capitalize
                     item_name = item_key.capitalize()
 
-            url = "https://d3.tft.tools/stats2/general/1100/15163/1"
+            url = "https://d3.tft.tools/stats2/general/1100/15170/1"
 
             try:
                 async with self.session.get(url) as response:
@@ -132,7 +175,7 @@ class Lookup(commands.Cog):
                     return
         
         # For unit + item lookups, use the combos/explorer endpoint
-        url = "https://d3.tft.tools/combos/explorer/1100/15163/1"
+        url = "https://d3.tft.tools/combos/explorer/1100/15170/1"
 
         payload = {
             "uid": "",
