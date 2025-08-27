@@ -41,6 +41,64 @@ class Lookup(commands.Cog):
             await ctx.send("Please provide an item name or unit and item names")
             return
 
+        # Handle trait lookup (when first arg is a number)
+        if args[0].isdigit():
+            # Combine args into trait format (e.g., "7 mighty mech" -> "7 mighty mech")
+            trait_key = " ".join(args).lower()
+            
+            # Check if trait exists in our config
+            config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config')
+            try:
+                with open(os.path.join(config_dir, 'traits.json'), 'r') as f:
+                    traits_config = json.load(f)
+                    if trait_key not in traits_config:
+                        await ctx.send(f"Unknown trait: {trait_key}")
+                        return
+                    
+                    trait_info = traits_config[trait_key]
+                    trait_name = trait_info[0]
+                    trait_tier = trait_info[1]
+
+                    # Use base URL for trait stats
+                    url = "https://d3.tft.tools/combos/base/1100/15170/1"
+
+                    payload = {
+                        "uid": ""
+                    }
+
+                    headers = {
+                        'Content-Type': 'application/json'
+                    }
+
+                    try:
+                        async with self.session.post(url, json=payload, headers=headers) as response:
+                            response.raise_for_status()
+                            data = await response.json()
+
+                        if 'traits' in data:
+                            for trait_data in data['traits']:
+                                if isinstance(trait_data, list) and len(trait_data) == 3:
+                                    current_trait, current_tier, stats = trait_data
+                                    if current_trait == trait_name and current_tier == trait_tier:
+                                        delta = stats.get('delta', 'N/A')
+                                        if delta != 'N/A':
+                                            # Format to 2 decimal places and add + for positive numbers
+                                            delta_formatted = '{:+.2f}'.format(delta)
+                                            await ctx.send(f"Delta: {delta_formatted}")
+                                            return
+                            
+                            await ctx.send(f"No data found for {trait_key}")
+                        else:
+                            await ctx.send("Error: Unexpected data format from API")
+                        
+                    except aiohttp.ClientError as e:
+                        await ctx.send(f"Error occurred while fetching data: {str(e)}")
+                    return
+
+            except Exception as e:
+                await ctx.send(f"Error loading traits config: {str(e)}")
+                return
+
         # Check if first arg is a unit (case-insensitive)
         first_arg = args[0].lower()
         first_arg_no_spaces = first_arg.replace(" ", "")
@@ -151,10 +209,6 @@ class Lookup(commands.Cog):
                     response.raise_for_status()
                     data = await response.json()
 
-                # Debug: Print the response data
-                print(f"Star lookup response for {formatted_unit_name} tier {star_level}:")
-                print(json.dumps(data, indent=2))
-
                 if 'base' in data:
                     base_stats = data['base']
                     place = base_stats.get('place', 0)
@@ -162,8 +216,6 @@ class Lookup(commands.Cog):
                     if count > 0:
                         avg_placement = place / count
                         await ctx.send(f"Average Placement ({star_level}★): {avg_placement:.2f}")
-                        # Debug: Print the calculation
-                        print(f"Calculation: {place} / {count} = {avg_placement}")
                         return
                     
                     await ctx.send(f"No data found for {star_level}★ {unit_name}")
