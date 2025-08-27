@@ -107,6 +107,62 @@ class Lookup(commands.Cog):
                 await ctx.send(f"Error occurred while fetching data: {str(e)}")
             return
 
+        # Handle unit + star level lookup
+        if len(args) == 2 and is_unit and args[1].isdigit():
+            star_level = int(args[1])
+            if not 1 <= star_level <= 4:
+                await ctx.send("Star level must be between 1 and 4")
+                return
+
+            unit_name = args[0]
+            # Format unit name
+            unit_key = unit_name.replace(" ", "").lower()
+            unit_found = False
+            for key, value in self.unit_special_cases.items():
+                if unit_key == key.lower():
+                    unit_name = value
+                    unit_found = True
+                    break
+            if not unit_found:
+                unit_name = unit_name.capitalize()
+            formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
+
+            # Use base URL for unit stats
+            url = "https://d3.tft.tools/combos/base/1100/15170/1"
+
+            payload = {
+                "uid": ""
+            }
+
+            headers = {
+                'Content-Type': 'application/json'
+            }
+
+            try:
+                async with self.session.post(url, json=payload, headers=headers) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+
+                if 'starUnits' in data:
+                    for unit_data in data['starUnits']:
+                        if isinstance(unit_data, list) and len(unit_data) == 3:
+                            current_unit, current_star, stats = unit_data
+                            if current_unit == formatted_unit_name and current_star == star_level:
+                                place = stats.get('place', 0)
+                                count = stats.get('count', 0)
+                                if count > 0:
+                                    avg_placement = place / count
+                                    await ctx.send(f"Average Placement ({star_level}★): {avg_placement:.2f}")
+                                    return
+                    
+                    await ctx.send(f"No data found for {star_level}★ {unit_name}")
+                else:
+                    await ctx.send("Error: Unexpected data format from API")
+                
+            except aiohttp.ClientError as e:
+                await ctx.send(f"Error occurred while fetching data: {str(e)}")
+            return
+
         # Handle item-only lookup
         if len(args) == 1 or not is_unit:
             # If we have multiple args but first isn't a unit, combine them for lookup
