@@ -96,7 +96,7 @@ class Lookup(commands.Cog):
                                 count = stats.get('count', 0)
                                 if count > 0:
                                     avg_placement = place / count
-                                    await ctx.send(f"Average Placement: {avg_placement:.2f}")
+                                    await ctx.send(f"Average Placement (any ★): {avg_placement:.2f}")
                                     return
                     
                     await ctx.send(f"No data found for {unit_name}")
@@ -131,7 +131,15 @@ class Lookup(commands.Cog):
             url = "https://d3.tft.tools/combos/base/1100/15170/1"
 
             payload = {
-                "uid": ""
+                "uid": "",
+                "filters": [
+                    {
+                        "typ": "u",
+                        "value": formatted_unit_name,
+                        "tier": str(star_level),
+                        "exclude": False
+                    }
+                ]
             }
 
             headers = {
@@ -143,17 +151,14 @@ class Lookup(commands.Cog):
                     response.raise_for_status()
                     data = await response.json()
 
-                if 'starUnits' in data:
-                    for unit_data in data['starUnits']:
-                        if isinstance(unit_data, list) and len(unit_data) == 3:
-                            current_unit, current_star, stats = unit_data
-                            if current_unit == formatted_unit_name and current_star == star_level:
-                                place = stats.get('place', 0)
-                                count = stats.get('count', 0)
-                                if count > 0:
-                                    avg_placement = place / count
-                                    await ctx.send(f"Average Placement ({star_level}★): {avg_placement:.2f}")
-                                    return
+                if 'base' in data:
+                    base_stats = data['base']
+                    place = base_stats.get('place', 0)
+                    count = base_stats.get('count', 0)
+                    if count > 0:
+                        avg_placement = place / count
+                        await ctx.send(f"Average Placement ({star_level}★): {avg_placement:.2f}")
+                        return
                     
                     await ctx.send(f"No data found for {star_level}★ {unit_name}")
                 else:
