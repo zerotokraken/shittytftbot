@@ -174,6 +174,10 @@ class MiscCommands(commands.Cog):
         await ctx.send("what the sigma")
 
     @commands.command()
+    async def night(self, ctx):
+        await ctx.send("u r literally schizo if u unironically believe shops are bugged")
+
+    @commands.command()
     async def saki(self, ctx):
         await ctx.send("where the heck is saki")
 
