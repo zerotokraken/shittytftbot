@@ -74,8 +74,16 @@ class Lookup(commands.Cog):
             # Use base URL for unit stats
             url = "https://d3.tft.tools/combos/base/1100/15170/1"
 
+            payload = {
+                "uid": ""
+            }
+
+            headers = {
+                'Content-Type': 'application/json'
+            }
+
             try:
-                async with self.session.get(url) as response:
+                async with self.session.post(url, json=payload, headers=headers) as response:
                     response.raise_for_status()
                     data = await response.json()
 
