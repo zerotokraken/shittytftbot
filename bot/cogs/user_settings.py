@@ -38,7 +38,7 @@ class UserSettings(commands.Cog):
 
     VALID_REGIONS = ['americas', 'europe', 'asia', 'sea']
 
-    @commands.command(name='set', aliases=['setname'])
+    @commands.command(name='set', aliases=['setname', 'register'])
     async def set_user_settings(self, ctx, *, args):
         """Set your TFT name and region (Format: .set Name#TAG region)"""
         # Split by space from the right to get region
