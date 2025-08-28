@@ -128,6 +128,10 @@ class MiscCommands(commands.Cog):
         await ctx.send("do these mods do anything around here? honestly")
 
     @commands.command()
+    async def seed(self, ctx):
+        await ctx.send("Your seed has been set.")
+
+    @commands.command()
     async def coaching(self, ctx):
         await ctx.send(
             "As a auto chess main at a respectably high elo, this game is hard to watch. Literally cringing at some of these mistakes. If you actually want to learn autochess PM me (im silver 2 24lp) I also do coaching.")
