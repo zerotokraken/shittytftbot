@@ -53,7 +53,7 @@ class StatCommands(commands.Cog):
                 result = cursor.fetchone()
                 if not result:
                     user_reference = "their" if member else "your"
-                    await ctx.send(f"This user has not registered their name and tag yet.")
+                    await ctx.send(f"This user has not registered their name and tag yet. [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)")
                     return
                 
                 gameName, tagLine, stored_region = result

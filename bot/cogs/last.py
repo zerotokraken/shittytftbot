@@ -533,7 +533,7 @@ class Last(commands.Cog):
                 cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id,))
                 result = cursor.fetchone()
                 if not result:
-                    await ctx.send(f"This user has not registered their name and tag yet.")
+                    await ctx.send(f"This user has not set their name and tag yet. [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)")
                     return
                 
                 name, tag, region = result

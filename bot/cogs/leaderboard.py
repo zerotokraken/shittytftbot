@@ -14,10 +14,17 @@ class Leaderboard(commands.Cog):
 
     def get_rank_value(self, tier, rank, league_points):
         """Helper function to convert rank to a numeric value for sorting"""
+        # For Challenger/Grandmaster/Master, sort by LP first but keep them above other ranks
+        if tier in ['CHALLENGER', 'GRANDMASTER', 'MASTER']:
+            # Use a high base value to keep them above other ranks
+            base = 1000000
+            # Add additional value based on tier to keep the general tier order
+            tier_bonus = {'CHALLENGER': 2000, 'GRANDMASTER': 1000, 'MASTER': 0}
+            # LP becomes the primary sort value within these tiers
+            return base + league_points + tier_bonus[tier]
+        
+        # For other ranks, use the traditional tier + division + LP system
         tier_values = {
-            'CHALLENGER': 9000,
-            'GRANDMASTER': 8000,
-            'MASTER': 7000,
             'DIAMOND': 6000,
             'EMERALD': 5000,
             'PLATINUM': 4000,
@@ -26,12 +33,6 @@ class Leaderboard(commands.Cog):
             'BRONZE': 1000,
             'IRON': 0
         }
-        
-        # For Challenger/Grandmaster/Master, only LP matters after tier
-        if tier in ['CHALLENGER', 'GRANDMASTER', 'MASTER']:
-            return tier_values[tier] + league_points
-        
-        # For other ranks, convert rank (I-IV) to points
         rank_values = {'I': 400, 'II': 300, 'III': 200, 'IV': 100}
         return tier_values[tier] + rank_values[rank] + league_points
 
