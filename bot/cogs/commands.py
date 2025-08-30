@@ -12,8 +12,8 @@ class ShittyCommands(commands.Cog):
         # Define a static list of main commands with custom descriptions
         main_commands = {
             'set': 'Set your TFT name/region for use in other commands [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)',
-            'stats': 'Look up your TFT stats on tactics.tools, Include the player tag as well [.stats or .mystats] (Must be registered with the bot with .set)',
-            'last': 'Pull the match history from your last game [.last] (Must be registered with the bot with .set)',
+            'stats': 'Look up your TFT stats on tactics.tools, Include the player tag as well [.stats or .mystats]',
+            'last': 'Pull the match history from your last game [.last]',
             'lookup': 'Look up AVP/deltas on items & units [.lookup ashe flickerblades][.lookup ashe 2][.lookup flickerblade]',
             'leaderboard': 'Top 10 players that are registered with the bot [.leaderboard or .lb]',
             'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [.cutoffs NA]',
