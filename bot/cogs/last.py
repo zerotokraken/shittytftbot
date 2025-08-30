@@ -518,7 +518,7 @@ class Last(commands.Cog):
         img_byte_arr.seek(0)
         return img_byte_arr
 
-    @commands.command(name='last')
+    @commands.command(name='last', aliases=['recent', '.lastmatch'])
     async def last_match(self, ctx, member: discord.Member = None):
         """Show your last TFT match"""
         try:
