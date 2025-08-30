@@ -116,6 +116,10 @@ class MiscCommands(commands.Cog):
         "GOING 8TH CHECKLIST: I already won the game ✔ This lobby’s playing for second ✔ This is my last loss ✔ I win out from here ✔ My board is too lit ✔ HP is fake ✔ I’m about to spike hard ✔ That’s a fake loss ✔ 20hp? That’s 3 lives ✔ This game is over ✔ We win out ✔")
 
     @commands.command()
+    async def register(self, ctx):
+        await ctx.send("To register please use the set command. Example: [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)")
+
+    @commands.command()
     async def unik(self, ctx):
         await ctx.send("i'm the best hyperroll player on this server dont @ me")
 

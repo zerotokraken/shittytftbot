@@ -7,22 +7,22 @@ class ShittyCommands(commands.Cog):
         self.bot = bot
 
     # Command to list main commands with custom descriptions and clump remaining into one line
-    @commands.command()
+    @commands.command(name='commands', aliases=['help', 'command'])
     async def commands(self, ctx):
         # Define a static list of main commands with custom descriptions
         main_commands = {
-            'stats': 'Look up your TFT stats on tactics.tools, Include the player tag as well [.stats or .mystats]',
-            'lookup': 'Look up a specific item on a unit to return the delta [.lookup ashe flickerblades]',
+            'set': 'Set your TFT name/region for use in other commands [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)',
+            'stats': 'Look up your TFT stats on tactics.tools, Include the player tag as well [.stats or .mystats] (Must be registered with the bot with .set)',
+            'last': 'Pull the match history from your last game [.last] (Must be registered with the bot with .set)',
+            'lookup': 'Look up AVP/deltas on items & units [.lookup ashe flickerblades][.lookup ashe 2][.lookup flickerblade]',
+            'leaderboard': 'Top 10 players that are registered with the bot [.leaderboard or .lb]',
+            'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [.cutoffs NA]',
             'top': 'Look up the top 5 players in a region [.top na]',
             'roll': 'Simulate a shop roll at a specific level [.roll #]',
-            'leaderboard': 'Top 10 players that are registered with the bot [.leaderboard or .lb]',
             'malding': 'Send up to 3 random messages from the malding channel. Refreshes once an hour',
-            'avp': 'Predict your average placement. Random integer between 1.0-8.0',
+            'avp': 'Predict your average placement. Random integer between 1.0-8.0 [.avp for going fast 9]',
             'suggest': 'Suggest a command or feature [.suggest myidea]',
-            'cutoffs': 'Challenger and Grandmaster Cutoffs for a specific region [.cutoffs NA]',
             'links': 'Large list of TFT resources to include webpages, discords, youtube and reddits',
-            'set': 'Set your TFT name/region for use in other commands [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)',
-            'last': 'Pull the match history from your last game [.last]'
         }
 
         # Define a list of miscellaneous commands
