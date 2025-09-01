@@ -11,6 +11,10 @@ class Leaderboard(commands.Cog):
         self.apikey = apikey
         self.set_number = set_number
         self.tt_url = os.getenv('tt_url')
+        # List of Discord IDs to ignore in leaderboard
+        self.ignored_users = [
+            729465001915711500
+        ]
 
     def get_rank_value(self, tier, rank, league_points):
         """Helper function to convert rank to a numeric value for sorting"""
@@ -174,7 +178,8 @@ class Leaderboard(commands.Cog):
                 await ctx.send("No ranked data found for any players.")
                 return
 
-            # Sort players by rank
+            # Filter out ignored users and sort players by rank
+            player_ranks = [p for p in player_ranks if p['discord_id'] not in self.ignored_users]
             player_ranks.sort(
                 key=lambda x: self.get_rank_value(x['tier'], x['rank'], x['lp']),
                 reverse=True
