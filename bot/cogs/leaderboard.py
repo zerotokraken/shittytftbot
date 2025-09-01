@@ -66,9 +66,11 @@ class Leaderboard(commands.Cog):
             try:
                 cursor.execute('SELECT discord_id, tft_name, tft_tag, region FROM tft_settings')
                 players = cursor.fetchall()
-                print(f"Found {len(players)} registered players")
+                # Filter out ignored users before processing
+                players = [p for p in players if p[0] not in self.ignored_users]
+                print(f"Found {len(players)} eligible players")
                 if not players:
-                    await ctx.send("No registered players found.")
+                    await ctx.send("No eligible players found.")
                     return
             finally:
                 cursor.close()
@@ -178,8 +180,7 @@ class Leaderboard(commands.Cog):
                 await ctx.send("No ranked data found for any players.")
                 return
 
-            # Filter out ignored users and sort players by rank
-            player_ranks = [p for p in player_ranks if p['discord_id'] not in self.ignored_users]
+            # Sort players by rank
             player_ranks.sort(
                 key=lambda x: self.get_rank_value(x['tier'], x['rank'], x['lp']),
                 reverse=True
