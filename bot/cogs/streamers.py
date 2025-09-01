@@ -53,6 +53,16 @@ class StreamerCommands(commands.Cog):
         await ctx.send(f'{selected_line_brother}')
 
     @commands.command()
+    async def crashout(self, ctx):
+        lines_crashout = self.streamer_data.get('lines_crashout', [])
+        if not lines_crashout:
+            print("No lines available for crashout.")
+            return
+
+        selected_line_crashout = random.choice(lines_crashout)
+        await ctx.send(f'{selected_line_crashout}')
+
+    @commands.command()
     async def soju(self, ctx):
         lines_soju = self.streamer_data.get('lines_soju', [])
         if not lines_soju:
