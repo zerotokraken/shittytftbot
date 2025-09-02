@@ -13,7 +13,7 @@ class Leaderboard(commands.Cog):
         self.tt_url = os.getenv('tt_url')
         # List of Discord IDs to ignore in leaderboard
         self.ignored_users = [
-            729465001915711500
+            729465001915711488
         ]
 
     def get_rank_value(self, tier, rank, league_points):
