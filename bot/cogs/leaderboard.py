@@ -64,7 +64,7 @@ class Leaderboard(commands.Cog):
             cursor = conn.cursor()
             
             try:
-                cursor.execute('SELECT discord_id, tft_name, tft_tag, region FROM tft_settings')
+                cursor.execute('SELECT CAST(discord_id AS TEXT) AS discord_id, tft_name, tft_tag, region FROM tft_settings')
                 players = cursor.fetchall()
                 print("Filtering players...")
                 print(f"Ignored users: {self.ignored_users}")
