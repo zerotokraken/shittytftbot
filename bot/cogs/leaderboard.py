@@ -69,7 +69,7 @@ class Leaderboard(commands.Cog):
                 print("Filtering players...")
                 print(f"Ignored users: {self.ignored_users}")
                 for p in players:
-                    print(f"Checking player discord_id: {p[0]} (type: {type(p[0])})")
+                    print(f"Checking player discord_id: {str(p[0])} (original value as string)")
                 # Filter out ignored users before processing - convert both to strings to avoid integer overflow
                 players = [p for p in players if str(p[0]) not in [str(uid) for uid in self.ignored_users]]
                 print(f"Found {len(players)} eligible players after filtering")
@@ -151,7 +151,7 @@ class Leaderboard(commands.Cog):
                     top4_percentage = (tops / plays) * 100
 
                     return {
-                        'discord_id': int(discord_id),
+                        'discord_id': str(discord_id),
                         'name': name,
                         'tier': rank_data['tier'],
                         'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
@@ -201,7 +201,7 @@ class Leaderboard(commands.Cog):
                 rank_str = self.format_rank(player['tier'], player['rank'], player['lp'])
                 
                 # Get member name if possible, otherwise use TFT name
-                member = ctx.guild.get_member(player['discord_id'])
+                member = ctx.guild.get_member(int(player['discord_id']))
                 display_name = member.display_name if member else player['name']
                 
                 embed.add_field(
