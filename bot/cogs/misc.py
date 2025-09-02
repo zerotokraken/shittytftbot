@@ -156,6 +156,18 @@ class MiscCommands(commands.Cog):
         await ctx.send("oh fuck oh fuck i'm a known pivoter")
 
     @commands.command()
+    async def fries(self, ctx):
+        await ctx.send("put the fries in the BAG")
+
+    @commands.command()
+    async def g(self, ctx):
+        await ctx.send("g")
+
+    @commands.command()
+    async def gee(self, ctx):
+        await ctx.send("gee")
+
+    @commands.command()
     async def deafen(self, ctx):
         await ctx.send("no scout no pivot /deafen")
 
