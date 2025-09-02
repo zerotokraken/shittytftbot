@@ -66,9 +66,13 @@ class Leaderboard(commands.Cog):
             try:
                 cursor.execute('SELECT discord_id, tft_name, tft_tag, region FROM tft_settings')
                 players = cursor.fetchall()
+                print("Filtering players...")
+                print(f"Ignored users: {self.ignored_users}")
+                for p in players:
+                    print(f"Checking player discord_id: {p[0]} (type: {type(p[0])})")
                 # Filter out ignored users before processing
-                players = [p for p in players if p[0] not in self.ignored_users]
-                print(f"Found {len(players)} eligible players")
+                players = [p for p in players if int(p[0]) not in self.ignored_users]
+                print(f"Found {len(players)} eligible players after filtering")
                 if not players:
                     await ctx.send("No eligible players found.")
                     return
@@ -147,7 +151,7 @@ class Leaderboard(commands.Cog):
                     top4_percentage = (tops / plays) * 100
 
                     return {
-                        'discord_id': discord_id,
+                        'discord_id': int(discord_id),
                         'name': name,
                         'tier': rank_data['tier'],
                         'rank': rank_data.get('rank', 'I'),  # Default to I for Master+
