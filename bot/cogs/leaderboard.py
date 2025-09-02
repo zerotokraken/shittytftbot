@@ -70,8 +70,8 @@ class Leaderboard(commands.Cog):
                 print(f"Ignored users: {self.ignored_users}")
                 for p in players:
                     print(f"Checking player discord_id: {p[0]} (type: {type(p[0])})")
-                # Filter out ignored users before processing
-                players = [p for p in players if int(p[0]) not in self.ignored_users]
+                # Filter out ignored users before processing - convert both to strings to avoid integer overflow
+                players = [p for p in players if str(p[0]) not in [str(uid) for uid in self.ignored_users]]
                 print(f"Found {len(players)} eligible players after filtering")
                 if not players:
                     await ctx.send("No eligible players found.")
