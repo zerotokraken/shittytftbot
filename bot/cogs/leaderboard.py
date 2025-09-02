@@ -50,7 +50,7 @@ class Leaderboard(commands.Cog):
     async def leaderboard(self, ctx):
         """Show top 10 ranked players"""
         # Check if command is used in the correct channel
-        if ctx.channel.id not in [1285382023887978526, 1308312472419307602]:
+        if ctx.channel.id not in [1285382023887978526, 1308312472419307602, 1307388628275822714]:
             await ctx.send(f"This command can only be used in <#1285382023887978526>", delete_after=5)
             try:
                 await ctx.message.delete()
