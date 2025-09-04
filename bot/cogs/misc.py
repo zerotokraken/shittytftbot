@@ -277,5 +277,22 @@ class MiscCommands(commands.Cog):
     async def toxic(self, ctx):
         await ctx.send(f"{ctx.author.display_name}, I'm not sure what's going on but it seems like all of your posts have a layer of toxicness that really isn't helpful or should be a part of the tft community.\n\nYou clearly enjoy the game or you wouldn't be playing it this long, but what makes you feel like you need to communicate like this? You're a skilled player, and I wish you could set a better example.\n\nIf you think stuff needs changed, let us know, and we usually respond within a patch or two at the most.")
 
+    @commands.command()
+    async def coinflip(self, ctx, *, message=None):
+        try:
+            if message is None:
+                choice = random.choice(["Heads", "Tails"])
+                await ctx.send(f"{choice}!")
+                return
+                
+            options = message.split(" or ")
+            if len(options) != 2:
+                print("Invalid coinflip format - wrong number of options")
+                return
+            choice = random.choice(options).strip()
+            await ctx.send(f"{choice}!")
+        except Exception as e:
+            print(f"Coinflip error: {str(e)}")
+
 async def setup(bot):
     await bot.add_cog(MiscCommands(bot))
