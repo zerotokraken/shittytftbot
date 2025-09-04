@@ -7,6 +7,7 @@ from io import BytesIO
 import math
 import aiohttp
 import asyncio
+import psycopg2
 
 class Last(commands.Cog):
     def __init__(self, bot, apikey, latest_version):
@@ -587,13 +588,22 @@ class Last(commands.Cog):
             discord_id = member.id if member else ctx.author.id
             
             try:
-                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id,))
+                # Convert discord_id to string before query
+                discord_id_str = str(discord_id)
+                print(f"Looking up settings for discord_id: {discord_id_str}")
+                
+                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id_str,))
                 result = cursor.fetchone()
                 if not result:
                     await ctx.send(f"This user has not set their name and tag yet. [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)")
                     return
                 
                 name, tag, region = result
+                print(f"Found settings: name={name}, tag={tag}, region={region}")
+            except psycopg2.Error as db_error:
+                print(f"Database error in last_match: {str(db_error)}")
+                await ctx.send("Error accessing user settings. Please try again later.")
+                return
             finally:
                 cursor.close()
                 conn.close()
