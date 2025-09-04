@@ -166,14 +166,38 @@ class Last(commands.Cog):
         # For SEA region, we need to use asia region for account lookup
         account_region = 'asia' if region.lower() == 'sea' else region
         url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=self.headers) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    # Remove any numbers from region (e.g., na1 -> na)
-                    return ''.join(c for c in data['region'].lower() if not c.isdigit())
-                else:
-                    raise Exception(f"Failed to get player region: {response.status}")
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=self.headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        # Remove any numbers from region (e.g., na1 -> na)
+                        return ''.join(c for c in data['region'].lower() if not c.isdigit())
+                    elif response.status == 401:
+                        print(f"Authentication error (401) when getting player region")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+                    elif response.status == 404:
+                        print(f"Region not found for PUUID: {puuid}")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+                    elif response.status == 429:
+                        print("Rate limit exceeded when getting player region")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+                    else:
+                        print(f"Unexpected status code {response.status} when getting player region")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+        except aiohttp.ClientError as e:
+            print(f"Network error getting player region: {str(e)}")
+            # Use original region as fallback
+            print(f"Using original region {region} as fallback")
+            return region.lower()
 
     async def get_puuid(self, name, tag, region):
         """Get PUUID from Riot ID"""
@@ -185,7 +209,17 @@ class Last(commands.Cog):
                 if response.status == 200:
                     data = await response.json()
                     return data['puuid']
+                elif response.status == 401:
+                    print(f"Authentication error (401) when getting PUUID. Check API key.")
+                    raise Exception("Failed to authenticate with Riot API. Please check API key.")
+                elif response.status == 404:
+                    print(f"Player not found: {name}#{tag} in region {region}")
+                    raise Exception(f"Could not find player {name}#{tag} in region {region}")
+                elif response.status == 429:
+                    print("Rate limit exceeded when getting PUUID")
+                    raise Exception("Rate limit exceeded. Please try again later.")
                 else:
+                    print(f"Unexpected status code {response.status} when getting PUUID")
                     raise Exception(f"Failed to get PUUID: {response.status}")
 
     async def get_last_match_id(self, puuid, region):
@@ -197,8 +231,21 @@ class Last(commands.Cog):
             async with session.get(url, headers=self.headers) as response:
                 if response.status == 200:
                     data = await response.json()
+                    if not data:
+                        print(f"No recent matches found for PUUID: {puuid}")
+                        raise Exception("No recent matches found for this player")
                     return data[0]
+                elif response.status == 401:
+                    print(f"Authentication error (401) when getting match history")
+                    raise Exception("Failed to authenticate with Riot API. Please check API key.")
+                elif response.status == 404:
+                    print(f"Match history not found for PUUID: {puuid}")
+                    raise Exception("Could not find match history for this player")
+                elif response.status == 429:
+                    print("Rate limit exceeded when getting match history")
+                    raise Exception("Rate limit exceeded. Please try again later.")
                 else:
+                    print(f"Unexpected status code {response.status} when getting match history")
                     raise Exception(f"Failed to get match history: {response.status}")
 
     async def get_match_details(self, match_id, region):
@@ -210,7 +257,17 @@ class Last(commands.Cog):
             async with session.get(url, headers=self.headers) as response:
                 if response.status == 200:
                     return await response.json()
+                elif response.status == 401:
+                    print(f"Authentication error (401) when getting match details")
+                    raise Exception("Failed to authenticate with Riot API. Please check API key.")
+                elif response.status == 404:
+                    print(f"Match not found: {match_id}")
+                    raise Exception("Could not find match details. The match may have expired.")
+                elif response.status == 429:
+                    print("Rate limit exceeded when getting match details")
+                    raise Exception("Rate limit exceeded. Please try again later.")
                 else:
+                    print(f"Unexpected status code {response.status} when getting match details")
                     raise Exception(f"Failed to get match details: {response.status}")
 
     def clean_name(self, name):
@@ -565,8 +622,27 @@ class Last(commands.Cog):
                 file=discord.File(img_bytes, 'last_match.png')
             )
             
+        except aiohttp.ClientError as e:
+            print(f"Network error in last_match: {str(e)}")
+            await ctx.send(f"Network error occurred while fetching data. Please try again later.")
+            return
         except Exception as e:
-            await ctx.send(f"An error occurred, please check your name and region.")
+            error_location = ""
+            error_details = str(e)
+            
+            if "Failed to get PUUID" in error_details:
+                error_location = "getting PUUID"
+            elif "Failed to get match history" in error_details:
+                error_location = "fetching match history"
+            elif "Failed to get match details" in error_details:
+                error_location = "getting match details"
+            elif "Player not found in match data" in error_details:
+                error_location = "finding player data"
+            else:
+                error_location = "processing request"
+            
+            print(f"Error in last_match ({error_location}): {error_details}")
+            await ctx.send(f"An error occurred while {error_location}. Please check your name and region are correct.")
 
 async def setup(bot, apikey, latest_version):
     await bot.add_cog(Last(bot, apikey, latest_version))
