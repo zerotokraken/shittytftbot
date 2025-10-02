@@ -12,7 +12,20 @@ class Lookup(commands.Cog):
         self.session = None
         self.unit_special_cases = {}
         self.item_special_cases = {}
+        self.patch_number = None
         self.load_special_cases()
+
+    async def get_latest_patch(self):
+        try:
+            async with self.session.get('https://d3.tft.tools/combos/config') as response:
+                response.raise_for_status()
+                data = await response.json()
+                if 'patches' in data and len(data['patches']) > 0:
+                    return data['patches'][0]
+                raise ValueError("No patch numbers found in config")
+        except Exception as e:
+            print(f"Error fetching latest patch: {e}")
+            return 15190  # Fallback to default patch number
 
     def load_special_cases(self):
         config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config')
@@ -26,6 +39,7 @@ class Lookup(commands.Cog):
 
     async def cog_load(self):
         self.session = aiohttp.ClientSession()
+        self.patch_number = await self.get_latest_patch()
 
     async def cog_unload(self):
         if self.session:
@@ -60,7 +74,7 @@ class Lookup(commands.Cog):
                     trait_tier = trait_info[1]
 
                     # Use base URL for trait stats
-                    url = "https://d3.tft.tools/combos/base/1100/15190/1"
+                    url = f"https://d3.tft.tools/combos/base/1100/{self.patch_number}/1"
 
                     payload = {
                         "uid": ""
@@ -130,7 +144,7 @@ class Lookup(commands.Cog):
             formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
             # Use base URL for unit stats
-            url = "https://d3.tft.tools/combos/base/1100/15190/1"
+            url = f"https://d3.tft.tools/combos/base/1100/{self.patch_number}/1"
 
             payload = {
                 "uid": ""
@@ -186,7 +200,7 @@ class Lookup(commands.Cog):
             formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
             # Use base URL for unit stats
-            url = "https://d3.tft.tools/combos/explorer/1100/15190/1"
+            url = f"https://d3.tft.tools/combos/explorer/1100/{self.patch_number}/1"
 
             payload = {
                 "uid": "",
@@ -243,7 +257,7 @@ class Lookup(commands.Cog):
                     # If not in special cases, just capitalize
                     item_name = item_key.capitalize()
 
-            url = "https://d3.tft.tools/stats2/general/1100/15190/1"
+            url = f"https://d3.tft.tools/stats2/general/1100/{self.patch_number}/1"
 
             try:
                 async with self.session.get(url) as response:
@@ -302,7 +316,7 @@ class Lookup(commands.Cog):
                     return
         
         # For unit + item lookups, use the combos/explorer endpoint
-        url = "https://d3.tft.tools/combos/explorer/1100/15190/1"
+        url = f"https://d3.tft.tools/combos/explorer/1100/{self.patch_number}/1"
 
         payload = {
             "uid": "",
