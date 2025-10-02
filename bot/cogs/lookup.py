@@ -60,7 +60,7 @@ class Lookup(commands.Cog):
                     trait_tier = trait_info[1]
 
                     # Use base URL for trait stats
-                    url = "https://d3.tft.tools/combos/base/1100/15180/1"
+                    url = "https://d3.tft.tools/combos/base/1100/15190/1"
 
                     payload = {
                         "uid": ""
@@ -130,7 +130,7 @@ class Lookup(commands.Cog):
             formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
             # Use base URL for unit stats
-            url = "https://d3.tft.tools/combos/base/1100/15180/1"
+            url = "https://d3.tft.tools/combos/base/1100/15190/1"
 
             payload = {
                 "uid": ""
@@ -186,7 +186,7 @@ class Lookup(commands.Cog):
             formatted_unit_name = f"TFT{self.set_number}_{unit_name}"
 
             # Use base URL for unit stats
-            url = "https://d3.tft.tools/combos/explorer/1100/15180/1"
+            url = "https://d3.tft.tools/combos/explorer/1100/15190/1"
 
             payload = {
                 "uid": "",
@@ -243,7 +243,7 @@ class Lookup(commands.Cog):
                     # If not in special cases, just capitalize
                     item_name = item_key.capitalize()
 
-            url = "https://d3.tft.tools/stats2/general/1100/15180/1"
+            url = "https://d3.tft.tools/stats2/general/1100/15190/1"
 
             try:
                 async with self.session.get(url) as response:
@@ -302,7 +302,7 @@ class Lookup(commands.Cog):
                     return
         
         # For unit + item lookups, use the combos/explorer endpoint
-        url = "https://d3.tft.tools/combos/explorer/1100/15180/1"
+        url = "https://d3.tft.tools/combos/explorer/1100/15190/1"
 
         payload = {
             "uid": "",
