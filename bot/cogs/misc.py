@@ -136,6 +136,10 @@ class MiscCommands(commands.Cog):
         await ctx.send("Your seed has been set.")
 
     @commands.command()
+    async def manifesto(self, ctx):
+        await ctx.send("https://docs.google.com/document/d/147cXaeUqGTSlXdzMlE6AgEG2vCZNZenf5NXIIhhbYmU/edit?tab=t.0")
+
+    @commands.command()
     async def coaching(self, ctx):
         await ctx.send(
             "As a auto chess main at a respectably high elo, this game is hard to watch. Literally cringing at some of these mistakes. If you actually want to learn autochess PM me (im silver 2 24lp) I also do coaching.")
