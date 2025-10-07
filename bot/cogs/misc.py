@@ -136,8 +136,12 @@ class MiscCommands(commands.Cog):
         await ctx.send("Your seed has been set.")
 
     @commands.command()
+    async def rammus(self, ctx):
+        await ctx.send("RAMMUS PISSING XDDDDD")
+
+    @commands.command()
     async def manifesto(self, ctx):
-        await ctx.send("https://docs.google.com/document/d/147cXaeUqGTSlXdzMlE6AgEG2vCZNZenf5NXIIhhbYmU/edit?tab=t.0")
+        await ctx.send("https://docs.google.com/document/d/147cXaeUqGTSlXdzMlE6AgEG2vCZNZenf5NXIIhhbYmU")
 
     @commands.command()
     async def coaching(self, ctx):
