@@ -339,41 +339,33 @@ class Last(commands.Cog):
         for i in range(border_width):
             draw.rectangle([x + i, y + i, x + width - i, y + height - i], outline=border_color)
 
-    def get_trait_image_name(self, trait_id):
+    async def get_trait_data(self):
+        """Get TFT trait data"""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://ddragon.leagueoflegends.com/cdn/{self.version}/data/en_US/tft-trait.json") as response:
+                    if response.status == 200:
+                        return await response.json()
+            return None
+        except Exception as e:
+            print(f"Error getting trait data: {str(e)}")
+            return None
+
+    async def get_trait_image_name(self, trait_id):
         """Get the correct trait image name from the trait data"""
-        trait_data = {
-            "TFT15_Bastion": "Trait_Icon_9_Bastion.png",
-            "TFT15_BattleAcademia": "Trait_Icon_15_BattleClub.TFT_Set15.png",
-            "TFT15_Destroyer": "Trait_Icon_15_Destroyer.TFT_Set15.png",
-            "TFT15_DragonFist": "Trait_Icon_15_DragonFist.TFT_Set15.png",
-            "TFT15_Edgelord": "Trait_Icon_10_Edgelord.png",
-            "TFT15_Empyrean": "Trait_Icon_15_Empyrean.TFT_Set15.png",
-            "TFT15_Heavyweight": "Trait_Icon_15_Heavyweight.TFT_Set15.png",
-            "TFT15_Spellslinger": "Trait_Icon_15_Sorcerer.TFT_Set15.png",
-            "TFT15_MonsterTrainer": "Trait_Icon_15_MonsterTrainer.TFT_Set15.png",
-            "TFT15_OldMentor": "Trait_Icon_15_OldMentor.TFT_Set15.png",
-            "TFT15_Prodigy": "Trait_Icon_15_Prodigy.TFT_Set15.png",
-            "TFT15_Protector": "Trait_Icon_6_Protector.png",
-            "TFT15_Juggernaut": "Trait_Icon_9_Juggernaut.png",
-            "TFT15_Sniper": "Trait_Icon_6_Sniper.png",
-            "TFT15_SoulFighter": "Trait_Icon_15_SoulFighter.TFT_Set15.png",
-            "TFT15_StarGuardian": "Trait_Icon_8_StarGuardian.png",
-            "TFT15_SupremeCells": "Trait_Icon_15_SupremeCells.TFT_Set15.png",
-            "TFT15_SentaiRanger": "Trait_Icon_15_RoboRangers.TFT_Set15.png",
-            "TFT15_Luchador": "Trait_Icon_15_RingKings.TFT_Set15.png",
-            "TFT15_GemForce": "Trait_Icon_15_GemForce.TFT_Set15.png",
-            "TFT15_TheCrew": "Trait_Icon_15_StarCrew.TFT_Set15.png",
-            "TFT15_Captain": "Trait_Icon_15_RogueCaptain.TFT_Set15.png",
-            "TFT15_Rosemother": "Trait_Icon_15_Rosemother.TFT_Set15.png",
-            "TFT15_Strategist": "Trait_Icon_9_Strategist.png",
-            "TFT15_Duelist": "Trait_Icon_8_Duelist.png",
-            "TFT15_ElTigre": "Trait_Icon_15_TheChamp.TFT_Set15.png"
-        }
-        return trait_data.get(trait_id)
+        trait_data = await self.get_trait_data()
+        if not trait_data:
+            return None
+            
+        trait = trait_data['data'].get(trait_id)
+        if not trait:
+            return None
+            
+        return trait['image']['full']
 
     async def draw_trait_icon(self, draw, img, x, y, trait_id, trait_style, num_units):
         """Draw a trait icon with count and background"""
-        image_name = self.get_trait_image_name(trait_id)
+        image_name = await self.get_trait_image_name(trait_id)
         if not image_name:
             return False
         
@@ -510,7 +502,7 @@ class Last(commands.Cog):
             items = unit.get('itemNames', [])
             rarity = unit['rarity']
             
-            champ_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft15_{champion_name.lower()}/skins/base/images/tft15_{champion_name.lower()}_mobile.tft_set15.png"
+            champ_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft16_{champion_name.lower()}/skins/base/images/tft15_{champion_name.lower()}_mobile.tft_set15.png"
             champ_img = await self.download_image(champ_url)
             
             if champ_img:
