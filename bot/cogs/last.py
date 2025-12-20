@@ -10,10 +10,11 @@ import asyncio
 import psycopg2
 
 class Last(commands.Cog):
-    def __init__(self, bot, apikey, latest_version):
+    def __init__(self, bot, apikey, latest_version, set_number):
         self.bot = bot
         self.apikey = apikey
         self.version = latest_version
+        self.set_number = set_number
         self.headers = {"X-Riot-Token": self.apikey}
         
         # Trait style colors (based on TFT in-game colors)
@@ -273,7 +274,7 @@ class Last(commands.Cog):
 
     def clean_name(self, name):
         """Clean champion name for URL"""
-        name = name.replace("TFT15_", "").replace("tft15_", "")
+        name = name.replace(f"TFT{self.set_number}_", "").replace(f"tft{self.set_number}_", "")
         
         # Special cases
         special_cases = {
@@ -502,7 +503,7 @@ class Last(commands.Cog):
             items = unit.get('itemNames', [])
             rarity = unit['rarity']
             
-            champ_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft16_{champion_name.lower()}/skins/base/images/tft15_{champion_name.lower()}_mobile.tft_set15.png"
+            champ_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/tft{self.set_number}_{champion_name.lower()}_mobile.tft_set{self.set_number}.png"
             champ_img = await self.download_image(champ_url)
             
             if champ_img:
@@ -646,5 +647,5 @@ class Last(commands.Cog):
             print(f"Error in last_match ({error_location}): {error_details}")
             await ctx.send(f"An error occurred while {error_location}. Please check your name and region are correct.")
 
-async def setup(bot, apikey, latest_version):
-    await bot.add_cog(Last(bot, apikey, latest_version))
+async def setup(bot, apikey, latest_version, set_number):
+    await bot.add_cog(Last(bot, apikey, latest_version, set_number))
