@@ -281,8 +281,10 @@ class Lookup(commands.Cog):
             return
 
         # Handle unit + item lookup
+        print("Entering unit + item lookup section")
         unit_name = args[0]
         item_name = " ".join(args[1:])  # Combine remaining args for item name
+        print(f"Processing lookup for unit: {unit_name}, item: {item_name}")
         
         # Handle unit name (case-insensitive)
         unit_key = unit_name.replace(" ", "").lower()
@@ -335,11 +337,23 @@ class Lookup(commands.Cog):
         }
 
         try:
+            print(f"Making request to {url}")
             async with self.session.post(url, json=payload, headers=headers) as response:
                 response.raise_for_status()
                 data = await response.json()
+                print(f"Response status: {response.status}")
+                print(f"Response data: {json.dumps(data, indent=2)}")
 
-            if isinstance(data, dict) and 'unitItems' in data:
+                if not isinstance(data, dict):
+                    print(f"Unexpected data type: {type(data)}")
+                    await ctx.send("Error: Unexpected data format from API")
+                    return
+
+                if 'unitItems' not in data:
+                    print(f"Missing unitItems in data. Keys present: {list(data.keys())}")
+                    await ctx.send("Error: Unexpected data format from API")
+                    return
+
                 for unit_item in data['unitItems']:
                     if isinstance(unit_item, list) and len(unit_item) >= 4:
                         current_unit = unit_item[0]
@@ -354,14 +368,3 @@ class Lookup(commands.Cog):
                                 # Format to 2 decimal places and add + for positive numbers
                                 delta_formatted = '{:+.2f}'.format(delta)
                                 await ctx.send(f"Delta: {delta_formatted}")
-                            else:
-                                await ctx.send(f"Delta: {delta}")
-                            return
-                
-                await ctx.send(f"No data found for {item_name} on {unit_name}")
-            
-        except aiohttp.ClientError as e:
-            await ctx.send(f"Error occurred: {str(e)}")
-
-async def setup(bot, set_number):
-    await bot.add_cog(Lookup(bot, set_number))
