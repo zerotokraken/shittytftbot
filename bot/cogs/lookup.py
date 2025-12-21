@@ -85,10 +85,6 @@ class Lookup(commands.Cog):
                     }
 
                     try:
-                        # Debug logging for request
-                        print(f"Sending request to {url}")
-                        print(f"Payload: {json.dumps(payload, indent=2)}")
-                        
                         async with self.session.post(url, json=payload, headers=headers) as response:
                             response.raise_for_status()
                             data = await response.json()
@@ -342,21 +338,14 @@ class Lookup(commands.Cog):
             async with self.session.post(url, json=payload, headers=headers) as response:
                 response.raise_for_status()
                 data = await response.json()
-                
-                # Debug logging for API response
-                print(f"API Response Data Structure:")
-                print(json.dumps(data, indent=2))
-                print(f"\nLooking for unit: {formatted_unit_name} with item: {item_name}")
+
             if isinstance(data, dict) and 'unitItems' in data:
-                print(f"Found {len(data['unitItems'])} unit-item pairs in data")
                 for unit_item in data['unitItems']:
                     if isinstance(unit_item, list) and len(unit_item) >= 4:
                         current_unit = unit_item[0]
                         current_item = unit_item[2]
                         item_stats = unit_item[3]
                         
-                        # Debug logging
-                        print(f"Comparing: {current_unit} == {formatted_unit_name} and {item_name.lower()} == {current_item.lower()}")
                         if current_unit == formatted_unit_name and item_name.lower() == current_item.lower():
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
