@@ -368,3 +368,14 @@ class Lookup(commands.Cog):
                                 # Format to 2 decimal places and add + for positive numbers
                                 delta_formatted = '{:+.2f}'.format(delta)
                                 await ctx.send(f"Delta: {delta_formatted}")
+                            else:
+                                await ctx.send(f"Delta: {delta}")
+                            return
+                
+                await ctx.send(f"No data found for {item_name} on {unit_name}")
+            
+        except aiohttp.ClientError as e:
+            await ctx.send(f"Error occurred: {str(e)}")
+
+async def setup(bot, set_number):
+    await bot.add_cog(Lookup(bot, set_number))
