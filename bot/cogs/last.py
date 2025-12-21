@@ -292,6 +292,27 @@ class Last(commands.Cog):
         
         return name
 
+    async def get_champion_image_filename(self, champion_name):
+        """Get the champion image filename from communitydragon directory"""
+        try:
+            base_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(base_url) as response:
+                    if response.status == 200:
+                        # Parse the HTML directory listing
+                        html = await response.text()
+                        # Look for .png files that contain the champion name
+                        import re
+                        pattern = f'tft{self.set_number}_{champion_name.lower()}_.*?.png'
+                        matches = re.findall(pattern, html, re.IGNORECASE)
+                        if matches:
+                            # Return the first matching filename
+                            return matches[0]
+            return None
+        except Exception as e:
+            print(f"Error getting champion image filename: {str(e)}")
+            return None
+
     async def download_image(self, url):
         """Download an image from URL and return as PIL Image"""
         try:
@@ -503,8 +524,14 @@ class Last(commands.Cog):
             items = unit.get('itemNames', [])
             rarity = unit['rarity']
             
-            champ_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/tft{self.set_number}_{champion_name.lower()}_splash_tile_0.tft_set{self.set_number}.png"
-            champ_img = await self.download_image(champ_url)
+            # Get champion image filename
+            image_filename = await self.get_champion_image_filename(champion_name)
+            if image_filename:
+                base_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/"
+                champ_url = base_url + image_filename
+                champ_img = await self.download_image(champ_url)
+            else:
+                champ_img = None
             
             if champ_img:
                 try:
