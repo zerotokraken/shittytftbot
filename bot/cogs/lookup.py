@@ -346,6 +346,8 @@ class Lookup(commands.Cog):
                         current_item = unit_item[2]
                         item_stats = unit_item[3]
                         
+                        # Debug logging
+                        print(f"Comparing: {current_unit} == {formatted_unit_name} and {item_name.lower()} == {current_item.lower()}")
                         if current_unit == formatted_unit_name and item_name.lower() == current_item.lower():
                             delta = item_stats.get('delta', 'N/A')
                             if delta != 'N/A':
