@@ -342,7 +342,6 @@ class Lookup(commands.Cog):
                 response.raise_for_status()
                 data = await response.json()
                 print(f"Response status: {response.status}")
-                print(f"Response data: {json.dumps(data, indent=2)}")
 
                 if not isinstance(data, dict):
                     print(f"Unexpected data type: {type(data)}")
