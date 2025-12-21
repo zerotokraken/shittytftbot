@@ -337,39 +337,52 @@ class Lookup(commands.Cog):
         }
 
         try:
-            print(f"Making request to {url}")
             async with self.session.post(url, json=payload, headers=headers) as response:
                 response.raise_for_status()
                 data = await response.json()
-                print(f"Response status: {response.status}")
 
                 if not isinstance(data, dict):
-                    print(f"Unexpected data type: {type(data)}")
                     await ctx.send("Error: Unexpected data format from API")
                     return
 
-                if 'unitItems' not in data:
-                    print(f"Missing unitItems in data. Keys present: {list(data.keys())}")
-                    await ctx.send("Error: Unexpected data format from API")
-                    return
+                print("Checking unitItems and unitItems2 arrays")
+                # Check unitItems array
+                if 'unitItems' in data:
+                    print("Checking unitItems array")
+                    for unit_item in data['unitItems']:
+                        if isinstance(unit_item, list) and len(unit_item) >= 4:
+                            current_unit = unit_item[0]
+                            current_item = unit_item[2]
+                            item_stats = unit_item[3]
+                            
+                            if current_unit == formatted_unit_name and item_name.lower() == current_item.lower():
+                                delta = item_stats.get('delta', 'N/A')
+                                if delta != 'N/A':
+                                    delta_formatted = '{:+.2f}'.format(delta)
+                                    await ctx.send(f"Delta: {delta_formatted}")
+                                    return
+                                else:
+                                    await ctx.send(f"Delta: {delta}")
+                                    return
 
-                for unit_item in data['unitItems']:
-                    if isinstance(unit_item, list) and len(unit_item) >= 4:
-                        current_unit = unit_item[0]
-                        current_item = unit_item[2]
-                        item_stats = unit_item[3]
-                        
-                        # Debug logging
-                        print(f"Comparing: {current_unit} == {formatted_unit_name} and {item_name.lower()} == {current_item.lower()}")
-                        if current_unit == formatted_unit_name and item_name.lower() == current_item.lower():
-                            delta = item_stats.get('delta', 'N/A')
-                            if delta != 'N/A':
-                                # Format to 2 decimal places and add + for positive numbers
-                                delta_formatted = '{:+.2f}'.format(delta)
-                                await ctx.send(f"Delta: {delta_formatted}")
-                            else:
-                                await ctx.send(f"Delta: {delta}")
-                            return
+                # Check unitItems2 array if no match found in unitItems
+                if 'unitItems2' in data:
+                    print("Checking unitItems2 array")
+                    for unit_item in data['unitItems2']:
+                        if isinstance(unit_item, list) and len(unit_item) >= 4:
+                            current_unit = unit_item[0]
+                            current_item = unit_item[2]
+                            item_stats = unit_item[3]
+                            
+                            if current_unit == formatted_unit_name and item_name.lower() == current_item.lower():
+                                delta = item_stats.get('delta', 'N/A')
+                                if delta != 'N/A':
+                                    delta_formatted = '{:+.2f}'.format(delta)
+                                    await ctx.send(f"Delta: {delta_formatted}")
+                                    return
+                                else:
+                                    await ctx.send(f"Delta: {delta}")
+                                    return
                 
                 await ctx.send(f"No data found for {item_name} on {unit_name}")
             
