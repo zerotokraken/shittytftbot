@@ -503,7 +503,7 @@ class Last(commands.Cog):
             items = unit.get('itemNames', [])
             rarity = unit['rarity']
             
-            champ_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/tft{self.set_number}_{champion_name.lower()}_mobile.tft_set{self.set_number}.png"
+            champ_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/tft{self.set_number}_{champion_name.lower()}_splash_tile_0.tft_set{self.set_number}.png"
             champ_img = await self.download_image(champ_url)
             
             if champ_img:
