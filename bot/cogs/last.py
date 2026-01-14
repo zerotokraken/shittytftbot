@@ -672,7 +672,7 @@ class Last(commands.Cog):
                 error_location = "processing request"
             
             print(f"Error in last_match ({error_location}): {error_details}")
-            await ctx.send(f"An error occurred while {error_location}. Please check your name and region are correct.")
+            await ctx.send(f"An error occurred while {error_location}. Please check your name and region are correct. [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)")
 
 async def setup(bot, apikey, latest_version, set_number):
     await bot.add_cog(Last(bot, apikey, latest_version, set_number))
