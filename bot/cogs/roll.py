@@ -6,11 +6,12 @@ from PIL import Image
 from io import BytesIO
 
 class RollCommands(commands.Cog):
-    def __init__(self, bot, champions_data, latest_version, shop_odds):
+    def __init__(self, bot, champions_data, latest_version, shop_odds, set_number):
         self.bot = bot
         self.champions_data = champions_data
         self.latest_version = latest_version
         self.shop_odds = shop_odds
+        self.set_number = set_number
 
     @commands.command()
     async def roll(self, ctx, level: int = 5):
@@ -25,7 +26,7 @@ class RollCommands(commands.Cog):
         results = []
 
         # Filter out champions with "Tutorial" in their name
-        valid_champions = {name: details for name, details in self.champions_data.items() if "TFT15" in details['id']}
+        valid_champions = {name: details for name, details in self.champions_data.items() if f"TFT{self.set_number}" in details['id']}
 
         # Roll champions based on the odds
         for tier in tiers:
@@ -86,5 +87,5 @@ class RollCommands(commands.Cog):
         else:
             await ctx.send("No images available to display.")
 
-async def setup(bot, champions_data, latest_version, shop_odds):
-    await bot.add_cog(RollCommands(bot, champions_data, latest_version, shop_odds))
+async def setup(bot, champions_data, latest_version, shop_odds, set_number):
+    await bot.add_cog(RollCommands(bot, champions_data, latest_version, shop_odds, set_number))
