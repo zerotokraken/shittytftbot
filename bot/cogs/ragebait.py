@@ -81,7 +81,7 @@ class RagebaitCommand(commands.Cog):
             return None
 
     @commands.command()
-    @commands.cooldown(1, 30, commands.BucketType.user)  # 30 second cooldown per user
+    @commands.cooldown(1, 5, commands.BucketType.user)  # 30 second cooldown per user
     async def ragebait(self, ctx):
 
         if ctx.author.id == "372292699597832192":  # Replace with your Discord ID
