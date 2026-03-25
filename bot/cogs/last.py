@@ -1,0 +1,678 @@
+import discord
+from discord.ext import commands
+import requests
+from PIL import Image, ImageDraw, ImageFont
+import os
+from io import BytesIO
+import math
+import aiohttp
+import asyncio
+import psycopg2
+
+class Last(commands.Cog):
+    def __init__(self, bot, apikey, latest_version, set_number):
+        self.bot = bot
+        self.apikey = apikey
+        self.version = latest_version
+        self.set_number = set_number
+        self.headers = {"X-Riot-Token": self.apikey}
+        
+        # Trait style colors (based on TFT in-game colors)
+        self.TRAIT_COLORS = {
+            0: '#5f5f5f',  # Gray for inactive
+            1: '#bf8f3f',  # Bronze
+            2: '#7e7e7e',  # Silver
+            3: '#ffd700',  # Gold
+            4: '#ff4de1'   # Chromatic/Prismatic
+        }
+
+        # Champion rarity colors
+        self.RARITY_COLORS = {
+            0: '#808080',  # Gray for 1-cost
+            1: '#11b288',  # Green for 2-cost
+            2: '#207ac7',  # Blue for 3-cost
+            4: '#c440da',  # Purple for 4-cost
+            5: '#ffb93b',  # Gold for special units
+            6: '#ffb93b'   # Gold for 5-cost
+        }
+
+        # Placement colors
+        self.PLACEMENT_COLORS = {
+            1: '#FFD700',  # Gold
+            2: '#c440da',  # Purple
+            3: '#207ac7',  # Blue
+            4: '#00FF00',  # Green
+            5: '#808080',  # Gray
+            6: '#808080',
+            7: '#808080',
+            8: '#808080'
+        }
+
+        # Load font for trait numbers
+        self.font = ImageFont.load_default()
+
+    def draw_number(self, draw, number, x, y, size, color):
+        """Draw a large number using vector paths"""
+        # Define number paths (normalized to 100x100 grid)
+        number_paths = {
+            '0': [(30, 20), (70, 20), (70, 80), (30, 80), (30, 20)],  # Added "0"
+            '1': [(50, 20), (50, 80)],  # Simple vertical line for "1"
+            '2': [(30, 20), (70, 20), (70, 50), (30, 50), (30, 80), (70, 80)],
+            '3': [(30, 20), (70, 20), (70, 50), (30, 50), (70, 50), (70, 80), (30, 80)],  # Fixed "3" with middle connection
+            '4': [(30, 20), (30, 50), (70, 50), (70, 20), (70, 80)],
+            '5': [(70, 20), (30, 20), (30, 50), (70, 50), (70, 80), (30, 80)],
+            '6': [(70, 20), (30, 20), (30, 80), (70, 80), (70, 50), (30, 50)],
+            '7': [(30, 20), (70, 20), (70, 80)],
+            '8': [(30, 20), (70, 20), (70, 80), (30, 80), (30, 20), (30, 50), (70, 50)],
+            '9': [(70, 80), (70, 20), (30, 20), (30, 50), (70, 50)]
+        }
+
+        # Convert number to string and get number of digits
+        num_str = str(number)
+        num_digits = len(num_str)
+        
+        # Calculate spacing and total width
+        digit_spacing = size * 0.4  # Reduced spacing between digits
+        total_width = size + (digit_spacing * (num_digits - 1))  # Total width including spacing
+        
+        # Calculate starting x position to center the entire number
+        start_x = x - (total_width - size) / 2
+        
+        # Draw each digit
+        for i, digit in enumerate(num_str):
+            path = number_paths.get(digit)
+            if path:
+                scale = size / 100
+                # Position each digit with the calculated spacing
+                digit_x = start_x + (i * digit_spacing)
+                scaled_path = [(digit_x + px * scale, y + py * scale) for px, py in path]
+                draw.line(scaled_path, fill=color, width=int(size/10))
+
+    def draw_large_text(self, draw, text, x, y, color, scale=2):
+        """Draw text at a larger scale"""
+        # Get original text size
+        text_bbox = draw.textbbox((0, 0), text, font=self.font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
+        
+        # Create a temporary image for the text
+        text_img = Image.new('RGBA', (text_width * scale, text_height * scale), (0, 0, 0, 0))
+        text_draw = ImageDraw.Draw(text_img)
+        
+        # Draw text in white
+        text_draw.text((0, 0), text, font=self.font, fill='white')
+        
+        # Scale up the text
+        text_img = text_img.resize((text_width * scale, text_height * scale), Image.NEAREST)
+        
+        # Convert white to desired color
+        if color != 'white':
+            data = text_img.getdata()
+            new_data = []
+            for item in data:
+                if item[3] > 0:  # If pixel is not transparent
+                    # Convert hex color to RGB if needed
+                    if isinstance(color, str) and color.startswith('#'):
+                        r = int(color[1:3], 16)
+                        g = int(color[3:5], 16)
+                        b = int(color[5:7], 16)
+                        new_data.append((r, g, b, item[3]))
+                    else:
+                        new_data.append((*color, item[3]))
+                else:
+                    new_data.append(item)
+            text_img.putdata(new_data)
+        
+        # Paste onto main image
+        draw._image.paste(text_img, (x, y), text_img)
+
+    async def get_tactician_data(self):
+        """Get TFT tactician data"""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://ddragon.leagueoflegends.com/cdn/{self.version}/data/en_US/tft-tactician.json") as response:
+                    if response.status == 200:
+                        return await response.json()
+            return None
+        except Exception as e:
+            print(f"Error getting tactician data: {str(e)}")
+            return None
+
+    async def get_tactician_icon(self, companion_data):
+        """Get tactician icon based on companion data"""
+        try:
+            print(f"Companion data received: {companion_data}")
+            
+            tactician_data = await self.get_tactician_data()
+            if not tactician_data:
+                return None
+            
+            item_id = str(companion_data.get('item_ID'))
+            print(f"Looking for tactician with item ID: {item_id}")
+            
+            tactician = tactician_data['data'].get(item_id)
+            if not tactician:
+                print(f"Could not find tactician with item ID: {item_id}")
+                return None
+            
+            image_data = tactician['image']
+            icon_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-tactician/{image_data['full']}"
+            
+            return await self.download_image(icon_url)
+        except Exception as e:
+            print(f"Error getting tactician icon: {str(e)}")
+            return None
+
+    async def get_player_region(self, puuid, region):
+        """Get player's region for tactics.tools link"""
+        # For SEA region, we need to use asia region for account lookup
+        account_region = 'asia' if region.lower() == 'sea' else region
+        url = f"https://{account_region}.api.riotgames.com/riot/account/v1/region/by-game/tft/by-puuid/{puuid}"
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=self.headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        # Remove any numbers from region (e.g., na1 -> na)
+                        return ''.join(c for c in data['region'].lower() if not c.isdigit())
+                    elif response.status == 401:
+                        print(f"Authentication error (401) when getting player region")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+                    elif response.status == 404:
+                        print(f"Region not found for PUUID: {puuid}")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+                    elif response.status == 429:
+                        print("Rate limit exceeded when getting player region")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+                    else:
+                        print(f"Unexpected status code {response.status} when getting player region")
+                        # Use original region as fallback
+                        print(f"Using original region {region} as fallback")
+                        return region.lower()
+        except aiohttp.ClientError as e:
+            print(f"Network error getting player region: {str(e)}")
+            # Use original region as fallback
+            print(f"Using original region {region} as fallback")
+            return region.lower()
+
+    async def get_puuid(self, name, tag, region):
+        """Get PUUID from Riot ID"""
+        # For SEA region, we need to use asia region for account lookup
+        account_region = 'asia' if region.lower() == 'sea' else region
+        url = f"https://{account_region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=self.headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data['puuid']
+                elif response.status == 401:
+                    print(f"Authentication error (401) when getting PUUID. Check API key.")
+                    raise Exception("Failed to authenticate with Riot API. Please check API key.")
+                elif response.status == 404:
+                    print(f"Player not found: {name}#{tag} in region {region}")
+                    raise Exception(f"Could not find player {name}#{tag} in region {region}")
+                elif response.status == 429:
+                    print("Rate limit exceeded when getting PUUID")
+                    raise Exception("Rate limit exceeded. Please try again later.")
+                else:
+                    print(f"Unexpected status code {response.status} when getting PUUID")
+                    raise Exception(f"Failed to get PUUID: {response.status}")
+
+    async def get_last_match_id(self, puuid, region):
+        """Get the last match ID for a player"""
+        # For SEA region, we need to use sea region for match lookups
+        match_region = region
+        url = f"https://{match_region}.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?count=1"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=self.headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if not data:
+                        print(f"No recent matches found for PUUID: {puuid}")
+                        raise Exception("No recent matches found for this player")
+                    return data[0]
+                elif response.status == 401:
+                    print(f"Authentication error (401) when getting match history")
+                    raise Exception("Failed to authenticate with Riot API. Please check API key.")
+                elif response.status == 404:
+                    print(f"Match history not found for PUUID: {puuid}")
+                    raise Exception("Could not find match history for this player")
+                elif response.status == 429:
+                    print("Rate limit exceeded when getting match history")
+                    raise Exception("Rate limit exceeded. Please try again later.")
+                else:
+                    print(f"Unexpected status code {response.status} when getting match history")
+                    raise Exception(f"Failed to get match history: {response.status}")
+
+    async def get_match_details(self, match_id, region):
+        """Get details for a specific match"""
+        # For SEA region, we need to use sea region for match lookups
+        match_region = region
+        url = f"https://{match_region}.api.riotgames.com/tft/match/v1/matches/{match_id}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=self.headers) as response:
+                if response.status == 200:
+                    return await response.json()
+                elif response.status == 401:
+                    print(f"Authentication error (401) when getting match details")
+                    raise Exception("Failed to authenticate with Riot API. Please check API key.")
+                elif response.status == 404:
+                    print(f"Match not found: {match_id}")
+                    raise Exception("Could not find match details. The match may have expired.")
+                elif response.status == 429:
+                    print("Rate limit exceeded when getting match details")
+                    raise Exception("Rate limit exceeded. Please try again later.")
+                else:
+                    print(f"Unexpected status code {response.status} when getting match details")
+                    raise Exception(f"Failed to get match details: {response.status}")
+
+    def clean_name(self, name):
+        """Clean champion name for URL"""
+        name = name.replace(f"TFT{self.set_number}_", "").replace(f"tft{self.set_number}_", "")
+        
+        # Special cases
+        special_cases = {
+            "drmundo": "DrMundo",
+            "leesin": "LeeSin",
+            "twistedfate": "TwistedFate",
+            "kogmaw": "KogMaw",
+            "reksai": "RekSai",
+            "masteryi": "MasterYi"
+        }
+        
+        name_lower = name.lower()
+        if name_lower in special_cases:
+            return special_cases[name_lower]
+        
+        return name
+
+    async def get_champion_image_filename(self, champion_name):
+        """Get the champion image filename from communitydragon directory"""
+        try:
+            base_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(base_url) as response:
+                    if response.status == 200:
+                        # Parse the HTML directory listing
+                        html = await response.text()
+                        # Look for .png files that contain the champion name
+                        import re
+                        pattern = f'tft{self.set_number}_{champion_name.lower()}_.*?.png'
+                        matches = re.findall(pattern, html, re.IGNORECASE)
+                        if matches:
+                            # Return the first matching filename
+                            return matches[0]
+            return None
+        except Exception as e:
+            print(f"Error getting champion image filename: {str(e)}")
+            return None
+
+    async def download_image(self, url):
+        """Download an image from URL and return as PIL Image"""
+        try:
+            print(f"Downloading image from: {url}")
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        data = await response.read()
+                        return Image.open(BytesIO(data))
+            return None
+        except Exception as e:
+            print(f"Failed to download image from {url}: {str(e)}")
+            return None
+
+    def draw_star(self, draw, x, y, size):
+        """Draw a star shape using polygon"""
+        outer_radius = size / 2
+        inner_radius = size / 4
+        points = []
+        
+        for i in range(10):
+            angle = math.pi / 5 * i - math.pi / 2
+            radius = outer_radius if i % 2 == 0 else inner_radius
+            points.append((
+                x + radius * math.cos(angle),
+                y + radius * math.sin(angle)
+            ))
+        
+        draw.polygon(points, fill='white')
+
+    def draw_star_background(self, draw, x, y, width, height, num_stars):
+        """Draw a rounded rectangle background with stars"""
+        draw.rectangle([x, y, x + width, y + height], fill='#607D8B')
+        
+        star_size = height - 4
+        star_spacing = (width - star_size * num_stars) / (num_stars + 1)
+        
+        for i in range(num_stars):
+            star_x = x + star_spacing * (i + 1) + star_size * i + star_size/2
+            star_y = y + height/2
+            self.draw_star(draw, star_x, star_y, star_size)
+
+    def draw_bordered_rectangle(self, draw, x, y, width, height, border_color, fill_color=None, border_width=2):
+        """Draw a rectangle with a border"""
+        draw.rectangle([x, y, x + width, y + height], outline=border_color, fill=fill_color)
+        for i in range(border_width):
+            draw.rectangle([x + i, y + i, x + width - i, y + height - i], outline=border_color)
+
+    async def get_trait_data(self):
+        """Get TFT trait data"""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://ddragon.leagueoflegends.com/cdn/{self.version}/data/en_US/tft-trait.json") as response:
+                    if response.status == 200:
+                        return await response.json()
+            return None
+        except Exception as e:
+            print(f"Error getting trait data: {str(e)}")
+            return None
+
+    async def get_trait_image_name(self, trait_id):
+        """Get the correct trait image name from the trait data"""
+        trait_data = await self.get_trait_data()
+        if not trait_data:
+            return None
+            
+        trait = trait_data['data'].get(trait_id)
+        if not trait:
+            return None
+            
+        return trait['image']['full']
+
+    async def draw_trait_icon(self, draw, img, x, y, trait_id, trait_style, num_units):
+        """Draw a trait icon with count and background"""
+        image_name = await self.get_trait_image_name(trait_id)
+        if not image_name:
+            return False
+        
+        icon_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-trait/{image_name}"
+        icon_img = await self.download_image(icon_url)
+        
+        if icon_img:
+            try:
+                icon_img = icon_img.resize((48, 48))  # Increased from 32x32
+                bg_color = self.TRAIT_COLORS.get(trait_style, '#5f5f5f')
+                draw.rectangle([x, y, x + 48, y + 48], fill=bg_color)  # Increased from 32x32
+                img.paste(icon_img, (x, y), icon_img)
+                
+                # Draw trait count background circle
+                number_size = 16  # Reduced size for trait count
+                circle_size = number_size + 6  # Smaller circle with less padding
+                circle_x = x + 48 - circle_size + 1  # Moved right by 3 pixels
+                circle_y = y + 48 - circle_size + 1  # Moved down by 3 pixels
+                
+                # Draw dark circle background with white border
+                draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], 
+                           fill='#2F3136', outline='white')
+                
+                # Draw trait count
+                count_text = str(num_units)
+                text_x = circle_x + (circle_size - number_size) // 2
+                text_y = circle_y + (circle_size - number_size) // 2
+                self.draw_number(draw, count_text, text_x, text_y, number_size, 'white')
+                
+                return True
+            except Exception as e:
+                print(f"Error processing trait icon {trait_id}: {str(e)}")
+                return False
+        return False
+
+    async def create_match_image(self, match_data, puuid):
+        """Create a horizontal image showing placement, units with stars and items"""
+        # Find player data
+        player_data = None
+        for participant in match_data['info']['participants']:
+            if participant['puuid'] == puuid:
+                player_data = participant
+                break
+        
+        if not player_data:
+            raise Exception("Player not found in match data")
+        
+        # Calculate dimensions
+        unit_width = 120
+        unit_spacing = 10  # Reduced spacing between units
+        left_margin = 265  # Increased from 200 to give more space for summoner icon
+        right_margin = 20
+        num_units = len(player_data['units'])
+        width = left_margin + (unit_width + unit_spacing) * num_units + right_margin
+        height = 220  # Increased from 200 to add padding
+        
+        # Create image
+        img = Image.new('RGB', (width, height), color='#36393F')
+        draw = ImageDraw.Draw(img)
+        
+        # Draw placement box
+        placement = player_data['placement']
+        placement_color = self.PLACEMENT_COLORS.get(placement, '#808080')
+        
+        # Create darker background color
+        bg_color = placement_color
+        if bg_color.startswith('#'):
+            r = int(bg_color[1:3], 16)
+            g = int(bg_color[3:5], 16)
+            b = int(bg_color[5:7], 16)
+            bg_color = f'#{r//2:02x}{g//2:02x}{b//2:02x}'
+        
+        box_size = 100  # Increased from 65 for larger text
+        box_x = 20
+        box_y = height//4  # Moved placement box and summoner icon further down
+        
+        # Draw placement box
+        draw.rectangle([box_x, box_y, box_x + box_size, box_y + box_size], 
+                      fill=bg_color, outline=placement_color)
+        draw.rectangle([box_x+1, box_y+1, box_x + box_size-1, box_y + box_size-1], 
+                      outline=placement_color)
+        
+        # Draw placement number
+        text = str(placement)
+        number_size = 60  # Size of the number
+        text_x = box_x + (box_size - number_size) // 2
+        text_y = box_y + (box_size - number_size) // 2
+        self.draw_number(draw, text, text_x, text_y, number_size, placement_color)
+        
+        # Draw summoner icon
+        icon_size = 100  # Increased from 65 to match placement box
+        icon_x = box_x + box_size + 20
+        icon_y = box_y
+        
+        icon_img = await self.get_tactician_icon(player_data.get('companion', {}))
+        if icon_img:
+            try:
+                icon_img = icon_img.resize((icon_size, icon_size))
+                mask = Image.new('L', (icon_size, icon_size), 0)
+                mask_draw = ImageDraw.Draw(mask)
+                mask_draw.ellipse([0, 0, icon_size, icon_size], fill=255)
+                img.paste(icon_img, (icon_x, icon_y), mask)
+            except Exception as e:
+                print(f"Error processing summoner icon: {str(e)}")
+                draw.ellipse([icon_x, icon_y, icon_x + icon_size, icon_y + icon_size], fill='#2F3136')
+        else:
+            draw.ellipse([icon_x, icon_y, icon_x + icon_size, icon_y + icon_size], fill='#2F3136')
+        
+        # Draw level
+        level_text = str(player_data['level'])
+        number_size = 30  # Smaller size for level number
+        
+        circle_size = number_size + 12
+        circle_x = icon_x + icon_size - circle_size - 2
+        circle_y = icon_y + icon_size - circle_size - 2
+        
+        draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], 
+                     fill='#2F3136')
+        draw.ellipse([circle_x, circle_y, circle_x + circle_size, circle_y + circle_size], 
+                     outline='white', width=1)
+        
+        # Draw level text
+        text_x = circle_x + (circle_size - number_size) // 2
+        text_y = circle_y + (circle_size - number_size) // 2
+        self.draw_number(draw, level_text, text_x, text_y, number_size, 'white')
+        
+        # Draw units
+        unit_start_x = left_margin
+        y_pos = 30  # Reduced from 40 to bring units closer to summoner icon
+        
+        for i, unit in enumerate(player_data['units']):
+            champion_name = self.clean_name(unit['character_id'])
+            unit_stars = unit['tier']
+            items = unit.get('itemNames', [])
+            rarity = unit['rarity']
+            
+            # Get champion image filename
+            image_filename = await self.get_champion_image_filename(champion_name)
+            if image_filename:
+                base_url = f"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft{self.set_number}_{champion_name.lower()}/skins/base/images/"
+                champ_url = base_url + image_filename
+                champ_img = await self.download_image(champ_url)
+            else:
+                champ_img = None
+            
+            if champ_img:
+                try:
+                    x_pos = unit_start_x + (unit_width + unit_spacing) * i
+                    
+                    # Draw stars
+                    if unit_stars > 0:
+                        star_width = 44
+                        star_height = 17
+                        star_x = x_pos + (96 - star_width) // 2  # Adjusted for new champion size
+                        star_y = y_pos - star_height - 3
+                        self.draw_star_background(draw, star_x, star_y, star_width, star_height, unit_stars)
+                    
+                    # Draw champion border - gold for 3-star units, otherwise based on rarity
+                    border_color = '#FFD700' if unit_stars == 3 else self.RARITY_COLORS.get(rarity, '#FFFFFF')
+                    self.draw_bordered_rectangle(draw, x_pos-2, y_pos-2, 100, 100, border_color)  # Increased from 84x84
+                    
+                    # Place champion
+                    champ_img = champ_img.resize((96, 96))  # Increased from 80x80
+                    img.paste(champ_img, (x_pos, y_pos))
+                    
+                    # Draw items
+                    if items:
+                        item_size = 32  # Increased from 25x25
+                        item_spacing = item_size + 2  # Add just 2 pixels of spacing between items
+                        item_y = y_pos + 96 - item_size + 3  # Added 3 pixels of padding at bottom
+                        # Calculate total width of items including gaps
+                        total_items_width = (item_size * len(items)) + ((len(items) - 1) * (item_spacing - item_size))
+                        # Center items by starting at half the remaining space
+                        item_x = x_pos + (96 - total_items_width) // 2 + 1  # Added 1 pixel to center
+                        for j, item_name in enumerate(items):
+                            # Use the full item name in the URL
+                            item_url = f"https://ddragon.leagueoflegends.com/cdn/{self.version}/img/tft-item/{item_name}.png"
+                            item_img = await self.download_image(item_url)
+                            
+                            if item_img:
+                                try:
+                                    item_img = item_img.resize((item_size, item_size))
+                                    img.paste(item_img, (item_x + j * item_spacing, item_y))
+                                except Exception as e:
+                                    print(f"Error processing item image {item_name}: {str(e)}")
+                
+                except Exception as e:
+                    print(f"Error processing unit {champion_name}: {str(e)}")
+        
+        # Draw traits
+        traits_y = y_pos + 110  # Adjusted for larger champion size
+        traits_x = left_margin  # Start traits from the same position as units
+        trait_spacing = 8  # Increased from 4
+        active_traits = [trait for trait in player_data.get('traits', []) if trait.get('tier_current', 0) > 0]
+        active_traits.sort(key=lambda x: (-x['tier_current'], -x['style'], x['name']))
+        for trait in active_traits:
+            if traits_x + 48 + trait_spacing > width:  # Adjusted for new trait size
+                break
+            
+            if await self.draw_trait_icon(draw, img, traits_x, traits_y, trait['name'], trait['style'], trait['num_units']):
+                traits_x += 48 + trait_spacing  # Adjusted for new trait size
+
+        # Save and return image bytes
+        img_byte_arr = BytesIO()
+        img.save(img_byte_arr, format='PNG')
+        img_byte_arr.seek(0)
+        return img_byte_arr
+
+    @commands.command(name='last', aliases=['recent', '.lastmatch'])
+    async def last_match(self, ctx, member: discord.Member = None):
+        """Show your last TFT match"""
+        try:
+            # Get user settings
+            conn = self.bot.get_cog('UserSettings').get_db_connection()
+            cursor = conn.cursor()
+            
+            # Use mentioned member's ID if provided, otherwise use author's ID
+            discord_id = member.id if member else ctx.author.id
+            
+            try:
+                # Convert discord_id to string before query
+                discord_id_str = str(discord_id)
+                print(f"Looking up settings for discord_id: {discord_id_str}")
+                
+                cursor.execute('SELECT tft_name, tft_tag, region FROM tft_settings WHERE discord_id = %s', (discord_id_str,))
+                result = cursor.fetchone()
+                if not result:
+                    await ctx.send(f"This user has not set their name and tag yet. [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)")
+                    return
+                
+                name, tag, region = result
+                print(f"Found settings: name={name}, tag={tag}, region={region}")
+            except psycopg2.Error as db_error:
+                print(f"Database error in last_match: {str(db_error)}")
+                await ctx.send("Error accessing user settings. Please try again later.")
+                return
+            finally:
+                cursor.close()
+                conn.close()
+
+            # Add loading reaction with appropriate message
+            message = await ctx.send(f"Fetching {member.name}'s last match..." if member else "Fetching your last match...")
+            
+            # Get match data
+            puuid = await self.get_puuid(name, tag, region)
+            match_id = await self.get_last_match_id(puuid, region)
+            match_data = await self.get_match_details(match_id, region)
+            
+            # Create and send image
+            img_bytes = await self.create_match_image(match_data, puuid)
+            await message.delete()
+            # Get player's region for tactics.tools link
+            player_region = await self.get_player_region(puuid, region)
+            
+            # Generate tactics.tools link (convert 'oc' to 'oce' for tactics.tools)
+            link_region = 'oce' if player_region == 'oc' else player_region
+            tactics_link = f"https://tactics.tools/player/{link_region}/{name.replace(' ', '%20')}/{tag}/{match_id}"
+            
+            # Send image and link
+            await ctx.send(
+                content=f"<{tactics_link}>",
+                file=discord.File(img_bytes, 'last_match.png')
+            )
+            
+        except aiohttp.ClientError as e:
+            print(f"Network error in last_match: {str(e)}")
+            await ctx.send(f"Network error occurred while fetching data. Please try again later.")
+            return
+        except Exception as e:
+            error_location = ""
+            error_details = str(e)
+            
+            if "Failed to get PUUID" in error_details:
+                error_location = "getting PUUID"
+            elif "Failed to get match history" in error_details:
+                error_location = "fetching match history"
+            elif "Failed to get match details" in error_details:
+                error_location = "getting match details"
+            elif "Player not found in match data" in error_details:
+                error_location = "finding player data"
+            else:
+                error_location = "processing request"
+            
+            print(f"Error in last_match ({error_location}): {error_details}")
+            await ctx.send(f"An error occurred while {error_location}. Please check your name and region are correct. [.set ZTK#TFT americas or .setname ZTK#TFT americas] (americas, europe, asia, sea)")
+
+async def setup(bot, apikey, latest_version, set_number):
+    await bot.add_cog(Last(bot, apikey, latest_version, set_number))
