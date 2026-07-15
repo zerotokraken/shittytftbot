@@ -32,13 +32,13 @@
     },
     {
       "region": "la1",
-      "num_challenger_players": 30,
-      "num_grandmaster_players": 60
+      "num_challenger_players": 40,
+      "num_grandmaster_players": 80
     },
     {
       "region": "la2",
-      "num_challenger_players": 30,
-      "num_grandmaster_players": 60
+      "num_challenger_players": 40,
+      "num_grandmaster_players": 80
     },
     {
       "region": "me1",
