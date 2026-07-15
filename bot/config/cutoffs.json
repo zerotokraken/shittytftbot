@@ -12,18 +12,18 @@
     },
     {
       "region": "euw1",
-      "num_challenger_players": 200,
-      "num_grandmaster_players": 400
+      "num_challenger_players": 300,
+      "num_grandmaster_players": 600
     },
     {
       "region": "br1",
-      "num_challenger_players": 50,
-      "num_grandmaster_players": 100
+      "num_challenger_players": 75,
+      "num_grandmaster_players": 150
     },
     {
       "region": "jp1",
-      "num_challenger_players": 50,
-      "num_grandmaster_players": 100
+      "num_challenger_players": 75,
+      "num_grandmaster_players": 150
     },
     {
       "region": "kr",
@@ -72,18 +72,18 @@
     },
     {
       "region": "tr1",
-      "num_challenger_players": 50,
-      "num_grandmaster_players": 100
+      "num_challenger_players": 75,
+      "num_grandmaster_players": 150
     },
     {
       "region": "tw2",
-      "num_challenger_players": 50,
-      "num_grandmaster_players": 100
+      "num_challenger_players": 100,
+      "num_grandmaster_players": 150
     },
     {
       "region": "vn2",
-      "num_challenger_players": 450,
-      "num_grandmaster_players": 900
+      "num_challenger_players": 600,
+      "num_grandmaster_players": 1200
     }
   ]
 }
